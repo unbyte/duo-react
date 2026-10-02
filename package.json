@@ -4,7 +4,8 @@
   "private": true,
   "description": "A React device frame for iPhone Duo previews.",
   "files": [
-    "dist"
+    "dist",
+    "THIRD_PARTY_LICENSES"
   ],
   "type": "module",
   "sideEffects": [
@@ -37,6 +38,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/use-sync-external-store": "^1.5.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "lucide-react": "^1.49.0",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "typescript": "^7.0.2",
@@ -53,5 +55,8 @@
       "onFail": "download"
     }
   },
-  "packageManager": "pnpm@11.21.0"
+  "packageManager": "pnpm@11.21.0",
+  "inlinedDependencies": {
+    "lucide-react": "1.49.0"
+  }
 }

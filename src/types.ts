@@ -65,8 +65,19 @@ export interface DuoState {
   readonly posture: DuoPosture;
   readonly orientation: DuoOrientation;
   readonly innerPlacement: DuoPlacement;
+  /** Requested scale, or "fit" to let the frame calculate it from available space.
+   * A numeric 1 maps one logical app pixel to one preview CSS pixel.
+   */
   readonly zoom: DuoZoom;
+  /** Whether zoom actions are disabled because DuoFrame has a zoom prop without
+   * an onZoomChange callback. This is a permission flag, not another scale.
+   */
   readonly zoomReadOnly: boolean;
+  /** Actual scale last applied by the mounted frame, including the result of "fit".
+   * Undefined before measurement or after unmount; 0 when no space is available.
+   * Zoom buttons step from this value while zoom is "fit". App layout stays in logical pixels.
+   */
+  readonly renderedZoom?: number;
   readonly system: DuoSystem;
   readonly screens: Readonly<Record<DuoDisplay, DuoScreenInfo>>;
 }

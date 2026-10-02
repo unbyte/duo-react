@@ -147,35 +147,3 @@
   border-radius: 2px;
   background: #b3b3b3;
 }
-.duo-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 12px;
-  font:
-    500 13px/1.5 system-ui,
-    sans-serif;
-}
-.duo-toolbar label {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.duo-toolbar button,
-.duo-toolbar select {
-  min-height: 36px;
-  border: 1px solid #cbd2dc;
-  border-radius: 7px;
-  padding: 6px 12px;
-  font: inherit;
-  color: inherit;
-  background: transparent;
-}
-.duo-toolbar button {
-  cursor: pointer;
-}
-.duo-toolbar button:focus-visible,
-.duo-toolbar select:focus-visible {
-  outline: 2px solid #2168e8;
-  outline-offset: 3px;
-}

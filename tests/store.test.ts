@@ -129,3 +129,61 @@ test("unsupported indicator styles reject the whole system update", () => {
   ).toThrow(RangeError);
   expect(store.getSnapshot()).toBe(initial);
 });
+
+test("rotation uses calibrated orientations and exits split view atomically for portrait", () => {
+  const store = createDuoStore({ innerPlacement: "left" });
+  const listener = vi.fn();
+  store.subscribe(listener);
+  store.actions.rotate("left");
+  expect(listener).not.toHaveBeenCalled();
+  store.actions.rotate("right");
+  expect(store.getSnapshot()).toMatchObject({ orientation: "portrait", innerPlacement: "full" });
+  expect(listener).toHaveBeenCalledTimes(1);
+  store.actions.rotate("right");
+  expect(store.getSnapshot().orientation).toBe("landscape-right");
+  store.actions.rotate("right");
+  expect(listener).toHaveBeenCalledTimes(2);
+  store.actions.rotate("left");
+  expect(store.getSnapshot().orientation).toBe("portrait");
+});
+
+test("zoom steps start from measured fit and preserve logical screen geometry", () => {
+  const store = createDuoStore();
+  const disconnect = store.connectFrame();
+  const initial = store.getSnapshot();
+  store.actions.zoomIn();
+  expect(store.getSnapshot()).toBe(initial);
+  store.reportRenderedZoom(0.4);
+  expect(store.getSnapshot()).toMatchObject({ zoom: "fit", renderedZoom: 0.4 });
+  const measured = store.getSnapshot();
+  store.reportRenderedZoom(0.4);
+  expect(store.getSnapshot()).toBe(measured);
+  store.actions.zoomIn();
+  expect(store.getSnapshot().zoom).toBe(0.5);
+  store.actions.zoomOut();
+  expect(store.getSnapshot().zoom).toBeCloseTo(0.4);
+  expect(store.getSnapshot().screens).toBe(initial.screens);
+  store.actions.setZoom("fit");
+  store.reportRenderedZoom(0);
+  store.actions.zoomOut();
+  expect(store.getSnapshot().zoom).toBe("fit");
+  disconnect();
+  expect(store.getSnapshot().renderedZoom).toBeUndefined();
+});
+
+test("zoom steps respect controlled fit and fixed zoom", () => {
+  const store = createDuoStore();
+  const requested = vi.fn();
+  store.configureZoom("fit", requested);
+  store.reportRenderedZoom(0.4);
+  store.actions.zoomIn();
+  expect(requested).toHaveBeenLastCalledWith(0.5);
+  expect(store.getSnapshot().zoom).toBe("fit");
+  store.configureZoom(0.5, requested);
+  store.actions.zoomOut();
+  expect(requested).toHaveBeenLastCalledWith(0.4);
+  store.configureZoom(0.5);
+  store.actions.zoomIn();
+  expect(requested).toHaveBeenCalledTimes(2);
+  expect(store.getSnapshot().zoom).toBe(0.5);
+});

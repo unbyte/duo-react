@@ -34,7 +34,7 @@ while editing. `pnpm dev` starts the React 19 demo.
 
 Both demos have React and iframe content modes. Change a counter or enter text,
 switch the inner window between left, right, and full, then use the toolbar's
-Display selector to switch to the outer display and back. Content should keep
+display buttons to switch to the outer display and back. Content should keep
 its state. Both content modes contain only a counter
 and a text input. The Background selector previews light, dark, gray, and mixed
 content; Icons selects automatic, white, or black indicators. Switching content
@@ -70,7 +70,15 @@ regression suites during this iteration stage.
 ## Component usage
 
 ```tsx
-import { DuoFrame, DuoProvider, DuoToolbar } from "duo-frame";
+import {
+  DuoFrame,
+  DuoProvider,
+  DuoToolbar,
+  DuoDisplayControls,
+  DuoRotationControls,
+  DuoLayoutControls,
+  DuoZoomControls,
+} from "duo-frame";
 import "duo-frame/style.css";
 
 <DuoProvider
@@ -78,14 +86,45 @@ import "duo-frame/style.css";
   defaultSystem={{ time: "9:41", battery: 100 }}
 >
   <DuoFrame inner={<InnerApp />} outer={<OuterApp />} style={{ width: "100%", height: 640 }} />
-  <DuoToolbar />
+  <DuoToolbar className="preview-toolbar">
+    <DuoDisplayControls className="preview-group" />
+    <DuoRotationControls className="preview-group" />
+    <DuoLayoutControls className="preview-group" />
+    <DuoZoomControls className="preview-group" />
+  </DuoToolbar>
 </DuoProvider>;
 ```
 
-The toolbar's Display selector shows the inner display for the open posture and
+The display buttons select the inner display for the open posture and
 the outer display for the closed posture. Both app subtrees remain mounted while
 switching. Call `setPosture("open")` or `setPosture("closed")` through
 `useDuoActions()` to select the same states programmatically.
+
+The toolbar is headless. Each control group works independently anywhere under
+`DuoProvider`; omit or reorder groups as needed. `DuoToolbar` is an optional
+container and renders only its children. Each component forwards its div ref and
+accepts normal div attributes, including `className` and `style`. The demos supply
+the floating placement, pill backgrounds, and button styling.
+
+| Group                 | Buttons           | Behavior                                                             |
+| --------------------- | ----------------- | -------------------------------------------------------------------- |
+| `DuoDisplayControls`  | Inner, outer      | Selects the visible display without remounting apps                  |
+| `DuoRotationControls` | Left, right       | Steps through landscape-left, portrait, landscape-right              |
+| `DuoLayoutControls`   | Left, full, right | Hidden on the outer display; split layouts disabled in portrait      |
+| `DuoZoomControls`     | Out, in, fit      | Divides or multiplies the current scale by 1.25, or restores fitting |
+
+Rotation stops at the supported landscape orientations; upside-down portrait has
+no geometry profile. Rotating a split window into portrait selects full width.
+The same operations are available through `rotate("left" | "right")`, `zoomIn()`,
+and `zoomOut()` on `useDuoActions()`.
+
+Buttons include accessible names, tooltips, icons, and native disabled states;
+selection buttons expose `aria-pressed`. Style descendants with
+`[data-duo-action]`, `[aria-pressed="true"]`, and `:disabled`. Group roots expose
+`data-duo-toolbar-group` with `display`, `rotation`, `layout`, or `zoom`. Icons use
+`currentColor`; custom Duo icons mark their translucent fill with
+`data-duo-icon-tone="secondary"`. The used Lucide icons are bundled into the
+package, so consumers do not install an icon dependency.
 
 Mount one frame per provider. Separate providers create independent sessions.
 The frame forwards its root div through `ref` and accepts standard div attributes,
@@ -220,6 +259,19 @@ prop. A `zoom` prop without a callback is fixed and disables toolbar zoom change
 The provider's `zoom` reflects the effective value after the frame commits. A
 server render uses provider defaults; supply matching defaults for controlled
 zoom when server-rendering controls.
+
+`useDuoState()` exposes three distinct zoom fields:
+
+| Field          | Meaning                                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `zoom`         | Requested numeric scale or `"fit"` mode                                                                          |
+| `renderedZoom` | Scale last applied by the frame; `undefined` before measurement or after unmount, `0` when no space is available |
+| `zoomReadOnly` | Boolean indicating that the frame has a `zoom` prop without `onZoomChange`                                       |
+
+For example, a fitted frame may have `zoom: "fit"` and `renderedZoom: 0.5`.
+Zoom in then requests `zoom: 0.625`. Zoom in and out wait for a positive measured
+scale when fitting; fixed zoom disables all three zoom buttons. These values
+control presentation; app window dimensions remain in logical CSS pixels.
 
 The package can be imported and its frame shell server-rendered without browser
 globals. Portal app content mounts on the client after its host is attached.

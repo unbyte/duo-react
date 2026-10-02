@@ -114,7 +114,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   const store = useDuoStore();
   const state = useDuoState((value) => value);
   const root = React.useRef<HTMLDivElement>(null);
-  const [size, setSize] = React.useState({ width: 0, height: 0 });
+  const [size, setSize] = React.useState<{ width: number; height: number }>();
   React.useImperativeHandle(forwardedRef, () => root.current!, []);
   useBrowserLayoutEffect(() => store.connectFrame(), [store]);
   useBrowserLayoutEffect(() => {
@@ -126,7 +126,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       setSize((current) =>
-        current.width === width && current.height === height ? current : { width, height },
+        current?.width === width && current.height === height ? current : { width, height },
       );
     });
     observer.observe(node);
@@ -140,10 +140,13 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   const outset = frameOutset(active.display);
   const scale = resolveZoom(
     effectiveZoom,
-    size,
+    size ?? { width: 0, height: 0 },
     { width: active.size.width + outset * 2, height: active.size.height + outset * 2 },
     fitPadding,
   );
+  useBrowserLayoutEffect(() => {
+    if (size) store.reportRenderedZoom(scale);
+  }, [store, scale, size]);
   return (
     <div
       {...props}

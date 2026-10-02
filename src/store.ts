@@ -1,4 +1,5 @@
 import { getDuoGeometry, validateZoom } from "./geometry";
+import { rotatedOrientation } from "./view-controls";
 import type {
   DuoDefaults,
   DuoDisplay,
@@ -80,6 +81,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
   let model = initial;
   let frameConnected = false;
   let controlledZoom: DuoZoom | undefined;
+  let renderedZoom: number | undefined;
   let onZoomChange: ((zoom: DuoZoom) => void) | undefined;
   const listeners = new Set<Listener>();
   const windowListeners = new Set<(event: DuoWindowChange) => void>();
@@ -111,6 +113,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
       ...model,
       zoom: controlledZoom ?? model.zoom,
       zoomReadOnly: controlledZoom !== undefined && !onZoomChange,
+      renderedZoom,
       screens:
         previous?.screens.inner === screens.inner && previous.screens.outer === screens.outer
           ? previous.screens
@@ -127,6 +130,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
       next.innerPlacement === state.innerPlacement &&
       next.zoom === state.zoom &&
       next.zoomReadOnly === state.zoomReadOnly &&
+      next.renderedZoom === state.renderedZoom &&
       next.system === state.system
     )
       return;
@@ -155,11 +159,28 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     } else update({ zoom });
   }
 
+  function stepZoom(factor: number) {
+    const current = typeof state.zoom === "number" ? state.zoom : renderedZoom;
+    if (current === undefined || current <= 0) return;
+    const next = current * factor;
+    if (Number.isFinite(next) && next > 0) setZoom(next);
+  }
+
   const actions = Object.freeze({
     setPosture: (posture: DuoPosture) => update({ posture }),
     setOrientation: (orientation: DuoOrientation) => update({ orientation }),
+    rotate: (direction: "left" | "right") => {
+      const orientation = rotatedOrientation(model.orientation, direction);
+      if (orientation)
+        update({
+          orientation,
+          innerPlacement: orientation === "portrait" ? "full" : model.innerPlacement,
+        });
+    },
     setInnerPlacement: (innerPlacement: DuoPlacement) => update({ innerPlacement }),
     setZoom,
+    zoomIn: () => stepZoom(1.25),
+    zoomOut: () => stepZoom(1 / 1.25),
     setSystem: (values: DuoSystemOptions) => {
       const next = mergeSystem(model.system, values);
       if (next === model.system) return;
@@ -202,6 +223,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
         frameConnected = false;
         controlledZoom = undefined;
         onZoomChange = undefined;
+        renderedZoom = undefined;
         publish();
       };
     },
@@ -209,6 +231,13 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
       if (zoom !== undefined) validateZoom(zoom);
       controlledZoom = zoom;
       onZoomChange = onChange;
+      publish();
+    },
+    reportRenderedZoom: (zoom: number) => {
+      if (!Number.isFinite(zoom) || zoom < 0)
+        throw new RangeError("Rendered zoom must be nonnegative and finite.");
+      if (renderedZoom === zoom) return;
+      renderedZoom = zoom;
       publish();
     },
   };

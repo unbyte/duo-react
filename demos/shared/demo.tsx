@@ -4,6 +4,10 @@ import {
   DuoProvider,
   DuoSafeArea,
   DuoToolbar,
+  DuoDisplayControls,
+  DuoRotationControls,
+  DuoLayoutControls,
+  DuoZoomControls,
   useDuoActions,
   useDuoState,
   useDuoScreen,
@@ -174,7 +178,6 @@ export function Demo({ version }: { version: string }) {
             Iframe content
           </a>
         </nav>
-        <DuoToolbar />
         <BackgroundPicker value={background} onChange={setBackground} />
         <label className="demo-region-toggle">
           <input
@@ -222,6 +225,12 @@ export function Demo({ version }: { version: string }) {
           />
           {showRegions && <RegionOverlay frameRef={frame} stageRef={stage} />}
         </div>
+        <DuoToolbar className="demo-toolbar">
+          <DuoDisplayControls className="demo-toolbar-group" />
+          <DuoRotationControls className="demo-toolbar-group" />
+          <DuoLayoutControls className="demo-toolbar-group" />
+          <DuoZoomControls className="demo-toolbar-group" />
+        </DuoToolbar>
       </main>
     </DuoProvider>
   );

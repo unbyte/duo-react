@@ -1,7 +1,16 @@
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { DuoFrame, DuoProvider, useDuoState } from "../src";
+import {
+  DuoFrame,
+  DuoProvider,
+  DuoToolbar,
+  DuoDisplayControls,
+  DuoLayoutControls,
+  DuoRotationControls,
+  DuoZoomControls,
+  useDuoState,
+} from "../src";
 
 function ReadState() {
   const width = useDuoState((state) => state.screens.inner.window.width);
@@ -58,4 +67,28 @@ test("split chrome is passive and the home indicator is opt-in", () => {
   const hidden = render(false);
   expect(hidden).not.toContain('class="duo-divider"');
   expect(hidden).not.toContain('class="duo-home"');
+});
+
+test("headless control groups compose independently with the React 16.8 baseline", () => {
+  const standalone = renderToString(
+    <DuoProvider>
+      <DuoRotationControls className="my-rotation" />
+    </DuoProvider>,
+  );
+  expect(standalone).toContain('class="my-rotation"');
+  expect(standalone).toContain('aria-label="Rotate left"');
+  expect(standalone).not.toContain('data-duo-toolbar-group="zoom"');
+  const composed = renderToString(
+    <DuoProvider defaultState={{ posture: "closed" }}>
+      <DuoToolbar className="my-toolbar">
+        <DuoZoomControls />
+        <DuoDisplayControls />
+        <DuoLayoutControls />
+      </DuoToolbar>
+    </DuoProvider>,
+  );
+  expect(composed).toContain('class="duo-toolbar my-toolbar"');
+  expect(composed).toContain('aria-label="Zoom in"');
+  expect(composed).toContain('aria-label="Outer display"');
+  expect(composed).not.toContain('data-duo-toolbar-group="layout"');
 });

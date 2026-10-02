@@ -23,4 +23,11 @@ export type {
 } from "./types";
 export { DuoFrame, DuoSafeArea } from "./frame";
 export type { DuoFrameProps } from "./frame";
-export { DuoToolbar } from "./toolbar";
+export {
+  DuoToolbar,
+  DuoDisplayControls,
+  DuoRotationControls,
+  DuoLayoutControls,
+  DuoZoomControls,
+} from "./toolbar";
+export type { DuoToolbarProps, DuoControlGroupProps } from "./toolbar";
