@@ -1,0 +1,21 @@
+{
+  "name": "@duo-frame/demo-react16",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev --host 127.0.0.1 --port 5116 --strictPort",
+    "build": "vp build",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "duo-frame": "workspace:*",
+    "react": "16.14.0",
+    "react-dom": "16.14.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.14.0",
+    "@types/react-dom": "^16.9.0",
+    "vite-plus": "catalog:"
+  }
+}

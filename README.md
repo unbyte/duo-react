@@ -2,37 +2,35 @@
 
 A React device frame for previewing applications on iPhone Duo.
 
-This repository currently contains the Vite Plus library scaffold and a React
-preview page. The device component and asset CLI are not implemented yet. The
-generated library function and its unit test are temporary scaffold examples.
+The package targets React 16.8 through React 19. The workspace has separate
+React 16.14 and React 19.3 demos that consume the built package; library checks
+use React 16.8.6 and React 16 types to catch accidental newer API dependencies.
+The device component and asset CLI are not implemented yet.
 
-Read [the proposed design](DESIGN.md) to review the public API, screen layout,
-asset preparation, and rendering constraints before implementation.
+Read [the design](DESIGN.md) for the architecture and remaining rendering decisions.
 
 ## Development
 
-Use pnpm 11.21.0. The project includes Vite Plus locally, so a global `vp`
-installation is optional.
+Use pnpm 11.21.0. Vite Plus is installed locally and delegates dependency
+management to the pinned pnpm version.
 
 ```sh
 pnpm install
-pnpm dev
+pnpm dev:react19
+# In another terminal:
+pnpm dev:react16
 ```
 
-The development server prints the local preview URL. The preview currently shows
-the scaffold status; it does not render a device yet.
+The demos run at http://127.0.0.1:5119 and http://127.0.0.1:5116. Each command
+builds the library before starting its demo. Run `pnpm watch` in another terminal
+to rebuild the library while editing. `pnpm dev` starts the React 19 demo.
 
 ```sh
+pnpm build:demos
 pnpm check
-pnpm build
-pnpm build:preview
 pnpm test --run
 ```
 
-`build` packages the library with `vp pack`; `build:preview` builds the React
-preview. To use Vite Plus for dependency management, run `pnpm exec vp add` or
-`pnpm exec vp install`. Both use the project's pinned pnpm version.
-
-Commit each meaningful change after checking it. Use the preview for manual
-acceptance; add focused unit tests for geometry and state behavior as those
-features arrive. Early E2E and UI test suites are outside the current workflow.
+Commit meaningful changes after checking them. Use the demos for manual
+acceptance and focused unit tests for state and geometry; defer E2E and visual
+regression suites during this iteration stage.
