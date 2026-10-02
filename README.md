@@ -30,12 +30,11 @@ while editing. `pnpm dev` starts the React 19 demo.
 
 Both demos have React and iframe content modes. Change a counter or enter text,
 switch the inner window between left, right, and full, then close and reopen the
-device. Content should keep its state. The iframe mode also shows a document ID,
-native resize count, and parent layout notifications. Switching demo content
-modes reloads the page intentionally.
+device. Content should keep its state. Both content modes contain only a counter
+and a text input. Switching modes reloads the page intentionally.
 
-Use the container-width slider and zoom control to compare resizing with scaling.
-The parent supplies a definite height while the frame uses `height: 100%`.
+Resize the browser window and use the zoom control to compare resizing with
+scaling. The parent supplies a definite height while the frame uses `height: 100%`.
 Portrait requires full-screen placement; unsupported profiles are rejected.
 
 ```sh
