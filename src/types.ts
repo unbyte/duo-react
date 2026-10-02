@@ -1,6 +1,10 @@
 export type DuoDisplay = "inner" | "outer";
 export type DuoPlacement = "full" | "left" | "right";
-export type DuoOrientation = "portrait" | "landscape-left" | "landscape-right";
+export type DuoOrientation =
+  | "portrait"
+  | "portrait-upside-down"
+  | "landscape-left"
+  | "landscape-right";
 export type DuoPosture = "open" | "closed";
 export type DuoZoom = "fit" | number;
 export type DuoIndicatorStyle = "auto" | "light" | "dark";
@@ -31,6 +35,7 @@ export interface DuoReservedRegion extends DuoRect {
 export interface DuoScreenInfo {
   readonly display: DuoDisplay;
   readonly placement: DuoPlacement;
+  /** App layout orientation; the outer display retains its supported layout when upside down. */
   readonly orientation: DuoOrientation;
   readonly visible: boolean;
   readonly size: Readonly<{ width: number; height: number }>;
@@ -63,7 +68,12 @@ export interface DuoDefaults {
 
 export interface DuoState {
   readonly posture: DuoPosture;
+  /** Requested device orientation. Each screen reports its effective app layout separately. */
   readonly orientation: DuoOrientation;
+  /** Target clockwise angle in degrees from upright portrait. Accumulates beyond 360
+   * so repeated turns keep their direction. The frame animates toward this value.
+   */
+  readonly rotation: number;
   readonly innerPlacement: DuoPlacement;
   /** Requested scale, or "fit" to let the frame calculate it from available space.
    * A numeric 1 maps one logical app pixel to one preview CSS pixel.

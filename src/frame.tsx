@@ -5,6 +5,8 @@ import { ScreenContext, useBrowserLayoutEffect, useDuoState, useDuoStore } from 
 import type { DuoDisplay, DuoZoom } from "./types";
 import { SystemChrome } from "./system-chrome";
 import { frameBezel, frameOutset, Hardware } from "./hardware";
+import { orientationRotation, rotatedSize } from "./view-controls";
+import { useRotation } from "./use-rotation";
 import "./style.css";
 
 export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
@@ -61,7 +63,7 @@ function DisplaySurface({
         height: screen.size.height,
         marginLeft: -screen.size.width / 2,
         marginTop: -screen.size.height / 2,
-        transform: `scale(${scale})`,
+        transform: `scale(${scale}) rotate(${-orientationRotation[screen.orientation]}deg)`,
         visibility: screen.visible && scale > 0 ? "visible" : "hidden",
         borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(" "),
         boxShadow:
@@ -137,11 +139,15 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   if (!Number.isFinite(fitPadding) || fitPadding < 0)
     throw new RangeError("fitPadding must be a nonnegative finite number.");
   const active = state.screens[state.posture === "open" ? "inner" : "outer"];
+  const rotation = useRotation(state.rotation);
   const outset = frameOutset(active.display);
   const scale = resolveZoom(
     effectiveZoom,
     size ?? { width: 0, height: 0 },
-    { width: active.size.width + outset * 2, height: active.size.height + outset * 2 },
+    rotatedSize(
+      { width: active.size.width + outset * 2, height: active.size.height + outset * 2 },
+      rotation - orientationRotation[active.orientation],
+    ),
     fitPadding,
   );
   useBrowserLayoutEffect(() => {
@@ -154,12 +160,14 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
       className={["duo-frame", className].filter(Boolean).join(" ")}
       style={style}
     >
-      <DisplaySurface display="inner" scale={scale} showSystemUI={showSystemUI}>
-        {inner}
-      </DisplaySurface>
-      <DisplaySurface display="outer" scale={scale} showSystemUI={showSystemUI}>
-        {outer}
-      </DisplaySurface>
+      <div className="duo-rotation" style={{ transform: `rotate(${rotation}deg)` }}>
+        <DisplaySurface display="inner" scale={scale} showSystemUI={showSystemUI}>
+          {inner}
+        </DisplaySurface>
+        <DisplaySurface display="outer" scale={scale} showSystemUI={showSystemUI}>
+          {outer}
+        </DisplaySurface>
+      </div>
     </div>
   );
 });

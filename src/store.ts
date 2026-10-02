@@ -1,5 +1,5 @@
 import { getDuoGeometry, validateZoom } from "./geometry";
-import { rotatedOrientation } from "./view-controls";
+import { nearestRotation, orientationAtRotation, orientationRotation } from "./view-controls";
 import type {
   DuoDefaults,
   DuoDisplay,
@@ -16,7 +16,10 @@ import type {
 } from "./types";
 
 type Listener = () => void;
-type Model = Pick<DuoState, "posture" | "orientation" | "innerPlacement" | "zoom" | "system">;
+type Model = Pick<
+  DuoState,
+  "posture" | "orientation" | "rotation" | "innerPlacement" | "zoom" | "system"
+>;
 
 function mergeIndicatorStyles(current: DuoIndicatorStyles, patch?: Partial<DuoIndicatorStyles>) {
   const statusBar = patch?.statusBar ?? current.statusBar;
@@ -64,6 +67,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
   const initial: Model = {
     posture: defaults.posture ?? "open",
     orientation: defaults.orientation ?? "landscape-left",
+    rotation: orientationRotation[defaults.orientation ?? "landscape-left"],
     innerPlacement: defaults.innerPlacement ?? "full",
     zoom: defaults.zoom ?? "fit",
     system: mergeSystem(
@@ -91,11 +95,17 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     const screens = {} as Record<DuoDisplay, DuoScreenInfo>;
     for (const display of ["inner", "outer"] as const) {
       const old = previous?.screens[display];
+      // The closed upside-down source has no safe-area measurements. Keep the
+      // previous app layout while its complete surface rotates with the shell.
+      const orientation =
+        display === "outer" && model.orientation === "portrait-upside-down"
+          ? (old?.orientation ?? "portrait")
+          : model.orientation;
       const placement = display === "inner" ? model.innerPlacement : "full";
       const visible = display === "inner" ? model.posture === "open" : model.posture === "closed";
       const sameGeometry =
         old &&
-        old.orientation === model.orientation &&
+        old.orientation === orientation &&
         old.placement === placement &&
         (display === "outer" || previous.system.cameraActive === model.system.cameraActive);
       const geometry = sameGeometry
@@ -103,7 +113,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
         : getDuoGeometry({
             display,
             placement,
-            orientation: model.orientation,
+            orientation,
             cameraActive: model.system.cameraActive,
           });
       screens[display] =
@@ -127,10 +137,12 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     if (
       next.posture === state.posture &&
       next.orientation === state.orientation &&
+      next.rotation === state.rotation &&
       next.innerPlacement === state.innerPlacement &&
       next.zoom === state.zoom &&
       next.zoomReadOnly === state.zoomReadOnly &&
       next.renderedZoom === state.renderedZoom &&
+      next.screens === state.screens &&
       next.system === state.system
     )
       return;
@@ -139,12 +151,12 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     for (const listener of pending) listener();
   }
 
-  function update(patch: Partial<Model>) {
+  function update(patch: Partial<Model>, geometryState = state) {
     const previous = model;
     model = { ...model, ...patch };
     let next: DuoState;
     try {
-      next = snapshot(state);
+      next = snapshot(geometryState);
     } catch (error) {
       model = previous;
       throw error;
@@ -168,14 +180,19 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
 
   const actions = Object.freeze({
     setPosture: (posture: DuoPosture) => update({ posture }),
-    setOrientation: (orientation: DuoOrientation) => update({ orientation }),
+    setOrientation: (orientation: DuoOrientation) =>
+      update({
+        orientation,
+        rotation: nearestRotation(model.rotation, orientation),
+      }),
     rotate: (direction: "left" | "right") => {
-      const orientation = rotatedOrientation(model.orientation, direction);
-      if (orientation)
-        update({
-          orientation,
-          innerPlacement: orientation === "portrait" ? "full" : model.innerPlacement,
-        });
+      const rotation = model.rotation + (direction === "left" ? -90 : 90);
+      const orientation = orientationAtRotation(rotation);
+      update({
+        rotation,
+        orientation,
+        innerPlacement: orientation.startsWith("portrait") ? "full" : model.innerPlacement,
+      });
     },
     setInnerPlacement: (innerPlacement: DuoPlacement) => update({ innerPlacement }),
     setZoom,
@@ -188,7 +205,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     },
     resetView: () => setZoom(initial.zoom),
     resetDevice: () => {
-      update({ ...initial, zoom: model.zoom });
+      update({ ...initial, zoom: model.zoom }, serverSnapshot);
       setZoom(initial.zoom);
     },
   });

@@ -109,12 +109,27 @@ the floating placement, pill backgrounds, and button styling.
 | Group                 | Buttons           | Behavior                                                             |
 | --------------------- | ----------------- | -------------------------------------------------------------------- |
 | `DuoDisplayControls`  | Inner, outer      | Selects the visible display without remounting apps                  |
-| `DuoRotationControls` | Left, right       | Steps through landscape-left, portrait, landscape-right              |
+| `DuoRotationControls` | Left, right       | Rotates by 90° in either direction without stopping                  |
 | `DuoLayoutControls`   | Left, full, right | Hidden on the outer display; split layouts disabled in portrait      |
 | `DuoZoomControls`     | Out, in, fit      | Divides or multiplies the current scale by 1.25, or restores fitting |
 
-Rotation stops at the supported landscape orientations; upside-down portrait has
-no geometry profile. Rotating a split window into portrait selects full width.
+Rotation passes through all four positions, including `portrait-upside-down`.
+Each click adds or subtracts 90°; repeated turns retain their direction across
+360°. The frame animates the turn and fits the rotated bounds, including during
+the transition. Reduced-motion preferences disable the animation. Rotating a
+split window into either portrait position selects full width.
+
+`state.rotation` is the accumulated clockwise target angle from upright portrait;
+`state.orientation` is the requested device orientation. Each display's
+`screen.orientation` reports its effective app layout. The inner display has
+measured geometry for all four positions. The outer display has no upside-down
+safe-area profile, so its app and system controls retain their last supported
+layout and rotate together with the shell. Starting upside down uses portrait
+as that outer layout. This fallback is a preview policy, not calibrated native
+behavior. App state and iframe instances remain mounted throughout.
+
+`setOrientation()` selects the nearest equivalent angle without discarding full
+turns. `resetDevice()` restores the initial device orientation and angle.
 The same operations are available through `rotate("left" | "right")`, `zoomIn()`,
 and `zoomOut()` on `useDuoActions()`.
 

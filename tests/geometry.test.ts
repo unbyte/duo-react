@@ -1,4 +1,5 @@
 import { expect, test } from "vite-plus/test";
+import { rotatedSize } from "../src/view-controls";
 import { getDuoGeometry, resolveZoom, safeAreaStyle } from "../src/geometry";
 
 test("split windows preserve a common pixel density and local reserved-region coordinates", () => {
@@ -64,4 +65,30 @@ test("outer corners rotate with the hinge edge and camera", () => {
     const cameraCorner = bottom ? (right ? 2 : 3) : right ? 1 : 0;
     expect(screen.cornerRadii[cameraCorner]).toBe(59);
   }
+});
+
+test("upside-down inner profiles preserve measured camera and safe-area coordinates", () => {
+  const options = { display: "inner", orientation: "portrait-upside-down" } as const;
+  const screen = getDuoGeometry(options);
+  expect(screen.size).toEqual({ width: 669, height: 951 });
+  expect(screen.safeArea).toEqual({ top: 82, right: 0, bottom: 34, left: 0 });
+  expect(getDuoGeometry({ ...options, cameraActive: true }).reservedRegions).toEqual([
+    { type: "occlusion", x: 611, y: 677.33, width: 37, height: 58 },
+    { type: "occlusion", x: 535, y: 0, width: 134, height: 82 },
+  ]);
+  expect(() => getDuoGeometry({ ...options, display: "outer" })).toThrow("No measured Duo profile");
+});
+
+test("rotated fit includes intermediate diagonal bounds and both portrait directions", () => {
+  const size = { width: 700, height: 500 };
+  for (const angle of [90, -90, 450]) {
+    expect(rotatedSize(size, angle).width).toBeCloseTo(500);
+    expect(rotatedSize(size, angle).height).toBeCloseTo(700);
+  }
+  const diagonal = rotatedSize(size, 45);
+  expect(diagonal.width).toBeCloseTo(1200 / Math.sqrt(2));
+  expect(diagonal.height).toBeCloseTo(diagonal.width);
+  expect(
+    resolveZoom("fit", { width: 648, height: 648 }, diagonal, 24) * diagonal.width,
+  ).toBeCloseTo(600);
 });

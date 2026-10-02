@@ -130,21 +130,63 @@ test("unsupported indicator styles reject the whole system update", () => {
   expect(store.getSnapshot()).toBe(initial);
 });
 
-test("rotation uses calibrated orientations and exits split view atomically for portrait", () => {
+test("rotation continues in both directions and resets to the initial angle", () => {
   const store = createDuoStore({ innerPlacement: "left" });
   const listener = vi.fn();
   store.subscribe(listener);
+  const initial = store.getSnapshot();
+  for (const rotation of [180, 270, 360, 450, 540, 630, 720, 810]) {
+    store.actions.rotate("right");
+    expect(store.getSnapshot().rotation).toBe(rotation);
+  }
+  expect(store.getSnapshot().orientation).toBe(initial.orientation);
+  expect(listener).toHaveBeenCalledTimes(8);
+  for (let i = 0; i < 12; i++) store.actions.rotate("left");
+  expect(store.getSnapshot()).toMatchObject({ rotation: -270, orientation: initial.orientation });
+  store.actions.resetDevice();
+  expect(store.getSnapshot()).toMatchObject({ rotation: 90, innerPlacement: "left" });
+});
+
+test("upside-down inner geometry is measured while outer content retains its supported layout", () => {
+  const store = createDuoStore({ innerPlacement: "right" });
+  const previousOuter = store.getSnapshot().screens.outer;
+  store.actions.rotate("right");
+  expect(store.getSnapshot()).toMatchObject({
+    rotation: 180,
+    orientation: "portrait-upside-down",
+    innerPlacement: "full",
+  });
+  expect(store.getSnapshot().screens.inner.orientation).toBe("portrait-upside-down");
+  expect(store.getSnapshot().screens.outer).toBe(previousOuter);
+  store.actions.setPosture("closed");
+  expect(store.getSnapshot().screens.outer.orientation).toBe("landscape-left");
+  store.actions.rotate("right");
+  const fromRight = store.getSnapshot().screens.outer;
   store.actions.rotate("left");
-  expect(listener).not.toHaveBeenCalled();
-  store.actions.rotate("right");
-  expect(store.getSnapshot()).toMatchObject({ orientation: "portrait", innerPlacement: "full" });
-  expect(listener).toHaveBeenCalledTimes(1);
-  store.actions.rotate("right");
-  expect(store.getSnapshot().orientation).toBe("landscape-right");
-  store.actions.rotate("right");
-  expect(listener).toHaveBeenCalledTimes(2);
+  expect(store.getSnapshot().screens.outer).toBe(fromRight);
+  expect(
+    createDuoStore({ orientation: "portrait-upside-down" }).getSnapshot().screens.outer.orientation,
+  ).toBe("portrait");
+});
+
+test("explicit orientation selects a nearby turn without discarding accumulated rotations", () => {
+  const store = createDuoStore();
+  for (let i = 0; i < 8; i++) store.actions.rotate("right");
+  store.actions.setOrientation("portrait");
+  expect(store.getSnapshot()).toMatchObject({ rotation: 720, orientation: "portrait" });
+  store.actions.setOrientation("landscape-right");
+  expect(store.getSnapshot()).toMatchObject({ rotation: 630, orientation: "landscape-right" });
+});
+
+test("reset restores the initial outer fallback when starting upside down", () => {
+  const store = createDuoStore({ orientation: "portrait-upside-down" });
+  const initial = store.getSnapshot();
   store.actions.rotate("left");
-  expect(store.getSnapshot().orientation).toBe("portrait");
+  store.actions.rotate("right");
+  expect(store.getSnapshot().screens.outer.orientation).toBe("landscape-left");
+  expect(store.getSnapshot().rotation).toBe(initial.rotation);
+  store.actions.resetDevice();
+  expect(store.getSnapshot().screens).toEqual(initial.screens);
 });
 
 test("zoom steps start from measured fit and preserve logical screen geometry", () => {

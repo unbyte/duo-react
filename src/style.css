@@ -6,6 +6,13 @@
   overflow: hidden;
   isolation: isolate;
 }
+.duo-rotation {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
 .duo-display {
   --duo-bezel-color: #151618;
   --duo-rim-color: #515357;

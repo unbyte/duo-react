@@ -30,7 +30,12 @@ test("the outer cutout uses measured coordinates and only shifts status when abo
 
 test("status stays in the reserved edge strip in all supported orientations", () => {
   const store = createDuoStore();
-  for (const orientation of ["portrait", "landscape-left", "landscape-right"] as const) {
+  for (const orientation of [
+    "portrait",
+    "portrait-upside-down",
+    "landscape-left",
+    "landscape-right",
+  ] as const) {
     store.actions.setOrientation(orientation);
     for (const screen of Object.values(store.getSnapshot().screens)) {
       const { status } = getSystemLayout(screen);

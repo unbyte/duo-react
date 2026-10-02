@@ -93,7 +93,7 @@ export function RegionOverlay({
   );
   const cameraActive = useDuoState((state) => state.system.cameraActive);
   const [layout, setLayout] = React.useState<{
-    display: DuoRect;
+    transform: DOMMatrix;
     frame: DuoRect;
     width: number;
   }>();
@@ -102,12 +102,21 @@ export function RegionOverlay({
     const stage = stageRef.current;
     const frame = frameRef.current;
     const display = frame?.querySelector(`[data-duo-display="${screen.display}"]`);
-    if (!stage || !frame || !display) return;
+    const rotation = frame?.querySelector(".duo-rotation");
+    if (!stage || !frame || !display || !rotation) return;
     let pending = 0;
     const measure = () => {
       const origin = stage.getBoundingClientRect();
+      const bounds = relativeRect(display, origin);
+      // Both transforms share the display center. Map logical coordinates through
+      // the same matrix as the frame, including turns between calibrated layouts.
+      const transform = new DOMMatrix()
+        .translate(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2)
+        .multiply(new DOMMatrix(getComputedStyle(rotation).transform))
+        .multiply(new DOMMatrix(getComputedStyle(display).transform))
+        .translate(-screen.size.width / 2, -screen.size.height / 2);
       setLayout({
-        display: relativeRect(display, origin),
+        transform,
         frame: relativeRect(frame, origin),
         width: origin.width,
       });
@@ -123,6 +132,7 @@ export function RegionOverlay({
     // A zoom transform changes viewport bounds without resizing the logical display.
     const mutation = new MutationObserver(schedule);
     mutation.observe(display, { attributes: true, attributeFilter: ["style"] });
+    mutation.observe(rotation, { attributes: true, attributeFilter: ["style"] });
     return () => {
       cancelAnimationFrame(pending);
       resize.disconnect();
@@ -130,9 +140,8 @@ export function RegionOverlay({
     };
   }, [frameRef, stageRef, screen]);
 
-  if (!layout || layout.display.width <= 0) return null;
-  const { display, frame, width } = layout;
-  const scale = display.width / screen.size.width;
+  if (!layout) return null;
+  const { transform, frame, width } = layout;
   const regions = getRegions(screen, cameraActive);
   const boundaries = {
     display: { bounds: { x: 0, y: 0, ...screen.size }, radii: screen.cornerRadii },
@@ -144,13 +153,16 @@ export function RegionOverlay({
     .map((region, index) => {
       const x = below ? 24 : frame.x + frame.width + 24;
       const y = (below ? frame.y + frame.height + 28 : 32) + index * 36;
-      const left = Math.max(frame.x, display.x + region.x * scale);
-      const top = Math.max(frame.y, display.y + region.y * scale);
-      const right = Math.min(frame.x + frame.width, display.x + (region.x + region.width) * scale);
-      const bottom = Math.min(
-        frame.y + frame.height,
-        display.y + (region.y + region.height) * scale,
-      );
+      const corners = [
+        { x: region.x, y: region.y },
+        { x: region.x + region.width, y: region.y },
+        { x: region.x + region.width, y: region.y + region.height },
+        { x: region.x, y: region.y + region.height },
+      ].map((point) => transform.transformPoint(point));
+      const left = Math.max(frame.x, Math.min(...corners.map((point) => point.x)));
+      const top = Math.max(frame.y, Math.min(...corners.map((point) => point.y)));
+      const right = Math.min(frame.x + frame.width, Math.max(...corners.map((point) => point.x)));
+      const bottom = Math.min(frame.y + frame.height, Math.max(...corners.map((point) => point.y)));
       return {
         region,
         x,
@@ -194,7 +206,7 @@ export function RegionOverlay({
         ))}
       </defs>
       <g clipPath="url(#demo-frame-clip)">
-        <g transform={`translate(${display.x} ${display.y}) scale(${scale})`}>
+        <g transform={transform.toString()}>
           <g clipPath="url(#demo-display-clip)">
             {regions.map((region, index) => (
               <g

@@ -24,8 +24,8 @@ const outerButtons = [
 ] as const;
 
 const rotation: Record<DuoDisplay, Record<DuoOrientation, number>> = {
-  inner: { "landscape-left": 0, "landscape-right": 180, portrait: -90 },
-  outer: { "landscape-left": 90, "landscape-right": -90, portrait: 0 },
+  inner: { "landscape-left": 0, "landscape-right": 180, portrait: -90, "portrait-upside-down": 90 },
+  outer: { "landscape-left": 90, "landscape-right": -90, portrait: 0, "portrait-upside-down": 180 },
 };
 
 export function Hardware({

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Maximize, RotateCcwSquare, RotateCwSquare, ZoomIn, ZoomOut } from "lucide-react";
 import { useDuoActions, useDuoState } from "./provider";
-import { rotatedOrientation } from "./view-controls";
 import type { DuoPlacement } from "./types";
 
 export type DuoToolbarProps = React.HTMLAttributes<HTMLDivElement>;
@@ -131,7 +130,6 @@ export const DuoDisplayControls = React.forwardRef<HTMLDivElement, DuoControlGro
 
 export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGroupProps>(
   function DuoRotationControls(props, ref) {
-    const orientation = useDuoState((state) => state.orientation);
     const { rotate } = useDuoActions();
     return (
       <div
@@ -141,20 +139,10 @@ export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGr
         {...props}
         ref={ref}
       >
-        <IconButton
-          label="Rotate left"
-          action="rotate-left"
-          disabled={!rotatedOrientation(orientation, "left")}
-          onClick={() => rotate("left")}
-        >
+        <IconButton label="Rotate left" action="rotate-left" onClick={() => rotate("left")}>
           <RotateCcwSquare {...iconProps} />
         </IconButton>
-        <IconButton
-          label="Rotate right"
-          action="rotate-right"
-          disabled={!rotatedOrientation(orientation, "right")}
-          onClick={() => rotate("right")}
-        >
+        <IconButton label="Rotate right" action="rotate-right" onClick={() => rotate("right")}>
           <RotateCwSquare {...iconProps} />
         </IconButton>
       </div>
@@ -185,7 +173,9 @@ export const DuoLayoutControls = React.forwardRef<HTMLDivElement, DuoControlGrou
             }
             action={`layout-${placement}`}
             aria-pressed={state.innerPlacement === placement}
-            disabled={placement !== "full" && state.orientation === "portrait"}
+            disabled={
+              placement !== "full" && state.screens.inner.orientation.startsWith("portrait")
+            }
             onClick={() => setInnerPlacement(placement)}
           >
             <LayoutIcon placement={placement} />
