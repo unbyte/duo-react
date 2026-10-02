@@ -30,8 +30,9 @@ commands build the library first; run `pnpm watch` in another terminal to rebuil
 while editing. `pnpm dev` starts the React 19 demo.
 
 Both demos have React and iframe content modes. Change a counter or enter text,
-switch the inner window between left, right, and full, then close and reopen the
-device. Content should keep its state. Both content modes contain only a counter
+switch the inner window between left, right, and full, then use the toolbar's
+Display selector to switch to the outer display and back. Content should keep
+its state. Both content modes contain only a counter
 and a text input. Switching modes reloads the page intentionally.
 
 Resize the browser window and use the zoom control to compare resizing with
@@ -69,6 +70,11 @@ import "duo-frame/style.css";
   <DuoToolbar />
 </DuoProvider>;
 ```
+
+The toolbar's Display selector shows the inner display for the open posture and
+the outer display for the closed posture. Both app subtrees remain mounted while
+switching. Call `setPosture("open")` or `setPosture("closed")` through
+`useDuoActions()` to select the same states programmatically.
 
 Mount one frame per provider. Separate providers create independent sessions.
 The frame forwards its root div through `ref` and accepts standard div attributes,

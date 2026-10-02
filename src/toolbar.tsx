@@ -14,13 +14,18 @@ export const DuoToolbar = React.forwardRef<HTMLDivElement, React.HTMLAttributes<
         ref={ref}
         className={["duo-toolbar", className].filter(Boolean).join(" ")}
       >
-        <button
-          type="button"
-          aria-pressed={state.posture === "closed"}
-          onClick={() => actions.setPosture(state.posture === "open" ? "closed" : "open")}
-        >
-          {state.posture === "open" ? "Close device" : "Open device"}
-        </button>
+        <label>
+          Display
+          <select
+            value={state.posture === "open" ? "inner" : "outer"}
+            onChange={(event) =>
+              actions.setPosture(event.currentTarget.value === "inner" ? "open" : "closed")
+            }
+          >
+            <option value="inner">Inner display</option>
+            <option value="outer">Outer display</option>
+          </select>
+        </label>
         <label>
           Orientation
           <select
