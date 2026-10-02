@@ -93,6 +93,10 @@ The frame forwards its root div through `ref` and accepts standard div attribute
 package exports can import `duo-frame/dist/style.css`. `showSystemUI={false}` hides
 the passive system indicators while retaining the outer display's camera cutout.
 
+The device has no built-in cast shadow. To add one around its silhouette, pass
+`style={{ filter: "drop-shadow(0 12px 20px rgb(0 0 0 / 18%))" }}` to `DuoFrame`,
+or apply the same filter through `className`.
+
 The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
 level changes the arc's fill; charging displays a lightning mark. These indicators
 have no click or gesture behavior. The SVG is drawn from the supplied image with

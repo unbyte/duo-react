@@ -66,8 +66,8 @@ function DisplaySurface({
         borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(" "),
         boxShadow:
           display === "inner"
-            ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-rim-color), 0 18px 70px #0003`
-            : "0 18px 70px #0003",
+            ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-rim-color)`
+            : undefined,
       }}
     >
       <Hardware display={display} orientation={screen.orientation} />
