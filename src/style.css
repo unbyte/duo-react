@@ -45,12 +45,15 @@
   mix-blend-mode: difference;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: proportional-nums;
   text-align: center;
   white-space: nowrap;
 }
-.duo-status svg {
+.duo-status > span {
   flex-shrink: 0;
+}
+.duo-status-glyph,
+.duo-status-glyph svg {
   display: block;
 }
 .duo-home {

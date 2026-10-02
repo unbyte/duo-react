@@ -1,16 +1,18 @@
 import { getDuoGeometry } from "./geometry";
 import type { DuoRect, DuoScreenInfo } from "./types";
 
-// Artwork sizes are app CSS pixels; only the camera bounds come from measured regions.
+// Reference-image pixels mapped to app CSS pixels using the provisional camera cutout.
+// This matches the supplied crop's proportions, not a confirmed physical-hole measurement.
+const referenceScale = 37 / 94;
 export const systemMetrics = {
-  glyphWidth: 44,
-  glyphHeight: 52,
+  glyphWidth: 104 * referenceScale,
+  glyphHeight: 108 * referenceScale,
   timeWidth: 44,
   fontSize: 16,
   lineHeight: 20,
-  gap: 6,
+  gap: 7,
   top: 24,
-  cameraGap: 8,
+  cameraGap: 18,
   homeWidth: 120,
   homeHeight: 5,
   homeBottom: 7,
@@ -50,9 +52,9 @@ export function getSystemLayout(screen: DuoScreenInfo) {
         ? camera.y + camera.height + metrics.cameraGap
         : metrics.top;
     status = {
-      x: center - metrics.glyphWidth / 2,
+      x: center - metrics.timeWidth / 2,
       y: top,
-      width: metrics.glyphWidth,
+      width: metrics.timeWidth,
       height: metrics.lineHeight + metrics.gap + metrics.glyphHeight,
     };
   }

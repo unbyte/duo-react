@@ -4,8 +4,8 @@ A React device frame for previewing applications on iPhone Duo.
 
 The current implementation is a flat layout prototype: a provider, persistent
 inner and outer app surfaces, measured window geometry, safe-area CSS properties,
-zoom, passive system indicators, and an optional toolbar. Status glyphs follow
-the reference project; their sizes still need visual acceptance. The device
+zoom, passive system indicators, and an optional toolbar. Status artwork follows
+the supplied image; its scale calibration still needs visual acceptance. The device
 outline is schematic. Apple's model, calibrated bezel, folding animation,
 hardware events, and asset CLI are not implemented yet.
 
@@ -84,12 +84,15 @@ the passive system indicators while retaining the outer display's camera cutout.
 
 The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
 level changes the arc's fill; charging displays a lightning mark. These indicators
-have no click or gesture behavior. Their vector paths follow the reference
-project, with attribution in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+have no click or gesture behavior. The SVG is drawn from the supplied image with
+a common center for the battery, Wi-Fi, and cellular dots. See the
+[reference measurements](docs/references/status-controls.md) for proportions and
+calibration assumptions.
 
 The status group occupies the full display's safe-area edge strip, independently
 of app placement. The outer camera cutout uses the square occlusion region in the
-geometry profile; the inner display has no visible camera cutout. The home
+geometry profile as a provisional approximation of the visible hole; the inner
+display has no visible camera cutout. The home
 indicator is centered beneath the current app window, including split windows.
 Artwork dimensions and spacing are defined in `src/system-layout.ts` in app CSS
 pixels and scale with the screen. The safe-area dataset establishes the available
