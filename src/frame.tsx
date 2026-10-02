@@ -53,6 +53,7 @@ function DisplaySurface({
       ref={surface}
       className="duo-display"
       data-duo-display={display}
+      data-duo-placement={screen.placement}
       aria-hidden={!screen.visible}
       style={{
         width: screen.size.width,
@@ -73,6 +74,7 @@ function DisplaySurface({
           top: bounds.y,
           width: bounds.width,
           height: bounds.height,
+          borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
           ...safeAreaStyle(screen.safeArea),
         }}
       />

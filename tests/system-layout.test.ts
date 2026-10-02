@@ -6,12 +6,14 @@ test("status belongs to the display while the home indicator follows the app win
   const store = createDuoStore();
   const full = getSystemLayout(store.getSnapshot().screens.inner);
   expect(full.home.x + full.home.width / 2).toBe(951 / 2);
+  expect(full.divider).toBeUndefined();
   for (const placement of ["left", "right"] as const) {
     store.actions.setInnerPlacement(placement);
     const screen = store.getSnapshot().screens.inner;
     const layout = getSystemLayout(screen);
     expect(layout.status).toEqual(full.status);
     expect(layout.home.x + layout.home.width / 2).toBe(screen.window.x + screen.window.width / 2);
+    expect(layout.divider).toEqual({ x: 473.5, y: 310.5, width: 4, height: 48 });
   }
 });
 

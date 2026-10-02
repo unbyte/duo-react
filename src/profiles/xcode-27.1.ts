@@ -1,6 +1,6 @@
 import type { DuoScreenInfo } from "../types";
 
-interface Profile extends Omit<DuoScreenInfo, "visible"> {
+interface Profile extends Omit<DuoScreenInfo, "visible" | "windowCornerRadii"> {
   readonly cameraActive: boolean;
 }
 

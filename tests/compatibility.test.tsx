@@ -34,4 +34,28 @@ test("frame can be server-rendered without browser globals", () => {
   );
   expect(html).toContain('data-duo-window="inner"');
   expect(html).toContain('data-duo-window="outer"');
+  expect(html).not.toContain('class="duo-home"');
+  expect(html).not.toContain('class="duo-divider"');
+});
+
+test("split chrome is passive and the home indicator is opt-in", () => {
+  const render = (showSystemUI: boolean) =>
+    renderToString(
+      <DuoProvider
+        defaultState={{ innerPlacement: "right" }}
+        defaultSystem={{ homeIndicatorVisible: true }}
+      >
+        <DuoFrame
+          inner={<span>Inner</span>}
+          outer={<span>Outer</span>}
+          showSystemUI={showSystemUI}
+        />
+      </DuoProvider>,
+    );
+  const visible = render(true);
+  expect(visible).toContain('class="duo-divider"');
+  expect(visible).toContain('class="duo-home"');
+  const hidden = render(false);
+  expect(hidden).not.toContain('class="duo-divider"');
+  expect(hidden).not.toContain('class="duo-home"');
 });

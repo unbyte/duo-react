@@ -8,6 +8,9 @@ test("split windows preserve a common pixel density and local reserved-region co
   expect(left.window).toEqual({ x: 0, y: 0, width: 469, height: 669 });
   expect(right.window).toEqual({ x: 482, y: 0, width: 469, height: 669 });
   expect(left.reservedRegions).toEqual([]);
+  expect(left.cornerRadii).toEqual([55, 55, 55, 55]);
+  expect(left.windowCornerRadii).toEqual([55, 32, 32, 55]);
+  expect(right.windowCornerRadii).toEqual([32, 55, 55, 32]);
   expect(right.reservedRegions[0]).toEqual({
     type: "occlusion",
     x: 195.33,
@@ -30,6 +33,7 @@ test("portrait profiles and the outer display retain their reported asymmetry", 
   expect(inner.safeArea.top).toBe(82);
   expect(outer.window).toMatchObject({ width: 466, height: 678 });
   expect(outer.cornerRadii).toEqual([8, 59, 59, 8]);
+  expect(outer.windowCornerRadii).toEqual(outer.cornerRadii);
   expect(() =>
     getDuoGeometry({ display: "inner", orientation: "portrait", placement: "left" }),
   ).toThrow("No measured Duo profile");

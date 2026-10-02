@@ -71,6 +71,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
         battery: 100,
         charging: false,
         cameraActive: false,
+        homeIndicatorVisible: false,
         indicatorStyles: Object.freeze({ inner: indicatorStyles, outer: indicatorStyles }),
       }),
       system,

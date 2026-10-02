@@ -30,6 +30,14 @@ export function getDuoGeometry({
   );
   if (!profile)
     throw new RangeError(`No measured Duo profile for ${display}/${orientation}/${placement}.`);
+  // Divider-facing corners are estimated from the Split View illustration, not simulator data.
+  const splitRadius = 32;
+  const windowCornerRadii: DuoScreenInfo["windowCornerRadii"] =
+    placement === "left"
+      ? [profile.cornerRadii[0], splitRadius, splitRadius, profile.cornerRadii[3]]
+      : placement === "right"
+        ? [splitRadius, profile.cornerRadii[1], profile.cornerRadii[2], splitRadius]
+        : [...profile.cornerRadii];
   return {
     display,
     orientation,
@@ -38,6 +46,7 @@ export function getDuoGeometry({
     window: Object.freeze({ ...profile.window }),
     safeArea: Object.freeze({ ...profile.safeArea }),
     cornerRadii: Object.freeze([...profile.cornerRadii]) as DuoScreenInfo["cornerRadii"],
+    windowCornerRadii: Object.freeze(windowCornerRadii),
     reservedRegions: Object.freeze(
       profile.reservedRegions.map((region) => Object.freeze({ ...region })),
     ),

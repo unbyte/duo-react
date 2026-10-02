@@ -27,6 +27,10 @@
   color: #17202a;
   background: #f7f9fc;
 }
+.duo-display[data-duo-placement="left"],
+.duo-display[data-duo-placement="right"] {
+  background: #000;
+}
 .duo-system {
   position: absolute;
   inset: 0;
@@ -69,6 +73,11 @@
   position: absolute;
   border-radius: 3px;
   background: currentColor;
+}
+.duo-divider {
+  position: absolute;
+  border-radius: 2px;
+  background: #b3b3b3;
 }
 .duo-toolbar {
   display: flex;

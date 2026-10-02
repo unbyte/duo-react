@@ -15,7 +15,9 @@ export function SystemChrome({
   screen: DuoScreenInfo;
   showIndicators: boolean;
 }) {
-  const { time, battery, charging, indicatorStyles } = useDuoState((state) => state.system);
+  const { time, battery, charging, indicatorStyles, homeIndicatorVisible } = useDuoState(
+    (state) => state.system,
+  );
   const appearance = indicatorStyles[screen.display];
   const layout = React.useMemo(() => getSystemLayout(screen), [screen]);
   return (
@@ -23,6 +25,7 @@ export function SystemChrome({
       {layout.camera && <div className="duo-camera-cutout" style={boundsStyle(layout.camera)} />}
       {showIndicators && (
         <>
+          {layout.divider && <div className="duo-divider" style={boundsStyle(layout.divider)} />}
           <div
             className="duo-status"
             data-duo-indicator-style={appearance.statusBar}
@@ -42,11 +45,13 @@ export function SystemChrome({
               <StatusGlyph battery={battery} charging={charging} />
             </span>
           </div>
-          <div
-            className="duo-home"
-            data-duo-indicator-style={appearance.homeIndicator}
-            style={boundsStyle(layout.home)}
-          />
+          {homeIndicatorVisible && (
+            <div
+              className="duo-home"
+              data-duo-indicator-style={appearance.homeIndicator}
+              style={boundsStyle(layout.home)}
+            />
+          )}
         </>
       )}
     </div>

@@ -16,6 +16,8 @@ export const systemMetrics = {
   homeWidth: 120,
   homeHeight: 5,
   homeBottom: 7,
+  dividerWidth: 4,
+  dividerHeight: 48,
 } as const;
 
 export function getSystemLayout(screen: DuoScreenInfo) {
@@ -63,6 +65,15 @@ export function getSystemLayout(screen: DuoScreenInfo) {
     camera,
     status,
     horizontal,
+    divider:
+      screen.display === "inner" && screen.placement !== "full"
+        ? {
+            x: (size.width - metrics.dividerWidth) / 2,
+            y: (size.height - metrics.dividerHeight) / 2,
+            width: metrics.dividerWidth,
+            height: metrics.dividerHeight,
+          }
+        : undefined,
     home: {
       x: screen.window.x + (screen.window.width - metrics.homeWidth) / 2,
       y: screen.window.y + screen.window.height - metrics.homeBottom - metrics.homeHeight,

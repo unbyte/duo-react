@@ -38,6 +38,7 @@ export interface DuoScreenInfo {
   readonly safeArea: DuoInsets;
   readonly reservedRegions: readonly DuoReservedRegion[];
   readonly cornerRadii: readonly [number, number, number, number];
+  readonly windowCornerRadii: readonly [number, number, number, number];
 }
 
 export interface DuoSystem {
@@ -45,6 +46,7 @@ export interface DuoSystem {
   readonly battery: number;
   readonly charging: boolean;
   readonly cameraActive: boolean;
+  readonly homeIndicatorVisible: boolean;
   readonly indicatorStyles: Readonly<Record<DuoDisplay, DuoIndicatorStyles>>;
 }
 
