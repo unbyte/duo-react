@@ -9,8 +9,9 @@ the supplied image; its scale calibration still needs visual acceptance. The dev
 outline is schematic. Apple's model, calibrated bezel, folding animation,
 hardware events, and asset CLI are not implemented yet.
 
-Read [the design](DESIGN.md) for the architecture and rendering decisions still
-needed before the 3D implementation.
+Read [the design](docs/design.md) for the architecture and rendering decisions still
+needed before the 3D implementation. The [calibration review](docs/calibration/README.md)
+records control measurements, reference data, and remaining accuracy gaps.
 
 ## Preview and development
 
@@ -86,14 +87,14 @@ The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
 level changes the arc's fill; charging displays a lightning mark. These indicators
 have no click or gesture behavior. The SVG is drawn from the supplied image with
 a common center for the battery, Wi-Fi, and cellular dots. See the
-[reference measurements](docs/references/status-controls.md) for proportions and
+[reference measurements](docs/calibration/status-controls.md) for proportions and
 calibration assumptions.
 
 The status group occupies the full display's safe-area edge strip, independently
 of app placement. The outer camera cutout uses the square occlusion region in the
 geometry profile as a provisional approximation of the visible hole; the inner
-display has no visible camera cutout. The home
-indicator is centered beneath the current app window, including split windows.
+display currently renders no camera visual, including when `cameraActive` adds
+a reserved region. The home indicator is centered beneath the current app window, including split windows.
 Artwork dimensions and spacing are defined in `src/system-layout.ts` in app CSS
 pixels and scale with the screen. The safe-area dataset establishes the available
 regions, not exact icon sizes or native status layouts in every orientation;
@@ -143,7 +144,10 @@ checks. The library does not inject code into consumer iframe documents.
 With no frame `zoom` prop, provider actions control zoom. `"fit"` fits the active
 display into the container with `fitPadding` (24px by default). A positive finite
 number sets the scale: `1` renders one app CSS pixel as one preview CSS pixel.
-Changing scale does not change app-window measurements; numeric zoom can crop.
+Changing scale leaves context window dimensions and CSS layout sizes unchanged;
+`getBoundingClientRect()` includes the transform and reports visual bounds in the
+containing document. Measurements inside an iframe use its own viewport. Numeric
+zoom can crop.
 
 For controlled zoom, pass `zoom` and `onZoomChange` to `DuoFrame`. Toolbar and
 provider actions request changes through the callback; the caller updates the

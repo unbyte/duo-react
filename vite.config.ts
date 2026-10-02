@@ -16,5 +16,8 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-  fmt: {},
+  fmt: {
+    // Preserve reference snapshots byte for byte so their provenance hashes stay valid.
+    ignorePatterns: ["docs/calibration/sources/**"],
+  },
 });
