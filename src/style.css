@@ -31,28 +31,34 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  color: #fff;
-  mix-blend-mode: difference;
-  font:
-    600 16px/1.2 system-ui,
-    sans-serif;
+}
+.duo-camera-cutout {
+  position: absolute;
+  border-radius: 50%;
+  background: #000;
 }
 .duo-status {
   position: absolute;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-direction: column;
-  gap: 12px;
+  color: #fff;
+  mix-blend-mode: difference;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+.duo-status svg {
+  flex-shrink: 0;
+  display: block;
 }
 .duo-home {
   position: absolute;
-  width: 130px;
-  height: 5px;
-  bottom: 9px;
-  border-radius: 4px;
-  background: currentColor;
-  transform: translateX(-50%);
+  border-radius: 3px;
+  background: #fff;
+  opacity: 0.6;
+  mix-blend-mode: difference;
 }
 .duo-toolbar {
   display: flex;

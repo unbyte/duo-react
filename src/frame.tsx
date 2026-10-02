@@ -1,8 +1,9 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
-import { getDuoGeometry, resolveZoom, safeAreaStyle, validateZoom } from "./geometry";
+import { resolveZoom, safeAreaStyle, validateZoom } from "./geometry";
 import { ScreenContext, useBrowserLayoutEffect, useDuoState, useDuoStore } from "./provider";
-import type { DuoDisplay, DuoScreenInfo, DuoZoom } from "./types";
+import type { DuoDisplay, DuoZoom } from "./types";
+import { SystemChrome } from "./system-chrome";
 import "./style.css";
 
 export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
@@ -12,50 +13,6 @@ export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   onZoomChange?: (zoom: DuoZoom) => void;
   fitPadding?: number;
   showSystemUI?: boolean;
-}
-
-function SystemChrome({ screen }: { screen: DuoScreenInfo }) {
-  const system = useDuoState((state) => state.system);
-  const { safeArea, size } = React.useMemo(
-    () =>
-      getDuoGeometry({
-        display: screen.display,
-        orientation: screen.orientation,
-        cameraActive: system.cameraActive,
-      }),
-    [screen.display, screen.orientation, system.cameraActive],
-  );
-  const side = safeArea.right > 0 ? "right" : "left";
-  return (
-    <div className="duo-system" aria-hidden="true">
-      <div
-        className="duo-status"
-        style={
-          safeArea.top > 0
-            ? { left: 32, right: 32, top: 24, flexDirection: "row" }
-            : { [side]: 16, top: 28, width: 52 }
-        }
-      >
-        <span>{system.time}</span>
-        <svg width="30" height="15" viewBox="0 0 30 15" fill="none">
-          <rect x="1" y="1" width="24" height="13" rx="3" stroke="currentColor" />
-          <path d="M28 5v5" stroke="currentColor" strokeWidth="2" />
-          <rect
-            x="3"
-            y="3"
-            width={(20 * system.battery) / 100}
-            height="9"
-            rx="1"
-            fill={system.charging ? "#2cbd70" : "currentColor"}
-          />
-        </svg>
-      </div>
-      <div
-        className="duo-home"
-        style={{ left: safeArea.left + (size.width - safeArea.left - safeArea.right) / 2 }}
-      />
-    </div>
-  );
 }
 
 function DisplaySurface({
@@ -119,7 +76,7 @@ function DisplaySurface({
           ...safeAreaStyle(screen.safeArea),
         }}
       />
-      {showSystemUI && <SystemChrome screen={screen} />}
+      <SystemChrome screen={screen} showIndicators={showSystemUI} />
       {host &&
         createPortal(
           <ScreenContext.Provider value={display}>{children}</ScreenContext.Provider>,

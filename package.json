@@ -4,7 +4,8 @@
   "private": true,
   "description": "A React device frame for iPhone Duo previews.",
   "files": [
-    "dist"
+    "dist",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "type": "module",
   "sideEffects": [

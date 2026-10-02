@@ -4,8 +4,9 @@ A React device frame for previewing applications on iPhone Duo.
 
 The current implementation is a flat layout prototype: a provider, persistent
 inner and outer app surfaces, measured window geometry, safe-area CSS properties,
-zoom, passive system indicators, and an optional toolbar. The outline and system
-artwork are schematic. Apple's model, calibrated bezel, folding animation,
+zoom, passive system indicators, and an optional toolbar. Status glyphs follow
+the reference project; their sizes still need visual acceptance. The device
+outline is schematic. Apple's model, calibrated bezel, folding animation,
 hardware events, and asset CLI are not implemented yet.
 
 Read [the design](DESIGN.md) for the architecture and rendering decisions still
@@ -73,7 +74,21 @@ Mount one frame per provider. Separate providers create independent sessions.
 The frame forwards its root div through `ref` and accepts standard div attributes,
 `className`, and `style`. Import the stylesheet once. Older bundlers that ignore
 package exports can import `duo-frame/dist/style.css`. `showSystemUI={false}` hides
-the passive system indicators.
+the passive system indicators while retaining the outer display's camera cutout.
+
+The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
+level changes the arc's fill; charging displays a lightning mark. These indicators
+have no click or gesture behavior. Their vector paths follow the reference
+project, with attribution in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+The status group occupies the full display's safe-area edge strip, independently
+of app placement. The outer camera cutout uses the square occlusion region in the
+geometry profile; the inner display has no visible camera cutout. The home
+indicator is centered beneath the current app window, including split windows.
+Artwork dimensions and spacing are defined in `src/system-layout.ts` in app CSS
+pixels and scale with the screen. The safe-area dataset establishes the available
+regions, not exact icon sizes or native status layouts in every orientation;
+those still require manual comparison.
 
 `useDuoState(selector, isEqual?)` subscribes to selected state. `useDuoActions()`
 provides posture, orientation, inner placement, zoom, system configuration, and
