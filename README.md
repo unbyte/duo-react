@@ -6,7 +6,9 @@ The current implementation is a flat layout prototype: a provider, persistent
 inner and outer app surfaces, measured window geometry, safe-area CSS properties,
 zoom, passive system indicators, and an optional toolbar. Status artwork follows
 the supplied image; its scale calibration still needs visual acceptance. The device
-outline is schematic. Apple's model, calibrated bezel, folding animation,
+outline is schematic, with passive buttons and hinge details on both displays,
+estimated from the supplied screenshot and projected mesh bounds. Apple's model,
+calibrated bezel, folding animation,
 hardware events, and asset CLI are not implemented yet.
 
 Read [the design](docs/design.md) for the architecture and rendering decisions still

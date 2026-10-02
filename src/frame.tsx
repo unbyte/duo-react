@@ -4,6 +4,7 @@ import { resolveZoom, safeAreaStyle, validateZoom } from "./geometry";
 import { ScreenContext, useBrowserLayoutEffect, useDuoState, useDuoStore } from "./provider";
 import type { DuoDisplay, DuoZoom } from "./types";
 import { SystemChrome } from "./system-chrome";
+import { frameBezel, frameOutset, Hardware } from "./hardware";
 import "./style.css";
 
 export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
@@ -63,22 +64,29 @@ function DisplaySurface({
         transform: `scale(${scale})`,
         visibility: screen.visible && scale > 0 ? "visible" : "hidden",
         borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(" "),
+        boxShadow:
+          display === "inner"
+            ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-rim-color), 0 18px 70px #0003`
+            : "0 18px 70px #0003",
       }}
     >
-      <div
-        className="duo-window"
-        ref={attachHost}
-        data-duo-window={display}
-        style={{
-          left: bounds.x,
-          top: bounds.y,
-          width: bounds.width,
-          height: bounds.height,
-          borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
-          ...safeAreaStyle(screen.safeArea),
-        }}
-      />
-      <SystemChrome screen={screen} showIndicators={showSystemUI} />
+      <Hardware display={display} orientation={screen.orientation} />
+      <div className="duo-screen">
+        <div
+          className="duo-window"
+          ref={attachHost}
+          data-duo-window={display}
+          style={{
+            left: bounds.x,
+            top: bounds.y,
+            width: bounds.width,
+            height: bounds.height,
+            borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
+            ...safeAreaStyle(screen.safeArea),
+          }}
+        />
+        <SystemChrome screen={screen} showIndicators={showSystemUI} />
+      </div>
       {host &&
         createPortal(
           <ScreenContext.Provider value={display}>{children}</ScreenContext.Provider>,
@@ -129,10 +137,11 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   if (!Number.isFinite(fitPadding) || fitPadding < 0)
     throw new RangeError("fitPadding must be a nonnegative finite number.");
   const active = state.screens[state.posture === "open" ? "inner" : "outer"];
+  const outset = frameOutset(active.display);
   const scale = resolveZoom(
     effectiveZoom,
     size,
-    { width: active.size.width + 24, height: active.size.height + 24 },
+    { width: active.size.width + outset * 2, height: active.size.height + outset * 2 },
     fitPadding,
   );
   return (
