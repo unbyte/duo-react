@@ -1,0 +1,88 @@
+.duo-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.45;
+  min-width: 0;
+  overflow: hidden;
+  isolation: isolate;
+}
+.duo-display {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  background: #111;
+  color: #fff;
+  box-shadow:
+    0 0 0 10px #151618,
+    0 0 0 12px #a5a7ab,
+    0 18px 70px #0003;
+  overflow: hidden;
+}
+.duo-window {
+  position: absolute;
+  overflow: hidden;
+  container-type: size;
+  container-name: duo-screen;
+  color: #17202a;
+  background: #f7f9fc;
+}
+.duo-system {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: #fff;
+  mix-blend-mode: difference;
+  font:
+    600 16px/1.2 system-ui,
+    sans-serif;
+}
+.duo-status {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+.duo-home {
+  position: absolute;
+  width: 130px;
+  height: 5px;
+  bottom: 9px;
+  border-radius: 4px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+.duo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  font:
+    500 13px/1.5 system-ui,
+    sans-serif;
+}
+.duo-toolbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.duo-toolbar button,
+.duo-toolbar select {
+  min-height: 36px;
+  border: 1px solid #cbd2dc;
+  border-radius: 7px;
+  padding: 6px 12px;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+.duo-toolbar button {
+  cursor: pointer;
+}
+.duo-toolbar button:focus-visible,
+.duo-toolbar select:focus-visible {
+  outline: 2px solid #2168e8;
+  outline-offset: 3px;
+}

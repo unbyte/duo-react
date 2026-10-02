@@ -229,9 +229,6 @@ importers:
       '@types/react-dom':
         specifier: ^16.9.0
         version: 16.9.25(@types/react@16.14.70)
-      '@types/react-test-renderer':
-        specifier: ^16.9.0
-        version: 16.9.12
       '@types/use-sync-external-store':
         specifier: ^1.5.0
         version: 1.7.0
@@ -242,9 +239,6 @@ importers:
         specifier: 16.8.6
         version: 16.8.6
       react-dom:
-        specifier: 16.8.6
-        version: 16.8.6(react@16.8.6)
-      react-test-renderer:
         specifier: 16.8.6
         version: 16.8.6(react@16.8.6)
       typescript:
@@ -653,9 +647,6 @@ packages:
     resolution: {integrity: sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==}
     peerDependencies:
       '@types/react': ^19.3.0
-
-  '@types/react-test-renderer@16.9.12':
-    resolution: {integrity: sha512-RJ4jeg32v2h1izOZ3gES/zQhQOwi6BEnZW890pmAuf3yVSfDm0wOR42YiWFiuSJJRyRykNaXEzis74+y3Ac9HQ==}
 
   '@types/react@16.14.70':
     resolution: {integrity: sha512-DM5Q7rSx9G6QYcVvMgxvEurL5P06OxcDNUXrLxlpBzG4ccUewcBCmsztYbxJBobzO8RIwwmjoaD5OsKqdHDuYQ==}
@@ -1362,11 +1353,6 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
-  react-test-renderer@16.8.6:
-    resolution: {integrity: sha512-H2srzU5IWYT6cZXof6AhUcx/wEyJddQ8l7cLM/F7gDXYyPr4oq+vCIxJYXVGhId1J706sqziAjuOEjyNkfgoEw==}
-    peerDependencies:
-      react: ^16.0.0
-
   react@16.14.0:
     resolution: {integrity: sha512-0X2CImDkJGApiAlcf0ODKIneSwBPhqJawOa5wCtKbu7ZECrmS26NvtSILynQ66cgkT/RJ4LidJOc3bUESwmU8g==}
     engines: {node: '>=0.10.0'}
@@ -1731,10 +1717,6 @@ snapshots:
   '@types/react-dom@19.3.0(@types/react@19.3.0)':
     dependencies:
       '@types/react': 19.3.0
-
-  '@types/react-test-renderer@16.9.12':
-    dependencies:
-      '@types/react': 16.14.70
 
   '@types/react@16.14.70':
     dependencies:
@@ -2274,14 +2256,6 @@ snapshots:
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
-
-  react-test-renderer@16.8.6(react@16.8.6):
-    dependencies:
-      object-assign: 4.1.1
-      prop-types: 15.8.1
-      react: 16.8.6
-      react-is: 16.13.1
-      scheduler: 0.13.6
 
   react@16.14.0:
     dependencies:

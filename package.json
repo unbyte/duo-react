@@ -7,9 +7,14 @@
     "dist"
   ],
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./style.css": "./dist/style.css"
   },
   "scripts": {
     "build": "vp pack",
@@ -28,12 +33,10 @@
     "@types/node": "^26.1.1",
     "@types/react": "^16.14.0",
     "@types/react-dom": "^16.9.0",
-    "@types/react-test-renderer": "^16.9.0",
     "@types/use-sync-external-store": "^1.5.0",
     "@vitejs/plugin-react": "^6.1.1",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-test-renderer": "16.8.6",
     "typescript": "^7.0.2",
     "vite-plus": "catalog:"
   },
