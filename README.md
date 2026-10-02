@@ -258,6 +258,64 @@ React context and CSS properties do not cross iframe document boundaries. The
 iframe demo shows a consumer-owned `postMessage` bridge with source and origin
 checks. The library does not inject code into consumer iframe documents.
 
+### App bar positioning
+
+`DuoTabBar` and `DuoAppToolbar` position caller-provided content within a frame's
+inner or outer app subtree. `DuoAppToolbar` is the in-app action bar;
+`DuoToolbar` controls the device preview. The positioning helpers do not implement
+navigation, tab selection, menus, or iOS visual styling.
+
+```tsx
+import { DuoTabBar, DuoAppToolbar } from "duo-frame";
+
+function App() {
+  return (
+    <>
+      <YourContent />
+      <DuoAppToolbar className="app-actions" aria-label="Document actions">
+        <button onClick={createDocument}>New</button>
+      </DuoAppToolbar>
+      <DuoTabBar className="app-tabs" aria-label="Destinations">
+        <YourNavigation />
+      </DuoTabBar>
+    </>
+  );
+}
+```
+
+Mount this app through a frame's `inner` or `outer` prop. Use one of each helper
+per display, or omit either. They accept standard div attributes, `style`,
+`className`, and a forwarded div ref. Supply the appropriate navigation or tab
+semantics on your children; the helpers do not impose ARIA tab behavior.
+
+On the side, the toolbar grows downward below system controls and the tab bar
+grows upward from the bottom. Split-left uses the left edge, split-right uses
+the right, and full-display placement follows the measured side inset. Inner
+portrait, including upside-down portrait, places the toolbar horizontally at the
+top and the tab bar horizontally at the bottom. RTL text does not swap hardware
+edges. These rules follow [Apple's Duo guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo#Vertical-controls).
+
+The frame provides private, stable portal hosts, so app scrolling and nested
+positioned ancestors do not move the bars. Children keep their React context and
+state across orientation, placement, and zoom changes. CSS inheritance follows
+the frame host rather than the original DOM ancestry; put appearance styles on
+the helper or its children. Both bars scale in logical pixels with the app.
+Helpers cannot run inside an iframe's separate React tree; mount them beside the
+iframe in the frame's React content instead.
+
+The default layout uses 16px edge/group spacing and the measured 84px side rail;
+the split-left rail uses that same width by convention. These gaps are our
+positioning defaults, not calibrated Apple control metrics. Reserved regions and
+the rendered status bounds constrain available space. Bars share that space and
+scroll when their content exceeds it; there is no automatic overflow menu or
+minimization. They overlay app content and do not change the provider's calibrated
+safe area. Keep your content clear of your chosen bar dimensions.
+
+Use `[data-duo-bar-placement="left" | "right" | "top" | "bottom"]` to adapt your
+styles. The helper uses a column on the side and a row in portrait; your own
+nested navigation container may also need to change its direction. The demos'
+**Show app bars** toggle demonstrates both helpers with React and iframe content.
+
 ### Zoom ownership
 
 With no frame `zoom` prop, provider actions control zoom. `"fit"` fits the active

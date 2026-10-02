@@ -31,3 +31,6 @@ export {
   DuoZoomControls,
 } from "./toolbar";
 export type { DuoToolbarProps, DuoControlGroupProps } from "./toolbar";
+
+export { DuoTabBar, DuoAppToolbar } from "./accessories";
+export type { DuoBarProps } from "./accessories";

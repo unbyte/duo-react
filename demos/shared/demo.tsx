@@ -3,6 +3,8 @@ import {
   DuoFrame,
   DuoProvider,
   DuoSafeArea,
+  DuoTabBar,
+  DuoAppToolbar,
   DuoToolbar,
   DuoDisplayControls,
   DuoRotationControls,
@@ -70,12 +72,15 @@ function BackgroundPicker({
   );
 }
 
-function ExampleApp({ background }: { background: Background }) {
+function ExampleApp({ background, showBars }: { background: Background; showBars: boolean }) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
   return (
-    <DuoSafeArea className="demo-app">
+    <DuoSafeArea
+      className="demo-app"
+      style={showBars ? { display: "grid", alignItems: "center" } : undefined}
+    >
       {background === "mixed" && <div className="demo-bottom-background" />}
       <div className="demo-content">
         <h2>{display === "inner" ? "Inner screen" : "Outer screen"}</h2>
@@ -130,6 +135,8 @@ const iframeSource = `<!doctype html>
     const { display, safeArea } = event.data.screen;
     document.body.style.background = event.data.appearance.background;
     document.body.style.color = event.data.appearance.color;
+    document.body.style.display = event.data.showBars ? "grid" : "block";
+    document.body.style.alignItems = "center";
     document.getElementById("bottom-background").style.display = event.data.background === "mixed" ? "block" : "none";
     document.querySelector('h1').textContent = display === 'inner' ? 'Inner screen (iframe)' : 'Outer screen (iframe)';
     for (const [side, value] of Object.entries(safeArea)) {
@@ -139,15 +146,15 @@ const iframeSource = `<!doctype html>
 </script>
 </html>`;
 
-function IframeApp({ background }: { background: Background }) {
+function IframeApp({ background, showBars }: { background: Background; showBars: boolean }) {
   const screen = useDuoScreen();
   const frame = React.useRef<HTMLIFrameElement>(null);
   const publish = React.useCallback(() => {
     frame.current?.contentWindow?.postMessage(
-      { type: "demo:layout", screen, background, appearance: backgrounds[background] },
+      { type: "demo:layout", screen, background, showBars, appearance: backgrounds[background] },
       window.location.origin,
     );
-  }, [screen, background]);
+  }, [screen, background, showBars]);
   React.useEffect(publish, [publish]);
   return (
     <iframe
@@ -160,9 +167,52 @@ function IframeApp({ background }: { background: Background }) {
   );
 }
 
+function ExampleBars() {
+  const [tab, setTab] = React.useState(1);
+  const [count, setCount] = React.useState(0);
+  return (
+    <>
+      <DuoAppToolbar className="demo-app-bar" aria-label="App actions">
+        <button
+          type="button"
+          aria-label={`Add item: ${count}`}
+          onClick={() => setCount((value) => value + 1)}
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </DuoAppToolbar>
+      <DuoTabBar className="demo-app-bar" aria-label="App destinations">
+        {[1, 2].map((value) => (
+          <button
+            type="button"
+            key={value}
+            aria-label={`Destination ${value}`}
+            aria-pressed={tab === value}
+            onClick={() => setTab(value)}
+          >
+            {value}
+          </button>
+        ))}
+      </DuoTabBar>
+    </>
+  );
+}
+
 export function Demo({ version }: { version: string }) {
   const [background, setBackground] = React.useState<Background>("light");
   const [showRegions, setShowRegions] = React.useState(false);
+  const [showBars, setShowBars] = React.useState(false);
   const frame = React.useRef<HTMLDivElement>(null);
   const stage = React.useRef<HTMLDivElement>(null);
   const iframe = new URLSearchParams(window.location.search).get("content") === "iframe";
@@ -187,6 +237,14 @@ export function Demo({ version }: { version: string }) {
           />{" "}
           Show layout regions
         </label>
+        <label className="demo-region-toggle">
+          <input
+            type="checkbox"
+            checked={showBars}
+            onChange={(event) => setShowBars(event.currentTarget.checked)}
+          />{" "}
+          Show app bars
+        </label>
         {showRegions && (
           <p className="demo-region-note">
             App safe area and insets; whole-display reserved regions. All measurements are logical
@@ -207,18 +265,24 @@ export function Demo({ version }: { version: string }) {
           <DuoFrame
             ref={frame}
             inner={
-              iframe ? (
-                <IframeApp background={background} />
-              ) : (
-                <ExampleApp background={background} />
-              )
+              <>
+                {iframe ? (
+                  <IframeApp background={background} showBars={showBars} />
+                ) : (
+                  <ExampleApp background={background} showBars={showBars} />
+                )}
+                {showBars && <ExampleBars />}
+              </>
             }
             outer={
-              iframe ? (
-                <IframeApp background={background} />
-              ) : (
-                <ExampleApp background={background} />
-              )
+              <>
+                {iframe ? (
+                  <IframeApp background={background} showBars={showBars} />
+                ) : (
+                  <ExampleApp background={background} showBars={showBars} />
+                )}
+                {showBars && <ExampleBars />}
+              </>
             }
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"

@@ -174,3 +174,31 @@ input {
     transition: none;
   }
 }
+
+.demo-app-bar {
+  gap: 4px;
+  padding: 4px;
+  border-radius: 28px;
+  background: #f0f3f8;
+  color: #25313e;
+}
+.demo-app-bar button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.demo-app-bar button[aria-pressed="true"] {
+  color: #0879ed;
+  background: #dcecff;
+}
+.demo-app-bar button:focus-visible {
+  outline: 2px solid #0879ed;
+  outline-offset: -2px;
+}

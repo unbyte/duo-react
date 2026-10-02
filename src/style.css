@@ -96,6 +96,7 @@
   transform: translateX(-50%) rotate(180deg);
 }
 .duo-window {
+  z-index: 0;
   position: absolute;
   overflow: hidden;
   container-type: size;
@@ -153,4 +154,50 @@
   position: absolute;
   border-radius: 2px;
   background: #b3b3b3;
+}
+
+.duo-accessory-window {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.duo-accessory-layout {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+}
+.duo-accessory-host {
+  display: flex;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-width: 100%;
+}
+.duo-accessory-host:empty {
+  display: none;
+}
+.duo-accessory-host[data-duo-accessory-host="tab"] {
+  margin-top: auto;
+  justify-content: center;
+}
+:where(.duo-app-bar) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  overflow: auto;
+  pointer-events: auto;
+}
+:where(.duo-app-bar > *) {
+  flex-shrink: 0;
+}
+:where(.duo-accessory-layout[data-duo-bar-axis="vertical"] .duo-app-bar) {
+  width: 100%;
+}
+:where(.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-app-bar) {
+  flex-direction: row;
 }

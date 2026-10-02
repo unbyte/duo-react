@@ -7,6 +7,8 @@ import { SystemChrome } from "./system-chrome";
 import { frameBezel, frameOutset, Hardware } from "./hardware";
 import { orientationRotation, rotatedSize } from "./view-controls";
 import { useRotation } from "./use-rotation";
+import { AccessoryContext } from "./accessory-context";
+import { getAccessoryLayout } from "./accessory-layout";
 import "./style.css";
 
 export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
@@ -35,6 +37,18 @@ function DisplaySurface({
   const attachHost = React.useCallback((node: HTMLDivElement | null) => {
     setHost(node ?? undefined);
   }, []);
+  const [tabBar, setTabBar] = React.useState<HTMLDivElement>();
+  const [toolbar, setToolbar] = React.useState<HTMLDivElement>();
+  const attachTabBar = React.useCallback(
+    (node: HTMLDivElement | null) => setTabBar(node ?? undefined),
+    [],
+  );
+  const attachToolbar = React.useCallback(
+    (node: HTMLDivElement | null) => setToolbar(node ?? undefined),
+    [],
+  );
+  const { side, ...accessoryBounds } = React.useMemo(() => getAccessoryLayout(screen), [screen]);
+  const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side]);
   const surface = React.useRef<HTMLDivElement>(null);
   const previous = React.useRef(screen);
   useBrowserLayoutEffect(() => {
@@ -87,11 +101,37 @@ function DisplaySurface({
             ...safeAreaStyle(screen.safeArea),
           }}
         />
+        <div
+          className="duo-accessory-window"
+          style={{
+            left: bounds.x,
+            top: bounds.y,
+            width: bounds.width,
+            height: bounds.height,
+            borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
+            ...safeAreaStyle(screen.safeArea),
+          }}
+        >
+          <div
+            className="duo-accessory-layout"
+            data-duo-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
+            style={accessoryBounds}
+          >
+            <div
+              className="duo-accessory-host"
+              data-duo-accessory-host="toolbar"
+              ref={attachToolbar}
+            />
+            <div className="duo-accessory-host" data-duo-accessory-host="tab" ref={attachTabBar} />
+          </div>
+        </div>
         <SystemChrome screen={screen} showIndicators={showSystemUI} />
       </div>
       {host &&
         createPortal(
-          <ScreenContext.Provider value={display}>{children}</ScreenContext.Provider>,
+          <ScreenContext.Provider value={display}>
+            <AccessoryContext.Provider value={accessoryHosts}>{children}</AccessoryContext.Provider>
+          </ScreenContext.Provider>,
           host,
           display,
         )}
