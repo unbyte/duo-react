@@ -1,0 +1,15 @@
+node_modules
+dist
+*.log
+.DS_Store
+
+# dotenv environment variable files
+.env
+.env.*
+!.env.example
+
+# Local exploration notes; retain the durable design document
+/docs/*
+!/docs/design.md
+/packages/duo-frame/docs/*
+!/packages/duo-frame/docs/design.md
