@@ -25,7 +25,6 @@
   container-type: size;
   container-name: duo-screen;
   color: #17202a;
-  background: #f7f9fc;
 }
 .duo-display[data-duo-placement="left"],
 .duo-display[data-duo-placement="right"] {
