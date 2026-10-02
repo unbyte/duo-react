@@ -8,7 +8,7 @@ export default defineConfig({
     dts: {
       generator: "tsgo",
     },
-    exports: true,
+    exports: { legacy: true },
   },
   lint: {
     options: {

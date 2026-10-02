@@ -72,7 +72,8 @@ import "duo-frame/style.css";
 
 Mount one frame per provider. Separate providers create independent sessions.
 The frame forwards its root div through `ref` and accepts standard div attributes,
-`className`, and `style`. Import the stylesheet once. `showSystemUI={false}` hides
+`className`, and `style`. Import the stylesheet once. Older bundlers that ignore
+package exports can import `duo-frame/dist/style.css`. `showSystemUI={false}` hides
 the passive system indicators.
 
 `useDuoState(selector, isEqual?)` subscribes to selected state. `useDuoActions()`
