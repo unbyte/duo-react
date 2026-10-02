@@ -91,3 +91,41 @@ test("reset restores provider defaults and separate providers can register their
   expect(createDuoStore().connectFrame()).toBeTypeOf("function");
   disconnect();
 });
+
+test("indicator updates merge per display without changing geometry or mutating snapshots", () => {
+  const store = createDuoStore(
+    {},
+    {
+      indicatorStyles: { inner: { statusBar: "light" } },
+    },
+  );
+  const initial = store.getSnapshot();
+  const listener = vi.fn();
+  store.subscribe(listener);
+  store.actions.setSystem({ indicatorStyles: { outer: { homeIndicator: "light" } } });
+  const next = store.getSnapshot();
+  expect(next.screens).toBe(initial.screens);
+  expect(next.system.indicatorStyles.inner).toBe(initial.system.indicatorStyles.inner);
+  expect(next.system.indicatorStyles.outer).toEqual({ statusBar: "auto", homeIndicator: "light" });
+  expect(initial.system.indicatorStyles.outer.homeIndicator).toBe("auto");
+  expect(Object.isFrozen(next.system.indicatorStyles.outer)).toBe(true);
+  store.actions.setSystem({ indicatorStyles: { outer: { homeIndicator: "light" } } });
+  expect(store.getSnapshot()).toBe(next);
+  expect(listener).toHaveBeenCalledTimes(1);
+  store.actions.resetDevice();
+  expect(store.getSnapshot().system).toBe(initial.system);
+});
+
+test("unsupported indicator styles reject the whole system update", () => {
+  const store = createDuoStore();
+  const initial = store.getSnapshot();
+  expect(Object.isFrozen(initial.system)).toBe(true);
+  expect(() =>
+    store.actions.setSystem({
+      battery: 25,
+      // @ts-expect-error Check JavaScript callers and unvalidated iframe messages.
+      indicatorStyles: { inner: { statusBar: "inverse" } },
+    }),
+  ).toThrow(RangeError);
+  expect(store.getSnapshot()).toBe(initial);
+});

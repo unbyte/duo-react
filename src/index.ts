@@ -7,6 +7,8 @@ export type {
   DuoDefaults,
   DuoDisplay,
   DuoInsets,
+  DuoIndicatorStyle,
+  DuoIndicatorStyles,
   DuoOrientation,
   DuoPlacement,
   DuoPosture,
@@ -15,6 +17,7 @@ export type {
   DuoScreenInfo,
   DuoState,
   DuoSystem,
+  DuoSystemOptions,
   DuoWindowChange,
   DuoZoom,
 } from "./types";

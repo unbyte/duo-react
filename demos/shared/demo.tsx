@@ -1,15 +1,78 @@
 import * as React from "react";
-import { DuoFrame, DuoProvider, DuoSafeArea, DuoToolbar, useDuoScreen } from "duo-frame";
+import {
+  DuoFrame,
+  DuoProvider,
+  DuoSafeArea,
+  DuoToolbar,
+  useDuoActions,
+  useDuoState,
+  useDuoScreen,
+} from "duo-frame";
+import type { DuoIndicatorStyle } from "duo-frame";
 import "duo-frame/style.css";
 import "./style.css";
 
-function ExampleApp() {
+const backgrounds = {
+  light: { background: "#fff", color: "#222" },
+  dark: { background: "#111", color: "#fff" },
+  gray: { background: "#808080", color: "#000" },
+  mixed: {
+    background: "#fff",
+    color: "#222",
+  },
+} as const;
+type Background = keyof typeof backgrounds;
+
+function BackgroundPicker({
+  value,
+  onChange,
+}: {
+  value: Background;
+  onChange: (value: Background) => void;
+}) {
+  const { setSystem } = useDuoActions();
+  const indicatorStyle = useDuoState((state) => state.system.indicatorStyles.outer.statusBar);
+  return (
+    <div className="demo-appearance">
+      <label>
+        Background{" "}
+        <select
+          value={value}
+          onChange={(event) => onChange(event.currentTarget.value as Background)}
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="gray">Gray</option>
+          <option value="mixed">Light top, dark bottom</option>
+        </select>
+      </label>
+      <label>
+        Icons{" "}
+        <select
+          value={indicatorStyle}
+          onChange={(event) => {
+            const next = event.currentTarget.value as DuoIndicatorStyle;
+            const styles = { statusBar: next, homeIndicator: next };
+            setSystem({ indicatorStyles: { inner: styles, outer: styles } });
+          }}
+        >
+          <option value="auto">Auto</option>
+          <option value="light">Light (white)</option>
+          <option value="dark">Dark (black)</option>
+        </select>
+      </label>
+    </div>
+  );
+}
+
+function ExampleApp({ background }: { background: Background }) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
   return (
     <DuoSafeArea className="demo-app">
-      <div>
+      {background === "mixed" && <div className="demo-bottom-background" />}
+      <div className="demo-content">
         <h2>{display === "inner" ? "Inner screen" : "Outer screen"}</h2>
         <button type="button" onClick={() => setCount((value) => value + 1)}>
           Count: {count}
@@ -28,7 +91,10 @@ const iframeSource = `<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Iframe example</title>
 <style>
+  html { height: 100%; }
   body {
+    min-height: 100%;
+    box-sizing: border-box;
     margin: 0;
     padding: var(--duo-safe-area-inset-top, 0px) var(--duo-safe-area-inset-right, 0px)
       var(--duo-safe-area-inset-bottom, 0px) var(--duo-safe-area-inset-left, 0px);
@@ -36,12 +102,14 @@ const iframeSource = `<!doctype html>
     color: #222;
     background: white;
   }
-  main { padding: 24px; }
+  main { position: relative; padding: 24px; }
+  #bottom-background { position: fixed; left: 0; right: 0; bottom: 0; height: 50%; background: #111; display: none; }
   h1 { font-size: 20px; }
   button, input { font: inherit; }
   label { display: block; margin-top: 16px; }
   input { max-width: 70%; }
 </style>
+<div id="bottom-background"></div>
 <main>
   <h1>Iframe</h1>
   <button type="button" id="count">Count: 0</button>
@@ -55,6 +123,9 @@ const iframeSource = `<!doctype html>
   addEventListener('message', event => {
     if (event.source !== parent || event.origin !== parent.location.origin || event.data?.type !== 'demo:layout') return;
     const { display, safeArea } = event.data.screen;
+    document.body.style.background = event.data.appearance.background;
+    document.body.style.color = event.data.appearance.color;
+    document.getElementById("bottom-background").style.display = event.data.background === "mixed" ? "block" : "none";
     document.querySelector('h1').textContent = display === 'inner' ? 'Inner screen (iframe)' : 'Outer screen (iframe)';
     for (const [side, value] of Object.entries(safeArea)) {
       document.documentElement.style.setProperty('--duo-safe-area-inset-' + side, value + 'px');
@@ -63,15 +134,15 @@ const iframeSource = `<!doctype html>
 </script>
 </html>`;
 
-function IframeApp() {
+function IframeApp({ background }: { background: Background }) {
   const screen = useDuoScreen();
   const frame = React.useRef<HTMLIFrameElement>(null);
   const publish = React.useCallback(() => {
     frame.current?.contentWindow?.postMessage(
-      { type: "demo:layout", screen },
+      { type: "demo:layout", screen, background, appearance: backgrounds[background] },
       window.location.origin,
     );
-  }, [screen]);
+  }, [screen, background]);
   React.useEffect(publish, [publish]);
   return (
     <iframe
@@ -85,6 +156,7 @@ function IframeApp() {
 }
 
 export function Demo({ version }: { version: string }) {
+  const [background, setBackground] = React.useState<Background>("light");
   const iframe = new URLSearchParams(window.location.search).get("content") === "iframe";
   return (
     <DuoProvider>
@@ -99,10 +171,31 @@ export function Demo({ version }: { version: string }) {
           </a>
         </nav>
         <DuoToolbar />
-        <div className="demo-frame">
+        <BackgroundPicker value={background} onChange={setBackground} />
+        <div
+          className="demo-frame"
+          style={
+            {
+              "--demo-background": backgrounds[background].background,
+              "--demo-color": backgrounds[background].color,
+            } as React.CSSProperties
+          }
+        >
           <DuoFrame
-            inner={iframe ? <IframeApp /> : <ExampleApp />}
-            outer={iframe ? <IframeApp /> : <ExampleApp />}
+            inner={
+              iframe ? (
+                <IframeApp background={background} />
+              ) : (
+                <ExampleApp background={background} />
+              )
+            }
+            outer={
+              iframe ? (
+                <IframeApp background={background} />
+              ) : (
+                <ExampleApp background={background} />
+              )
+            }
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"
           />

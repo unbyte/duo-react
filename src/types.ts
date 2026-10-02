@@ -3,6 +3,12 @@ export type DuoPlacement = "full" | "left" | "right";
 export type DuoOrientation = "portrait" | "landscape-left" | "landscape-right";
 export type DuoPosture = "open" | "closed";
 export type DuoZoom = "fit" | number;
+export type DuoIndicatorStyle = "auto" | "light" | "dark";
+
+export interface DuoIndicatorStyles {
+  readonly statusBar: DuoIndicatorStyle;
+  readonly homeIndicator: DuoIndicatorStyle;
+}
 
 export interface DuoRect {
   readonly x: number;
@@ -39,6 +45,11 @@ export interface DuoSystem {
   readonly battery: number;
   readonly charging: boolean;
   readonly cameraActive: boolean;
+  readonly indicatorStyles: Readonly<Record<DuoDisplay, DuoIndicatorStyles>>;
+}
+
+export interface DuoSystemOptions extends Partial<Omit<DuoSystem, "indicatorStyles">> {
+  readonly indicatorStyles?: Partial<Record<DuoDisplay, Partial<DuoIndicatorStyles>>>;
 }
 
 export interface DuoDefaults {

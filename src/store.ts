@@ -2,18 +2,43 @@ import { getDuoGeometry, validateZoom } from "./geometry";
 import type {
   DuoDefaults,
   DuoDisplay,
+  DuoIndicatorStyles,
   DuoOrientation,
   DuoPlacement,
   DuoPosture,
   DuoScreenInfo,
   DuoState,
   DuoSystem,
+  DuoSystemOptions,
   DuoWindowChange,
   DuoZoom,
 } from "./types";
 
 type Listener = () => void;
 type Model = Pick<DuoState, "posture" | "orientation" | "innerPlacement" | "zoom" | "system">;
+
+function mergeIndicatorStyles(current: DuoIndicatorStyles, patch?: Partial<DuoIndicatorStyles>) {
+  const statusBar = patch?.statusBar ?? current.statusBar;
+  const homeIndicator = patch?.homeIndicator ?? current.homeIndicator;
+  return statusBar === current.statusBar && homeIndicator === current.homeIndicator
+    ? current
+    : Object.freeze({ statusBar, homeIndicator });
+}
+
+function mergeSystem(current: DuoSystem, patch: DuoSystemOptions) {
+  const inner = mergeIndicatorStyles(current.indicatorStyles.inner, patch.indicatorStyles?.inner);
+  const outer = mergeIndicatorStyles(current.indicatorStyles.outer, patch.indicatorStyles?.outer);
+  const indicatorStyles =
+    inner === current.indicatorStyles.inner && outer === current.indicatorStyles.outer
+      ? current.indicatorStyles
+      : Object.freeze({ inner, outer });
+  const next = Object.freeze({ ...current, ...patch, indicatorStyles });
+  return Object.keys(next).every(
+    (key) => next[key as keyof DuoSystem] === current[key as keyof DuoSystem],
+  )
+    ? current
+    : next;
+}
 
 function validateModel(model: Model) {
   validateZoom(model.zoom);
@@ -25,21 +50,31 @@ function validateModel(model: Model) {
     model.system.battery > 100
   )
     throw new RangeError("Battery must be between 0 and 100.");
+  for (const styles of Object.values(model.system.indicatorStyles)) {
+    for (const style of [styles.statusBar, styles.homeIndicator]) {
+      if (style !== "auto" && style !== "light" && style !== "dark")
+        throw new RangeError('Indicator style must be "auto", "light", or "dark".');
+    }
+  }
 }
 
-export function createDuoStore(defaults: DuoDefaults = {}, system: Partial<DuoSystem> = {}) {
+export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOptions = {}) {
+  const indicatorStyles = Object.freeze({ statusBar: "auto", homeIndicator: "auto" } as const);
   const initial: Model = {
     posture: defaults.posture ?? "open",
     orientation: defaults.orientation ?? "landscape-left",
     innerPlacement: defaults.innerPlacement ?? "full",
     zoom: defaults.zoom ?? "fit",
-    system: Object.freeze({
-      time: "9:41",
-      battery: 100,
-      charging: false,
-      cameraActive: false,
-      ...system,
-    }),
+    system: mergeSystem(
+      Object.freeze({
+        time: "9:41",
+        battery: 100,
+        charging: false,
+        cameraActive: false,
+        indicatorStyles: Object.freeze({ inner: indicatorStyles, outer: indicatorStyles }),
+      }),
+      system,
+    ),
   };
   let model = initial;
   let frameConnected = false;
@@ -124,14 +159,9 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: Partial<DuoSy
     setOrientation: (orientation: DuoOrientation) => update({ orientation }),
     setInnerPlacement: (innerPlacement: DuoPlacement) => update({ innerPlacement }),
     setZoom,
-    setSystem: (values: Partial<DuoSystem>) => {
-      const next = Object.freeze({ ...model.system, ...values });
-      if (
-        Object.keys(next).every(
-          (key) => next[key as keyof DuoSystem] === model.system[key as keyof DuoSystem],
-        )
-      )
-        return;
+    setSystem: (values: DuoSystemOptions) => {
+      const next = mergeSystem(model.system, values);
+      if (next === model.system) return;
       update({ system: next });
     },
     resetView: () => setZoom(initial.zoom),

@@ -34,7 +34,9 @@ Both demos have React and iframe content modes. Change a counter or enter text,
 switch the inner window between left, right, and full, then use the toolbar's
 Display selector to switch to the outer display and back. Content should keep
 its state. Both content modes contain only a counter
-and a text input. Switching modes reloads the page intentionally.
+and a text input. The Background selector previews light, dark, gray, and mixed
+content; Icons selects automatic, white, or black indicators. Switching content
+modes reloads the page intentionally.
 
 Resize the browser window and use the zoom control to compare resizing with
 scaling. The parent supplies a definite height while the frame uses `height: 100%`.
@@ -115,6 +117,49 @@ and landscape right. Inner split windows are supported in landscape. The
 13px split gap is inferred from the reported widths; the source does not supply
 window origins. Geometry provenance is recorded in
 [src/profiles/xcode-27.1.ts](src/profiles/xcode-27.1.ts).
+
+### Indicator appearance
+
+Each display has independent status-bar and home-indicator styles. `"light"`
+forces white artwork, `"dark"` forces black, and `"auto"` is the default. The camera
+cutout stays black. These values describe the foreground, not the app's theme.
+
+Set initial styles through `defaultSystem`:
+
+```tsx
+<DuoProvider
+  defaultSystem={{
+    indicatorStyles: {
+      inner: { statusBar: "auto", homeIndicator: "auto" },
+      outer: { statusBar: "light", homeIndicator: "dark" },
+    },
+  }}
+>
+  {/* Frame and application content */}
+</DuoProvider>
+```
+
+Change them with `useDuoActions().setSystem()`:
+
+```tsx
+const { display } = useDuoScreen();
+const { setSystem } = useDuoActions();
+setSystem({ indicatorStyles: { [display]: { statusBar: "light" } } });
+```
+
+Call the action from an event handler or effect. Partial updates preserve the
+other display and the other indicator's setting. Reset restores provider
+defaults. Changing appearance does not resize or remount app content. Iframe
+owners can forward an explicit preference through their own message bridge.
+
+**Automatic rendering is provisional.** It currently retains CSS `difference`
+blending, which inverts pixels independently, can produce colored or low-contrast
+results, and can split one icon across light/dark backgrounds. It does **not** yet
+meet the intended whole-control black-or-white behavior. Explicit `light` and
+`dark` modes do. State stores the requested mode only; no resolved color or
+JavaScript sampling loop is present. The next rendering step must select one
+color for the complete control without pretending that arbitrary DOM or
+cross-origin iframe pixels are readable.
 
 ### Safe area and iframe content
 

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
 import { createDuoStore } from "./store";
 import type { DuoStore } from "./store";
-import type { DuoDefaults, DuoDisplay, DuoState, DuoSystem, DuoWindowChange } from "./types";
+import type { DuoDefaults, DuoDisplay, DuoState, DuoSystemOptions, DuoWindowChange } from "./types";
 
 const StoreContext = React.createContext<DuoStore | undefined>(undefined);
 export const ScreenContext = React.createContext<DuoDisplay | undefined>(undefined);
@@ -12,7 +12,7 @@ export const useBrowserLayoutEffect =
 export interface DuoProviderProps {
   children?: React.ReactNode;
   defaultState?: DuoDefaults;
-  defaultSystem?: Partial<DuoSystem>;
+  defaultSystem?: DuoSystemOptions;
 }
 
 export function DuoProvider({

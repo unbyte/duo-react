@@ -41,8 +41,6 @@
   position: absolute;
   display: flex;
   align-items: center;
-  color: #fff;
-  mix-blend-mode: difference;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 600;
   font-variant-numeric: proportional-nums;
@@ -56,12 +54,21 @@
 .duo-status-glyph svg {
   display: block;
 }
+[data-duo-indicator-style="light"],
+[data-duo-indicator-style="auto"] {
+  color: #fff;
+}
+[data-duo-indicator-style="dark"] {
+  color: #000;
+}
+/* Provisional auto mode: per-pixel inversion, not whole-control contrast selection. */
+[data-duo-indicator-style="auto"] {
+  mix-blend-mode: difference;
+}
 .duo-home {
   position: absolute;
   border-radius: 3px;
-  background: #fff;
-  opacity: 0.6;
-  mix-blend-mode: difference;
+  background: currentColor;
 }
 .duo-toolbar {
   display: flex;
