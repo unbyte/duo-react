@@ -48,3 +48,20 @@ test("fit responds to container bounds while numeric zoom preserves app scale", 
   for (const zoom of [0, -1, Infinity, NaN])
     expect(() => resolveZoom(zoom, device, device)).toThrow(RangeError);
 });
+
+test("outer corners rotate with the hinge edge and camera", () => {
+  const portrait = getDuoGeometry({ display: "outer", orientation: "portrait" });
+  const clockwise = getDuoGeometry({ display: "outer", orientation: "landscape-left" });
+  const counterclockwise = getDuoGeometry({ display: "outer", orientation: "landscape-right" });
+  expect(portrait.cornerRadii).toEqual([8, 59, 59, 8]);
+  expect(clockwise.cornerRadii).toEqual([8, 8, 59, 59]);
+  expect(counterclockwise.cornerRadii).toEqual([59, 59, 8, 8]);
+  for (const screen of [portrait, clockwise, counterclockwise]) {
+    expect(screen.windowCornerRadii).toEqual(screen.cornerRadii);
+    const camera = screen.reservedRegions.find((region) => region.width === region.height)!;
+    const right = camera.x > screen.size.width / 2;
+    const bottom = camera.y > screen.size.height / 2;
+    const cameraCorner = bottom ? (right ? 2 : 3) : right ? 1 : 0;
+    expect(screen.cornerRadii[cameraCorner]).toBe(59);
+  }
+});

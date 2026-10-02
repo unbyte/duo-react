@@ -30,14 +30,23 @@ export function getDuoGeometry({
   );
   if (!profile)
     throw new RangeError(`No measured Duo profile for ${display}/${orientation}/${placement}.`);
+  // The source repeats outer radii in native portrait order even in landscape.
+  // Rotate them into the same oriented coordinates as the screen and camera.
+  const [topLeft, topRight, bottomRight, bottomLeft] = profile.cornerRadii;
+  const cornerRadii: DuoScreenInfo["cornerRadii"] =
+    display === "outer" && orientation === "landscape-left"
+      ? [bottomLeft, topLeft, topRight, bottomRight]
+      : display === "outer" && orientation === "landscape-right"
+        ? [topRight, bottomRight, bottomLeft, topLeft]
+        : [...profile.cornerRadii];
   // Divider-facing corners are estimated from the Split View illustration, not simulator data.
   const splitRadius = 32;
   const windowCornerRadii: DuoScreenInfo["windowCornerRadii"] =
     placement === "left"
-      ? [profile.cornerRadii[0], splitRadius, splitRadius, profile.cornerRadii[3]]
+      ? [cornerRadii[0], splitRadius, splitRadius, cornerRadii[3]]
       : placement === "right"
-        ? [splitRadius, profile.cornerRadii[1], profile.cornerRadii[2], splitRadius]
-        : [...profile.cornerRadii];
+        ? [splitRadius, cornerRadii[1], cornerRadii[2], splitRadius]
+        : [...cornerRadii];
   return {
     display,
     orientation,
@@ -45,7 +54,7 @@ export function getDuoGeometry({
     size: Object.freeze({ ...profile.size }),
     window: Object.freeze({ ...profile.window }),
     safeArea: Object.freeze({ ...profile.safeArea }),
-    cornerRadii: Object.freeze([...profile.cornerRadii]) as DuoScreenInfo["cornerRadii"],
+    cornerRadii: Object.freeze(cornerRadii),
     windowCornerRadii: Object.freeze(windowCornerRadii),
     reservedRegions: Object.freeze(
       profile.reservedRegions.map((region) => Object.freeze({ ...region })),
