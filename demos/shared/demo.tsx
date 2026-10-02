@@ -9,6 +9,7 @@ import {
   useDuoScreen,
 } from "duo-frame";
 import type { DuoIndicatorStyle } from "duo-frame";
+import { RegionOverlay } from "./region-overlay";
 import "duo-frame/style.css";
 import "./style.css";
 
@@ -157,6 +158,9 @@ function IframeApp({ background }: { background: Background }) {
 
 export function Demo({ version }: { version: string }) {
   const [background, setBackground] = React.useState<Background>("light");
+  const [showRegions, setShowRegions] = React.useState(false);
+  const frame = React.useRef<HTMLDivElement>(null);
+  const stage = React.useRef<HTMLDivElement>(null);
   const iframe = new URLSearchParams(window.location.search).get("content") === "iframe";
   return (
     <DuoProvider>
@@ -172,8 +176,24 @@ export function Demo({ version }: { version: string }) {
         </nav>
         <DuoToolbar />
         <BackgroundPicker value={background} onChange={setBackground} />
+        <label className="demo-region-toggle">
+          <input
+            type="checkbox"
+            checked={showRegions}
+            onChange={(event) => setShowRegions(event.currentTarget.checked)}
+          />{" "}
+          Show layout regions
+        </label>
+        {showRegions && (
+          <p className="demo-region-note">
+            App safe area and insets; whole-display reserved regions. All measurements are logical
+            pixels. Fills show exact bounds; dashed outlines sit 2 px inside them.
+          </p>
+        )}
         <div
+          ref={stage}
           className="demo-frame"
+          data-regions={showRegions}
           style={
             {
               "--demo-background": backgrounds[background].background,
@@ -182,6 +202,7 @@ export function Demo({ version }: { version: string }) {
           }
         >
           <DuoFrame
+            ref={frame}
             inner={
               iframe ? (
                 <IframeApp background={background} />
@@ -199,6 +220,7 @@ export function Demo({ version }: { version: string }) {
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"
           />
+          {showRegions && <RegionOverlay frameRef={frame} stageRef={stage} />}
         </div>
       </main>
     </DuoProvider>

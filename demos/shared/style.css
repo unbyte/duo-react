@@ -27,16 +27,48 @@ input {
   font-weight: bold;
 }
 .demo-frame {
+  position: relative;
   height: 70vh;
   min-height: 320px;
   margin-top: 16px;
 }
 .demo-appearance {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-top: 12px;
 }
-.demo-frame .duo-display {
+
+.demo-region-toggle {
+  display: block;
+  margin-top: 12px;
+}
+.demo-region-note {
+  max-width: 680px;
+  margin: 8px 0 0;
+  color: #555;
+  font-size: 13px;
+}
+.demo-frame[data-regions="true"] {
+  box-sizing: border-box;
+  padding-right: 220px;
+}
+.demo-regions {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@media (width < 688px) {
+  .demo-frame[data-regions="true"] {
+    height: calc(70vh + 280px);
+    min-height: 600px;
+    padding-right: 0;
+    padding-bottom: 280px;
+  }
+}
+.demo-frame .duo-display[data-duo-placement="full"] {
   background: var(--demo-background);
 }
 .demo-app {

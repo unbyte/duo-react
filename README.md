@@ -38,6 +38,12 @@ and a text input. The Background selector previews light, dark, gray, and mixed
 content; Icons selects automatic, white, or black indicators. Switching content
 modes reloads the page intentionally.
 
+Enable **Show layout regions** for translucent safe-area and reserved-region
+blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
+display and app-window boundaries. Outlines sit 2 logical pixels inside the
+region boundaries; labels report the original dimensions. The overlay follows
+placement, orientation, and zoom without remounting content.
+
 Resize the browser window and use the zoom control to compare resizing with
 scaling. The parent supplies a definite height while the frame uses `height: 100%`.
 Portrait requires full-screen placement; unsupported profiles are rejected.
@@ -96,7 +102,10 @@ The status group occupies the full display's safe-area edge strip, independently
 of app placement. The outer camera cutout uses the square occlusion region in the
 geometry profile as a provisional approximation of the visible hole; the inner
 display currently renders no camera visual, including when `cameraActive` adds
-a reserved region. The home indicator is centered beneath the current app window, including split windows.
+a reserved region. The home indicator is hidden by default; set
+`defaultSystem={{ homeIndicatorVisible: true }}` or call
+`setSystem({ homeIndicatorVisible: true })` to show it beneath the current app
+window. Split View has a black gap and a passive vertical divider grabber.
 Artwork dimensions and spacing are defined in `src/system-layout.ts` in app CSS
 pixels and scale with the screen. The safe-area dataset establishes the available
 regions, not exact icon sizes or native status layouts in every orientation;
@@ -109,13 +118,18 @@ defaults without resetting consumer component state.
 
 `useDuoScreen()` is available in both app subtrees. It returns the display,
 placement, visibility, display size, window rectangle, safe insets, and reserved
-regions. Geometry uses app CSS pixels: one pixel per source device point.
-`getDuoGeometry()` exposes the same measured profiles without mounting React.
+regions. `cornerRadii` describes the display; `windowCornerRadii` describes the
+app window. Both use top-left, top-right, bottom-right, bottom-left order.
+Geometry uses app CSS pixels: one pixel per source device point.
+`getDuoGeometry()` exposes the same geometry without mounting React.
 
 The current profiles cover open and closed layouts in portrait, landscape left,
 and landscape right. Inner split windows are supported in landscape. The
 13px split gap is inferred from the reported widths; the source does not supply
-window origins. Geometry provenance is recorded in
+window origins. Split windows retain the display's outer corner radii and use a
+provisional 32px radius beside the divider, estimated from the
+[supplied illustration](docs/calibration/split-view.png). The divider's 4 × 48px
+grabber is also provisional. Geometry provenance is recorded in
 [src/profiles/xcode-27.1.ts](src/profiles/xcode-27.1.ts).
 
 ### Indicator appearance
