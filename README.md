@@ -43,8 +43,10 @@ or black indicators. **Camera** simulates inner-camera activity through
 the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
 
 Drag the blue block beneath the system controls to inspect the capsule's blur.
+Use the native **Color** picker to try black, white, or any other block color.
 Mouse, touch, and pen dragging follow preview zoom and rotation. Focus the block
 and use arrow keys to move it (Shift for finer movement), or Home to reset it.
+The block has no focus border or ring.
 **Block** hides it for solid-background comparisons; its relative position is
 preserved when switching displays, layouts, or visibility. With **Icons** set to
 Auto, the clock and combined indicator independently choose black or white from

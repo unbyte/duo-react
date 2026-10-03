@@ -4,7 +4,7 @@ import { useDuoScreen } from "duo-frame";
 const initialPosition = { x: 0.6, y: 0.55 };
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
-export function DraggableBlock({ visible }: { visible: boolean }) {
+export function DraggableBlock({ visible, color }: { visible: boolean; color: string }) {
   const screen = useDuoScreen();
   const { width, height } = screen.window;
   const size = Math.min(144, width, height);
@@ -40,6 +40,7 @@ export function DraggableBlock({ visible }: { visible: boolean }) {
     >
       <rect
         className="demo-color-block"
+        fill={color}
         x={x}
         y={y}
         width={size}

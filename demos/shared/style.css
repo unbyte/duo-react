@@ -33,7 +33,8 @@ input {
   margin-top: 20px;
 }
 .demo-select,
-.demo-toggle {
+.demo-toggle,
+.demo-color {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
@@ -58,6 +59,7 @@ input {
   cursor: pointer;
 }
 .demo-select:focus-within,
+.demo-color:focus-within,
 .demo-toggle:has(input:focus-visible) {
   outline: 2px solid #0879ed;
   outline-offset: 2px;
@@ -105,6 +107,26 @@ input {
 }
 .demo-toggle input:checked::before {
   transform: translateX(12px);
+}
+.demo-color input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.demo-color input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.demo-color input::-webkit-color-swatch {
+  border: 0;
+  border-radius: 6px;
+}
+.demo-color input::-moz-color-swatch {
+  border: 0;
+  border-radius: 6px;
 }
 @media (forced-colors: active) {
   .demo-toggle input {
@@ -176,7 +198,6 @@ input {
   user-select: none;
 }
 .demo-color-block {
-  fill: #0066ff;
   pointer-events: auto;
   touch-action: none;
   cursor: grab;
@@ -185,8 +206,7 @@ input {
   cursor: grabbing;
 }
 .demo-color-block:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 4px;
+  outline: none;
 }
 .demo-block-layer text {
   fill: #fff;

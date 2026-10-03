@@ -100,7 +100,15 @@ function ProviderState() {
   );
 }
 
-function ExampleApp({ background, showBlock }: { background: Background; showBlock: boolean }) {
+function ExampleApp({
+  background,
+  showBlock,
+  blockColor,
+}: {
+  background: Background;
+  showBlock: boolean;
+  blockColor: string;
+}) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
@@ -116,7 +124,7 @@ function ExampleApp({ background, showBlock }: { background: Background; showBlo
           Text <input value={text} onChange={(event) => setText(event.currentTarget.value)} />
         </label>
       </div>
-      <DraggableBlock visible={showBlock} />
+      <DraggableBlock visible={showBlock} color={blockColor} />
     </DuoSafeArea>
   );
 }
@@ -168,6 +176,7 @@ export function Demo({ version }: { version: string }) {
   const [showRegions, setShowRegions] = React.useState(false);
   const [showBars, setShowBars] = React.useState(false);
   const [showBlock, setShowBlock] = React.useState(true);
+  const [blockColor, setBlockColor] = React.useState("#0066ff");
   const frame = React.useRef<HTMLDivElement>(null);
   return (
     <DuoProvider>
@@ -183,6 +192,15 @@ export function Demo({ version }: { version: string }) {
               onChange={(event) => setShowBlock(event.currentTarget.checked)}
             />
             <span>Block</span>
+          </label>
+          <label className="demo-color">
+            <span>Color</span>
+            <input
+              type="color"
+              aria-label="Block color"
+              value={blockColor}
+              onChange={(event) => setBlockColor(event.currentTarget.value)}
+            />
           </label>
           <label className="demo-toggle" title="Show layout regions">
             <input
@@ -219,7 +237,7 @@ export function Demo({ version }: { version: string }) {
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"
           >
-            <ExampleApp background={background} showBlock={showBlock} />
+            <ExampleApp background={background} showBlock={showBlock} blockColor={blockColor} />
             {showBars && <ExampleBars />}
           </DuoFrame>
           {showRegions && (
