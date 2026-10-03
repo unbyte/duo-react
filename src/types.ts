@@ -5,7 +5,7 @@ export type DuoOrientation =
   | "portrait-upside-down"
   | "landscape-left"
   | "landscape-right";
-export type DuoPosture = "open" | "closed";
+export type DuoPosture = "open" | "closed" | "partially-open";
 export type DuoZoom = "fit" | number;
 export type DuoIndicatorStyle = "auto" | "light" | "dark";
 
@@ -36,7 +36,7 @@ export interface DuoFoldingRegion {
   /** Full-display coordinates, including the fold's avoidance margins. */
   readonly frame: DuoRect;
   readonly margins: DuoInsets;
-  /** False for the fully open inner display supported by the 2D frame. */
+  /** Active only while partially open, independently of orientation and placement. */
   readonly active: boolean;
 }
 

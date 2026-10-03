@@ -98,6 +98,48 @@ test("fit responds to container bounds while numeric zoom preserves app scale", 
     expect(() => resolveZoom(zoom, device, device)).toThrow(RangeError);
 });
 
+test("partial folding clips the active division to each window without changing measured layout", () => {
+  for (const orientation of [
+    "portrait",
+    "portrait-upside-down",
+    "landscape-left",
+    "landscape-right",
+  ] as const) {
+    const portrait = orientation.startsWith("portrait");
+    for (const cameraActive of [false, true]) {
+      for (const placement of ["full", "left", "right"] as const) {
+        if (portrait && placement !== "full") continue;
+        const options = { display: "inner", orientation, cameraActive, placement } as const;
+        const open = getDuoGeometry(options);
+        const partial = getDuoGeometry({ ...options, posture: "partially-open" });
+        const division = partial.reservedRegions.find((region) => region.type === "division")!;
+        expect(division).toEqual({
+          type: "division",
+          ...(portrait
+            ? { x: 0, y: 455.5, width: 669, height: 40 }
+            : {
+                x: placement === "right" ? 0 : 455.5,
+                y: 0,
+                width: placement === "full" ? 40 : 13.5,
+                height: 669,
+              }),
+        });
+        expect(partial.foldingRegion).toEqual({ ...open.foldingRegion, active: true });
+        expect(partial.reservedRegions).toEqual([...open.reservedRegions, division]);
+        expect(Object.isFrozen(division)).toBe(true);
+        expect(Object.isFrozen(partial.reservedRegions)).toBe(true);
+        expect({
+          ...partial,
+          foldingRegion: open.foldingRegion,
+          reservedRegions: open.reservedRegions,
+        }).toEqual(open);
+      }
+    }
+  }
+  const outer = { display: "outer", orientation: "portrait" } as const;
+  expect(getDuoGeometry({ ...outer, posture: "partially-open" })).toEqual(getDuoGeometry(outer));
+});
+
 test("outer corners rotate with the hinge edge and camera", () => {
   const portrait = getDuoGeometry({ display: "outer", orientation: "portrait" });
   const clockwise = getDuoGeometry({ display: "outer", orientation: "landscape-left" });

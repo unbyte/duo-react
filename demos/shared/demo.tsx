@@ -253,7 +253,7 @@ export function Demo({ version }: { version: string }) {
         <ProviderState />
         {showRegions && (
           <p className="demo-region-note">
-            App safe area and insets; whole-display reserved regions and the inactive inner fold.
+            App safe area and insets; whole-display reserved regions and the inner fold's activity.
             All measurements are logical pixels. Fills show exact bounds; dashed outlines sit 2 px
             inside them.
           </p>

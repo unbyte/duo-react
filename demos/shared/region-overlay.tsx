@@ -1,6 +1,6 @@
 import * as React from "react";
 import { getDuoGeometry, useDuoState } from "duo-frame";
-import type { DuoRect, DuoScreenInfo } from "duo-frame";
+import type { DuoPosture, DuoRect, DuoScreenInfo } from "duo-frame";
 
 interface Region extends DuoRect {
   name: string;
@@ -8,13 +8,14 @@ interface Region extends DuoRect {
   scope?: "display";
 }
 
-function getRegions(screen: DuoScreenInfo, cameraActive: boolean): Region[] {
+function getRegions(screen: DuoScreenInfo, cameraActive: boolean, posture: DuoPosture): Region[] {
   const { window: bounds, safeArea: inset } = screen;
   const { x, y, width, height } = bounds;
   const display = getDuoGeometry({
     display: screen.display,
     orientation: screen.orientation,
     cameraActive,
+    posture,
   });
   return [
     {
@@ -43,12 +44,14 @@ function getRegions(screen: DuoScreenInfo, cameraActive: boolean): Region[] {
       height: inset.bottom,
     },
     { name: "Left safe inset", color: "#00828b", x, y, width: inset.left, height },
-    ...display.reservedRegions.map((region, index) => ({
-      ...region,
-      name: `${region.type === "occlusion" ? "Occlusion" : "Division"} ${index + 1}`,
-      color: ["#d94b42", "#7954cc", "#957126"][index % 3]!,
-      scope: "display" as const,
-    })),
+    ...display.reservedRegions
+      .filter((region) => region.type !== "division")
+      .map((region, index) => ({
+        ...region,
+        name: `Occlusion ${index + 1}`,
+        color: ["#d94b42", "#7954cc", "#957126"][index % 3]!,
+        scope: "display" as const,
+      })),
     ...(display.foldingRegion
       ? [
           {
@@ -99,9 +102,10 @@ export function RegionOverlay({
   stageRef: React.RefObject<HTMLDivElement>;
 }) {
   const screen = useDuoState(
-    (state) => state.screens[state.posture === "open" ? "inner" : "outer"],
+    (state) => state.screens[state.posture === "closed" ? "outer" : "inner"],
   );
   const cameraActive = useDuoState((state) => state.system.cameraActive);
+  const posture = useDuoState((state) => state.posture);
   const [layout, setLayout] = React.useState<{
     transform: DOMMatrix;
     frame: DuoRect;
@@ -152,7 +156,7 @@ export function RegionOverlay({
 
   if (!layout) return null;
   const { transform, frame, width } = layout;
-  const regions = getRegions(screen, cameraActive);
+  const regions = getRegions(screen, cameraActive, posture);
   const boundaries = {
     display: { bounds: { x: 0, y: 0, ...screen.size }, radii: screen.cornerRadii },
     window: { bounds: screen.window, radii: screen.windowCornerRadii },

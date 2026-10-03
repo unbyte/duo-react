@@ -163,7 +163,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   validateZoom(effectiveZoom);
   if (!Number.isFinite(fitPadding) || fitPadding < 0)
     throw new RangeError("fitPadding must be a nonnegative finite number.");
-  const active = state.screens[state.posture === "open" ? "inner" : "outer"];
+  const active = state.screens[state.posture === "closed" ? "outer" : "inner"];
   const rotation = useRotation(state.rotation);
   const outset = frameOutset(active.display);
   const scale = resolveZoom(

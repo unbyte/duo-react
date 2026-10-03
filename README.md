@@ -45,8 +45,8 @@ blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
 display and app-window boundaries. Outlines sit 2 logical pixels inside the
 region boundaries; labels report the original dimensions. The overlay follows
 placement, orientation, and zoom without remounting content. It also shows the
-inner display’s inactive folding region: 669 × 40pt in portrait, 40 × 669pt in
-landscape. `useDuoScreen().foldingRegion` exposes its full-display frame, margins,
+inner display’s folding region, active only while partially open: 669 × 40pt in
+portrait, 40 × 669pt in landscape. `useDuoScreen().foldingRegion` exposes its full-display frame, margins,
 and activity separately from active reserved regions. The
 [folding-region calibration](docs/calibration/folding-region.md) explains why
 this band does not change the 13px Split View gap.
@@ -102,12 +102,12 @@ import "duo-frame/style.css";
 </DuoProvider>;
 ```
 
-The display buttons select the inner display for the open posture and
-the outer display for the closed posture. `DuoFrame` renders one `children` tree
-in a stable host, updating its dimensions and screen context when switching.
+The posture buttons select Closed, Partially open, or Fully open. Closed shows
+the outer display; both open postures show the inner display. `DuoFrame` renders
+one `children` tree in a stable host, updating its dimensions and screen context when switching.
 The child can adapt through `useDuoScreen()` or `useDuoState()` without remounting.
-Call `setPosture("open")` or `setPosture("closed")` through `useDuoActions()` to
-select the same states programmatically.
+Call `setPosture("open")`, `setPosture("partially-open")`, or `setPosture("closed")`
+through `useDuoActions()` to select these states programmatically.
 
 Use `<DuoFrame><App /></DuoFrame>` in place of the separate `inner` and `outer`
 props. The frame preserves the child’s identity across display, orientation,
@@ -122,12 +122,12 @@ container and renders only its children. Each component forwards its div ref and
 accepts normal div attributes, including `className` and `style`. The demos supply
 the floating placement, pill backgrounds, and button styling.
 
-| Group                 | Buttons           | Behavior                                                             |
-| --------------------- | ----------------- | -------------------------------------------------------------------- |
-| `DuoDisplayControls`  | Inner, outer      | Selects the visible display without remounting apps                  |
-| `DuoRotationControls` | Left, right       | Rotates by 90° in either direction without stopping                  |
-| `DuoLayoutControls`   | Left, full, right | Hidden on the outer display; split layouts disabled in portrait      |
-| `DuoZoomControls`     | Out, in, fit      | Divides or multiplies the current scale by 1.25, or restores fitting |
+| Group                 | Buttons                            | Behavior                                                             |
+| --------------------- | ---------------------------------- | -------------------------------------------------------------------- |
+| `DuoDisplayControls`  | Closed, partially open, fully open | Selects posture without remounting apps                              |
+| `DuoRotationControls` | Left, right                        | Rotates by 90° in either direction without stopping                  |
+| `DuoLayoutControls`   | Left, full, right                  | Hidden on the outer display; split layouts disabled in portrait      |
+| `DuoZoomControls`     | Out, in, fit                       | Divides or multiplies the current scale by 1.25, or restores fitting |
 
 Rotation passes through all four positions, including `portrait-upside-down`.
 Each click adds or subtracts 90°; repeated turns retain their direction across
@@ -201,14 +201,36 @@ app window. Both use top-left, top-right, bottom-right, bottom-left order.
 Geometry uses app CSS pixels: one pixel per source device point.
 `getDuoGeometry()` exposes the same geometry without mounting React.
 
-The current profiles cover open and closed layouts in portrait, landscape left,
-and landscape right. Inner split windows are supported in landscape. The
-13px split gap is inferred from the reported widths; the source does not supply
+The inner display supports fully open and partially open layouts in all four
+orientations. The closed outer display supports portrait and both landscape
+orientations, with the upside-down fallback described above. Inner split windows
+are supported in landscape in both open postures. The 13px split gap is inferred from the reported widths; the source does not supply
 window origins. Split windows retain the display's outer corner radii and use a
 provisional 32px radius beside the divider, estimated from the
 [supplied illustration](docs/calibration/split-view.png). The divider's 4 × 48px
 grabber is also provisional. Geometry provenance is recorded in
 [src/profiles/xcode-27.1.ts](src/profiles/xcode-27.1.ts).
+
+### Partial folding
+
+Posture and orientation are independent. `"partially-open"` activates the inner
+`foldingRegion` and adds its intersection with the current app window to
+`reservedRegions` as a `"division"`. These rectangles use window-local coordinates;
+`foldingRegion.frame` uses full-display coordinates. `getDuoGeometry()` accepts
+an optional `posture` with the same behavior, defaulting to `"open"`.
+
+For a full landscape window, the division is `(455.5, 0, 40, 669)`. Left and right
+split windows receive `(455.5, 0, 13.5, 669)` and `(0, 0, 13.5, 669)` respectively.
+Portrait uses `(0, 455.5, 669, 40)`. Window sizes, safe insets, and the 13px split gap
+stay unchanged. A posture change emits `windowchange` after the frame commits,
+even when only region activity changes.
+
+Children choose how to respond through `useDuoState()` and `useDuoScreen()`.
+Apps may adjust important controls or columns around the division; continuous
+scrolling content can stay continuous. The frame does not impose app padding or
+split an app into panels. It stays flat, with no hinge angle or folding animation.
+Enable **Show layout regions** to inspect the fold's active/inactive status.
+See the [calibration and Apple guidance](docs/calibration/folding-region.md).
 
 ### Indicator appearance
 

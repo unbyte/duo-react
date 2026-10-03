@@ -56,7 +56,7 @@ test("frame children receive the active display's screen context on the server",
     const screen = useDuoScreen();
     return <span>{`${screen.display}:${screen.window.width}`}</span>;
   }
-  for (const posture of ["open", "closed"] as const) {
+  for (const posture of ["open", "closed", "partially-open"] as const) {
     const html = renderToString(
       <DuoProvider defaultState={{ posture, orientation: "portrait" }}>
         <DuoFrame>
@@ -64,7 +64,7 @@ test("frame children receive the active display's screen context on the server",
         </DuoFrame>
       </DuoProvider>,
     );
-    expect(html).toContain(posture === "open" ? "inner:669" : "outer:466");
+    expect(html).toContain(posture === "closed" ? "outer:466" : "inner:669");
     expect(html.match(/class="duo-window"/g)).toHaveLength(1);
   }
 });
@@ -109,6 +109,20 @@ test("headless control groups compose independently with the React 16.8 baseline
   );
   expect(composed).toContain('class="duo-toolbar my-toolbar"');
   expect(composed).toContain('aria-label="Zoom in"');
-  expect(composed).toContain('aria-label="Outer display"');
+  expect(composed).toContain('aria-label="Closed"');
   expect(composed).not.toContain('data-duo-toolbar-group="layout"');
+});
+
+test("partial posture selects its own control and keeps landscape layout controls available", () => {
+  const html = renderToString(
+    <DuoProvider defaultState={{ posture: "partially-open" }}>
+      <DuoDisplayControls />
+      <DuoLayoutControls />
+    </DuoProvider>,
+  );
+  expect(html).toMatch(/data-duo-action="partially-open" aria-pressed="true"/);
+  expect(html).toMatch(/data-duo-action="inner" aria-pressed="false"/);
+  expect(html).toMatch(/data-duo-action="outer" aria-pressed="false"/);
+  expect(html).toContain('data-duo-toolbar-group="layout"');
+  expect(html).not.toContain("disabled");
 });

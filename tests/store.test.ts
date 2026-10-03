@@ -43,6 +43,55 @@ test("visibility changes preserve window metrics and close/reopen preserves plac
   expect(store.getSnapshot().innerPlacement).toBe("right");
 });
 
+test("partial posture updates regions without changing display visibility and ignores repeated selection", () => {
+  const store = createDuoStore({ innerPlacement: "right" });
+  const initial = store.getSnapshot();
+  const listener = vi.fn();
+  store.subscribe(listener);
+  store.actions.setPosture("partially-open");
+  const partial = store.getSnapshot();
+  expect(partial.screens.inner).not.toBe(initial.screens.inner);
+  expect(partial.screens.inner.visible).toBe(true);
+  expect(partial.screens.inner.foldingRegion?.active).toBe(true);
+  expect(partial.screens.outer).toBe(initial.screens.outer);
+  expect(partial.screens.inner.window).toEqual(initial.screens.inner.window);
+  store.actions.setPosture("partially-open");
+  expect(store.getSnapshot()).toBe(partial);
+  expect(listener).toHaveBeenCalledTimes(1);
+  store.actions.setSystem({ cameraActive: true });
+  expect(store.getSnapshot().screens.inner.reservedRegions).toHaveLength(3);
+  expect(store.getSnapshot().screens.inner.foldingRegion?.active).toBe(true);
+  store.actions.setPosture("closed");
+  expect(store.getSnapshot().screens.inner.foldingRegion?.active).toBe(false);
+  expect(store.getSnapshot().screens.outer.visible).toBe(true);
+  store.actions.setPosture("partially-open");
+  expect(store.getSnapshot().innerPlacement).toBe("right");
+  store.actions.setPosture("open");
+  expect(store.getSnapshot().screens.inner.foldingRegion?.active).toBe(false);
+  expect(
+    store.getSnapshot().screens.inner.reservedRegions.every((r) => r.type === "occlusion"),
+  ).toBe(true);
+});
+
+test("partial defaults survive rotation and reset while unsupported postures are rejected", () => {
+  const store = createDuoStore({ posture: "partially-open", innerPlacement: "left" });
+  const initial = store.getSnapshot();
+  for (let i = 0; i < 4; i++) {
+    store.actions.rotate("right");
+    expect(store.getSnapshot().posture).toBe("partially-open");
+    expect(store.getSnapshot().screens.inner.foldingRegion?.active).toBe(true);
+    expect(store.getSnapshot().innerPlacement).toBe("full");
+  }
+  store.actions.setPosture("closed");
+  store.actions.resetDevice();
+  expect(store.getSnapshot()).toEqual(initial);
+  expect(() => {
+    // @ts-expect-error Validate JavaScript callers too.
+    store.actions.setPosture("half");
+  }).toThrow(RangeError);
+  expect(store.getSnapshot()).toEqual(initial);
+});
+
 test("controlled zoom requests changes without mutating its owner", () => {
   const store = createDuoStore();
   const disconnect = store.connectFrame();

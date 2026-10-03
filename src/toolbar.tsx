@@ -68,6 +68,24 @@ function LayoutIcon({ placement }: { placement: DuoPlacement }) {
   );
 }
 
+function PartialFoldIcon() {
+  const outline =
+    "M12 6 4.25 4.28A1 1 0 0 0 3 5.26v11.94a1 1 0 0 0 .78.98L12 20l8.22-1.82a1 1 0 0 0 .78-.98V5.26a1 1 0 0 0-1.25-.98L12 6Z";
+  return (
+    <Glyph>
+      <path
+        d={outline}
+        fill="currentColor"
+        fillOpacity="0.14"
+        stroke="none"
+        data-duo-icon-tone="secondary"
+      />
+      <path d={outline} />
+      <path d="M12 6v14" />
+    </Glyph>
+  );
+}
+
 function IconButton({
   label,
   action,
@@ -103,25 +121,33 @@ export const DuoToolbar = React.forwardRef<HTMLDivElement, DuoToolbarProps>(func
 
 export const DuoDisplayControls = React.forwardRef<HTMLDivElement, DuoControlGroupProps>(
   function DuoDisplayControls(props, ref) {
-    const inner = useDuoState((state) => state.posture === "open");
+    const posture = useDuoState((state) => state.posture);
     const { setPosture } = useDuoActions();
     return (
-      <div role="group" aria-label="Display" data-duo-toolbar-group="display" {...props} ref={ref}>
+      <div role="group" aria-label="Posture" data-duo-toolbar-group="display" {...props} ref={ref}>
         <IconButton
-          label="Inner display"
-          action="inner"
-          aria-pressed={inner}
-          onClick={() => setPosture("open")}
-        >
-          <DisplayIcon inner />
-        </IconButton>
-        <IconButton
-          label="Outer display"
+          label="Closed"
           action="outer"
-          aria-pressed={!inner}
+          aria-pressed={posture === "closed"}
           onClick={() => setPosture("closed")}
         >
           <DisplayIcon inner={false} />
+        </IconButton>
+        <IconButton
+          label="Partially open"
+          action="partially-open"
+          aria-pressed={posture === "partially-open"}
+          onClick={() => setPosture("partially-open")}
+        >
+          <PartialFoldIcon />
+        </IconButton>
+        <IconButton
+          label="Fully open"
+          action="inner"
+          aria-pressed={posture === "open"}
+          onClick={() => setPosture("open")}
+        >
+          <DisplayIcon inner />
         </IconButton>
       </div>
     );
@@ -154,7 +180,7 @@ export const DuoLayoutControls = React.forwardRef<HTMLDivElement, DuoControlGrou
   function DuoLayoutControls(props, ref) {
     const state = useDuoState((value) => value);
     const { setInnerPlacement } = useDuoActions();
-    if (state.posture !== "open") return null;
+    if (state.posture === "closed") return null;
     return (
       <div
         role="group"

@@ -1,4 +1,4 @@
-import { getDuoGeometry, validateZoom } from "./geometry";
+import { getDuoGeometry, validatePosture, validateZoom } from "./geometry";
 import { normalizeRotation, orientationAtRotation, orientationRotation } from "./view-controls";
 import type {
   DuoDefaults,
@@ -46,8 +46,7 @@ function mergeSystem(current: DuoSystem, patch: DuoSystemOptions) {
 
 function validateModel(model: Model) {
   validateZoom(model.zoom);
-  if (model.posture !== "open" && model.posture !== "closed")
-    throw new RangeError("Unsupported Duo posture.");
+  validatePosture(model.posture);
   if (
     !Number.isFinite(model.system.battery) ||
     model.system.battery < 0 ||
@@ -102,12 +101,14 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
           ? (old?.orientation ?? "portrait")
           : model.orientation;
       const placement = display === "inner" ? model.innerPlacement : "full";
-      const visible = display === "inner" ? model.posture === "open" : model.posture === "closed";
+      const visible = display === "inner" ? model.posture !== "closed" : model.posture === "closed";
       const sameGeometry =
         old &&
         old.orientation === orientation &&
         old.placement === placement &&
-        (display === "outer" || previous.system.cameraActive === model.system.cameraActive);
+        (display === "outer" ||
+          (previous.system.cameraActive === model.system.cameraActive &&
+            old.foldingRegion?.active === (model.posture === "partially-open")));
       const geometry = sameGeometry
         ? old
         : getDuoGeometry({
@@ -115,6 +116,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
             placement,
             orientation,
             cameraActive: model.system.cameraActive,
+            posture: model.posture,
           });
       screens[display] =
         sameGeometry && old.visible === visible ? old : Object.freeze({ ...geometry, visible });
