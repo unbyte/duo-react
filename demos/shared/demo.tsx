@@ -16,6 +16,7 @@ import {
   useDuoScreen,
 } from "duo-frame";
 import type { DuoIndicatorStyle } from "duo-frame";
+import { DraggableBlock } from "./draggable-block";
 import "duo-frame/style.css";
 import "./style.css";
 
@@ -99,7 +100,7 @@ function ProviderState() {
   );
 }
 
-function ExampleApp({ background }: { background: Background }) {
+function ExampleApp({ background, showBlock }: { background: Background; showBlock: boolean }) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
@@ -115,6 +116,7 @@ function ExampleApp({ background }: { background: Background }) {
           Text <input value={text} onChange={(event) => setText(event.currentTarget.value)} />
         </label>
       </div>
+      <DraggableBlock visible={showBlock} />
     </DuoSafeArea>
   );
 }
@@ -165,6 +167,7 @@ export function Demo({ version }: { version: string }) {
   const [background, setBackground] = React.useState<Background>("light");
   const [showRegions, setShowRegions] = React.useState(false);
   const [showBars, setShowBars] = React.useState(false);
+  const [showBlock, setShowBlock] = React.useState(true);
   const frame = React.useRef<HTMLDivElement>(null);
   return (
     <DuoProvider>
@@ -173,6 +176,14 @@ export function Demo({ version }: { version: string }) {
         <div className="demo-controls" role="group" aria-label="Preview appearance">
           <BackgroundPicker value={background} onChange={setBackground} />
           <CameraToggle />
+          <label className="demo-toggle" title="Show draggable color block">
+            <input
+              type="checkbox"
+              checked={showBlock}
+              onChange={(event) => setShowBlock(event.currentTarget.checked)}
+            />
+            <span>Block</span>
+          </label>
           <label className="demo-toggle" title="Show layout regions">
             <input
               type="checkbox"
@@ -208,7 +219,7 @@ export function Demo({ version }: { version: string }) {
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"
           >
-            <ExampleApp background={background} />
+            <ExampleApp background={background} showBlock={showBlock} />
             {showBars && <ExampleBars />}
           </DuoFrame>
           {showRegions && (

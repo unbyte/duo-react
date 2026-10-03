@@ -42,6 +42,14 @@ or black indicators. **Camera** simulates inner-camera activity through
 `cameraActive`; enable **Regions** to see its reserved area. **Regions** toggles
 the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
 
+Drag the blue block beneath the system controls to inspect the capsule's blur.
+Mouse, touch, and pen dragging follow preview zoom and rotation. Focus the block
+and use arrow keys to move it (Shift for finer movement), or Home to reset it.
+**Block** hides it for solid-background comparisons; its relative position is
+preserved when switching displays, layouts, or visibility. Select white or black
+**Icons** to inspect the material independently of the provisional automatic
+indicator coloring.
+
 Enable **Regions** for the library's interactive `DuoRegionMask`. It shows the
 app safe area and nonzero insets, active whole-display reserved regions, and the
 Split View gap. Hover a region or its label to highlight both; labels also support
