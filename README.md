@@ -306,7 +306,9 @@ iframe in the frame's React content instead.
 Side bars use a 48px-wide column inset 24px from the display edge, following
 [measurements of Apple's guide images](docs/calibration/app-bars.md). The 84px
 safe inset describes app geometry rather than the bar's centerline. Group gaps
-and portrait edge spacing retain provisional 16px defaults. Reserved regions and
+and portrait edge spacing retain provisional 16px defaults. In inner landscape,
+status and app bars share one axis; the right toolbar starts at the 120px status
+reservation boundary and the split-left toolbar at 24px from the top. Reserved regions and
 the rendered status bounds constrain available space. Bars share that space and
 scroll when their content exceeds it; there is no automatic overflow menu or
 minimization. They overlay app content and do not change the provider's calibrated

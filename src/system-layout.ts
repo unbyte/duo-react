@@ -1,3 +1,4 @@
+import { sideControlMetrics } from "./control-metrics";
 import { getDuoGeometry } from "./geometry";
 import type { DuoRect, DuoScreenInfo } from "./types";
 
@@ -46,13 +47,13 @@ export function getSystemLayout(screen: DuoScreenInfo) {
   } else {
     const center = camera
       ? camera.x + camera.width / 2
-      : safeArea.left > 0
-        ? safeArea.left / 2
-        : size.width - safeArea.right / 2;
+      : size.width - sideControlMetrics.edgeInset - sideControlMetrics.width / 2;
     const top =
       camera && camera.y < size.height / 2
         ? camera.y + camera.height + metrics.cameraGap
-        : metrics.top;
+        : screen.display === "inner"
+          ? sideControlMetrics.innerStatusTop
+          : metrics.top;
     status = {
       x: center - metrics.timeWidth / 2,
       y: top,
