@@ -29,7 +29,7 @@
     "watch": "vp pack --watch"
   },
   "dependencies": {
-    "html2canvas": "1.4.1",
+    "@zumer/snapdom": "3.2.0",
     "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {

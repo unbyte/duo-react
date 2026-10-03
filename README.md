@@ -343,8 +343,9 @@ other display and the other indicator's setting. Reset restores provider
 defaults. Changing appearance does not resize or remount app content. Iframe
 owners can forward an explicit preference through their own message bridge.
 
-**Auto samples each control separately.** A lazy-loaded `html2canvas` renderer
-reconstructs the display content into a canvas, excluding the system chrome.
+**Auto samples each control separately.** Lazy-loaded
+[SnapDOM](https://github.com/zumerlab/snapdom) captures the display content through
+SVG `foreignObject` and rasterizes it into a canvas, excluding the system chrome.
 The clock, 3-in-1 indicator, and optional home indicator each use the average
 linear luminance within their own bounds to choose one black or white foreground.
 A small threshold band prevents flicker near equal contrast. Moving a dark block
@@ -354,12 +355,16 @@ Sampling responds to content, scrolling, size, and transform changes, with a
 500ms periodic refresh for canvas, video, and CSS animation. Captures run one at a
 time and update asynchronously; they pause in hidden documents and stop when no
 visible indicator uses Auto. Explicit styles bypass sampling for that indicator.
-No app color-scheme setting is required or consulted.
+No app color-scheme setting is required or consulted. SnapDOM can reuse captures
+and resources between updates; periodic refreshes also invalidate its style cache
+to pick up CSSOM edits. Long captures yield to keep the page responsive. Resolved
+color changes use a 120ms CSS transition, disabled by reduced motion.
 
 This is DOM reconstruction, not direct access to browser-composited pixels or a
-calibration of Apple's selection algorithm. Unsupported CSS, protected video,
-tainted canvases, and cross-origin content without CORS can be omitted by the
-renderer. A failed capture retains the previous choice (initially black); use
+calibration of Apple's selection algorithm. SVG capture support varies by browser.
+Protected video, tainted canvases, and cross-origin resources without CORS can be
+omitted or replaced with placeholders; cross-origin iframes cannot be captured
+faithfully. A failed capture retains the previous choice (initially black); use
 explicit indicator styles when content cannot be sampled reliably. The capsule
 blur is excluded from the measurement. Resolved colors remain local to rendering;
 provider state stores only the requested modes.

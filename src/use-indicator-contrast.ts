@@ -27,6 +27,7 @@ export function useIndicatorContrast(
     let dirty = false;
     let timer = 0;
     let lastCapture = 0;
+    let invalidate = false;
 
     const schedule = () => {
       dirty = true;
@@ -40,47 +41,52 @@ export function useIndicatorContrast(
       busy = true;
       dirty = false;
       lastCapture = performance.now();
-      let clonedFrame: Element | undefined;
+      const refreshStyles = invalidate;
+      invalidate = false;
       try {
-        const { default: render } = await import("html2canvas");
+        const { snapdom } = await import("@zumer/snapdom");
         if (stopped) return;
-        const bounds = surface.getBoundingClientRect();
-        if (!bounds.width || !bounds.height) return;
+        const width = surface.offsetWidth;
+        const height = surface.offsetHeight;
+        if (!width || !height) return;
+        // SnapDOM captures local layout; ancestor zoom/rotation must not move the sample.
         const areas = controls.map((key) => {
           const active = key === "home" ? autoHome : autoStatus;
-          return active ? targets[key].current?.getBoundingClientRect() : undefined;
+          const target = active ? targets[key].current : undefined;
+          if (!target) return;
+          let x = 0;
+          let y = 0;
+          let ancestor: Element | undefined = target;
+          while (ancestor instanceof HTMLElement && ancestor !== surface) {
+            x += ancestor.offsetLeft;
+            y += ancestor.offsetTop;
+            ancestor = ancestor.offsetParent ?? undefined;
+          }
+          if (ancestor !== surface) return;
+          return { x, y, width: target.offsetWidth, height: target.offsetHeight };
         });
-        const canvas = await render(surface, {
-          backgroundColor: null,
+        const canvas = await snapdom.toCanvas(surface, {
           scale: 0.5,
-          logging: false,
-          useCORS: true,
-          imageTimeout: 1000,
-          ignoreElements: (element) => element.classList.contains("duo-system"),
-          onclone: (document) => {
-            clonedFrame = document.defaultView?.frameElement ?? undefined;
-          },
+          dpr: 1,
+          exclude: ".duo-system",
+          excludeMode: "remove",
+          fast: false,
+          invalidate: refreshStyles,
         });
         if (stopped) return;
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (!context) return;
         const samples = areas.map((area) => {
           if (!area) return;
-          const x = Math.max(
-            0,
-            Math.floor(((area.left - bounds.left) / bounds.width) * canvas.width),
-          );
-          const y = Math.max(
-            0,
-            Math.floor(((area.top - bounds.top) / bounds.height) * canvas.height),
-          );
+          const x = Math.max(0, Math.floor((area.x / width) * canvas.width));
+          const y = Math.max(0, Math.floor((area.y / height) * canvas.height));
           const right = Math.min(
             canvas.width,
-            Math.ceil(((area.right - bounds.left) / bounds.width) * canvas.width),
+            Math.ceil(((area.x + area.width) / width) * canvas.width),
           );
           const bottom = Math.min(
             canvas.height,
-            Math.ceil(((area.bottom - bounds.top) / bounds.height) * canvas.height),
+            Math.ceil(((area.y + area.height) / height) * canvas.height),
           );
           return right > x && bottom > y
             ? context.getImageData(x, y, right - x, bottom - y).data
@@ -97,7 +103,6 @@ export function useIndicatorContrast(
       } catch {
         // Unreadable canvases or unsupported content retain the last valid choice.
       } finally {
-        clonedFrame?.remove();
         busy = false;
         if (dirty) schedule();
       }
@@ -121,8 +126,11 @@ export function useIndicatorContrast(
     window.addEventListener("resize", schedule);
     surface.addEventListener("load", schedule, true);
     document.addEventListener("visibilitychange", schedule);
-    // Canvas/video frames and stylesheet-driven animations need periodic refreshes.
-    const refresh = window.setInterval(schedule, 500);
+    // CSSOM edits have no mutation signal; periodically refresh SnapDOM's style cache too.
+    const refresh = window.setInterval(() => {
+      invalidate = true;
+      schedule();
+    }, 500);
     schedule();
     return () => {
       stopped = true;
