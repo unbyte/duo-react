@@ -72,6 +72,16 @@ function BackgroundPicker({
   );
 }
 
+function ProviderState() {
+  const state = useDuoState((value) => value);
+  return (
+    <details className="demo-state">
+      <summary>Provider state</summary>
+      <pre>{JSON.stringify(state, undefined, 2)}</pre>
+    </details>
+  );
+}
+
 function ExampleApp({ background, showBars }: { background: Background; showBars: boolean }) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
@@ -245,6 +255,7 @@ export function Demo({ version }: { version: string }) {
           />{" "}
           Show app bars
         </label>
+        <ProviderState />
         {showRegions && (
           <p className="demo-region-note">
             App safe area and insets; whole-display reserved regions. All measurements are logical

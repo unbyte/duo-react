@@ -44,6 +44,21 @@ input {
   display: block;
   margin-top: 12px;
 }
+.demo-state {
+  margin-top: 12px;
+}
+.demo-state summary {
+  cursor: pointer;
+}
+.demo-state pre {
+  max-height: 320px;
+  overflow: auto;
+  padding: 12px;
+  background: #f5f6f8;
+  font-size: 12px;
+  line-height: 1.5;
+  tab-size: 2;
+}
 .demo-region-note {
   max-width: 680px;
   margin: 8px 0 0;
