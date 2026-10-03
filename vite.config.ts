@@ -4,6 +4,7 @@ export default defineConfig({
   pack: {
     platform: "browser",
     target: "es2020",
+    outputOptions: { comments: { legal: true } },
     deps: { neverBundle: [/^react(?:-dom)?(?:\/|$)/, /^use-sync-external-store(?:\/|$)/] },
     dts: {
       generator: "tsgo",
