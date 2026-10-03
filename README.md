@@ -288,6 +288,15 @@ regions and nonzero rectangles are rendered. The mask intercepts pointer events
 on its regions while mounted; hide it to interact with the app beneath it.
 It renders its measured regions only in the browser and supports React 16.8–19.
 
+### System-control material
+
+The controls sit on a rounded, blurred backdrop: the inner capsule encloses the
+clock and combined indicator, and the outer capsule includes the camera as well.
+The foreground stays sharp. The material follows display rotation and preview
+zoom, and hides with `showSystemUI={false}`; the outer camera remains visible.
+The [calibration note](docs/calibration/status-controls.md#capsule-material) records
+the simulator references and estimated material parameters.
+
 ### Indicator appearance
 
 Each display has independent status-bar and home-indicator styles. `"light"`

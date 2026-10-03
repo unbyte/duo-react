@@ -14,6 +14,8 @@ export const systemMetrics = {
   gap: 7,
   top: 24,
   cameraGap: 18,
+  materialEndPadding: 8,
+  materialSidePadding: 5,
   homeWidth: 120,
   homeHeight: 5,
   homeBottom: 7,
@@ -45,27 +47,42 @@ export function getSystemLayout(screen: DuoScreenInfo) {
       height: metrics.glyphHeight,
     };
   } else {
+    const height = metrics.lineHeight + metrics.gap + metrics.glyphHeight;
     const center = camera
       ? camera.x + camera.width / 2
       : size.width - sideControlMetrics.edgeInset - sideControlMetrics.width / 2;
-    const top =
-      camera && camera.y < size.height / 2
+    const top = camera
+      ? camera.y < size.height / 2
         ? camera.y + camera.height + metrics.cameraGap
-        : screen.display === "inner"
-          ? sideControlMetrics.innerStatusTop
-          : metrics.top;
+        : camera.y - metrics.cameraGap - height
+      : screen.display === "inner"
+        ? sideControlMetrics.innerStatusTop
+        : metrics.top;
     status = {
       x: center - metrics.timeWidth / 2,
       y: top,
       width: metrics.timeWidth,
-      height: metrics.lineHeight + metrics.gap + metrics.glyphHeight,
+      height,
     };
   }
+
+  const left = Math.min(status.x, camera?.x ?? status.x);
+  const top = Math.min(status.y, camera?.y ?? status.y);
+  const right = Math.max(status.x + status.width, camera ? camera.x + camera.width : 0);
+  const bottom = Math.max(status.y + status.height, camera ? camera.y + camera.height : 0);
+  const paddingX = horizontal ? metrics.materialEndPadding : metrics.materialSidePadding;
+  const paddingY = horizontal ? metrics.materialSidePadding : metrics.materialEndPadding;
 
   return {
     camera,
     status,
     horizontal,
+    material: {
+      x: left - paddingX,
+      y: top - paddingY,
+      width: right - left + paddingX * 2,
+      height: bottom - top + paddingY * 2,
+    },
     divider:
       screen.display === "inner" && screen.placement !== "full"
         ? {

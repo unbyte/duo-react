@@ -50,3 +50,29 @@ test("status stays in the reserved edge strip in all supported orientations", ()
     }
   }
 });
+
+test("capsule encloses the complete control group with consistent padding in every orientation", () => {
+  const store = createDuoStore();
+  for (const orientation of [
+    "portrait",
+    "portrait-upside-down",
+    "landscape-left",
+    "landscape-right",
+  ] as const) {
+    store.actions.setOrientation(orientation);
+    for (const screen of Object.values(store.getSnapshot().screens)) {
+      const { material, status, camera } = getSystemLayout(screen);
+      for (const bounds of camera ? [camera, status] : [status]) {
+        expect(material.x).toBeLessThan(bounds.x);
+        expect(material.y).toBeLessThan(bounds.y);
+        expect(material.x + material.width).toBeGreaterThan(bounds.x + bounds.width);
+        expect(material.y + material.height).toBeGreaterThan(bounds.y + bounds.height);
+      }
+      expect(material.x).toBeGreaterThanOrEqual(0);
+      expect(material.y).toBeGreaterThanOrEqual(0);
+      expect(material.x + material.width).toBeLessThanOrEqual(screen.size.width);
+      expect(material.y + material.height).toBeLessThanOrEqual(screen.size.height);
+      if (camera) expect(material.height).toBeLessThan(150);
+    }
+  }
+});

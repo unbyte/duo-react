@@ -22,6 +22,9 @@ export function SystemChrome({
   const layout = React.useMemo(() => getSystemLayout(screen), [screen]);
   return (
     <div className="duo-system" aria-hidden="true">
+      {showIndicators && (
+        <div className="duo-status-material" style={boundsStyle(layout.material)} />
+      )}
       {layout.camera && <div className="duo-camera-cutout" style={boundsStyle(layout.camera)} />}
       {showIndicators && (
         <>

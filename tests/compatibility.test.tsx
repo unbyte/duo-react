@@ -96,9 +96,11 @@ test("split chrome is passive and the home indicator is opt-in", () => {
   const visible = render(true);
   expect(visible).toContain('class="duo-divider"');
   expect(visible).toContain('class="duo-home"');
+  expect(visible).toContain('class="duo-status-material"');
   const hidden = render(false);
   expect(hidden).not.toContain('class="duo-divider"');
   expect(hidden).not.toContain('class="duo-home"');
+  expect(hidden).not.toContain('class="duo-status-material"');
 });
 
 test("headless control groups compose independently with the React 16.8 baseline", () => {
