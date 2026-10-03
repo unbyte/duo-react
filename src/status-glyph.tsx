@@ -22,12 +22,20 @@ const cellularDots = [-30, -10, 10, 30].map((degrees) => {
   return { x: center + Math.sin(angle) * 47, y: center + Math.cos(angle) * 47 };
 });
 
-export function StatusGlyph({ battery, charging }: Pick<DuoSystem, "battery" | "charging">) {
+export function StatusGlyph({
+  battery,
+  charging,
+  width = "100%",
+  height = "100%",
+}: Pick<DuoSystem, "battery" | "charging"> & {
+  width?: number | string;
+  height?: number | string;
+}) {
   return (
     <svg
       viewBox={`0 0 ${statusArtwork.width} ${statusArtwork.height}`}
-      width="100%"
-      height="100%"
+      width={width}
+      height={height}
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"

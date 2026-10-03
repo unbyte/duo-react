@@ -68,7 +68,7 @@ test("frame can be server-rendered without browser globals", () => {
   expect(html).toContain('data-duo-window="inner"');
   expect(html).not.toContain('data-duo-window="outer"');
   expect(html).toContain("App content");
-  expect(html).not.toContain('class="duo-home"');
+  expect(html).not.toContain('class="duo-indicator duo-home"');
   expect(html).not.toContain('class="duo-divider"');
 });
 
@@ -115,11 +115,11 @@ test("split chrome is passive and the home indicator is opt-in", () => {
     );
   const visible = render(true);
   expect(visible).toContain('class="duo-divider"');
-  expect(visible).toContain('class="duo-home"');
+  expect(visible).toContain('class="duo-indicator duo-home"');
   expect(visible).toContain('class="duo-status-material"');
   const hidden = render(false);
   expect(hidden).not.toContain('class="duo-divider"');
-  expect(hidden).not.toContain('class="duo-home"');
+  expect(hidden).not.toContain('class="duo-indicator duo-home"');
   expect(hidden).not.toContain('class="duo-status-material"');
 });
 
@@ -146,7 +146,7 @@ test("outer landscape hides status and capsule while retaining the camera and op
         expect(html.includes('class="duo-status"')).toBe(expected && showSystemUI);
         expect(html.includes('class="duo-status-material"')).toBe(expected && showSystemUI);
         expect(html).toContain('class="duo-camera-cutout"');
-        expect(html.includes('class="duo-home"')).toBe(showSystemUI);
+        expect(html.includes('class="duo-indicator duo-home"')).toBe(showSystemUI);
       }
     }
   }
@@ -174,7 +174,7 @@ test("app status preference reaches children and rendering while retaining indep
         expect(html.includes('class="duo-status-material"')).toBe(
           showSystemUI && !prefersStatusBarHidden,
         );
-        expect(html.includes('class="duo-home"')).toBe(showSystemUI);
+        expect(html.includes('class="duo-indicator duo-home"')).toBe(showSystemUI);
         expect(html.includes('class="duo-camera-cutout"')).toBe(posture === "closed");
       }
     }

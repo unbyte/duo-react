@@ -383,37 +383,35 @@ other display and the other indicator's setting. Reset restores provider
 defaults. Changing appearance does not resize or remount app content. Iframe
 owners can forward an explicit preference through their own message bridge.
 
-**Auto samples each control separately.** Lazy-loaded
-[SnapDOM](https://github.com/zumerlab/snapdom) captures the display content through
-SVG `foreignObject` and rasterizes it into a canvas, excluding the system chrome.
-The clock, 3-in-1 indicator, and optional home indicator each use the average
-linear luminance within their own bounds to choose one black or white foreground.
-A small threshold band prevents flicker near equal contrast. Moving a dark block
-under only the 3-in-1 can turn it white while the clock remains black.
+**Auto samples each control separately.** An SVG backdrop filter averages the rendered
+background around each control with a Gaussian blur, takes a small sample near its
+center, and expands it across the control. The blur uses a minimum 16px standard
+deviation on each axis to reduce sensitivity to small background details.
+Linear luminance below 0.18 selects white; otherwise it selects
+black. An SVG alpha mask supplies the clock, 3-in-1, or home indicator artwork,
+including antialiased edges and subdued cellular dots. Moving a dark block under
+only the 3-in-1 can turn it white while the clock remains black.
 
-Sampling responds to content, scrolling, size, and transform changes, with a
-500ms periodic refresh for canvas, video, and CSS animation. Captures run one at a
-time and update asynchronously; they pause in hidden documents and stop when no
-visible indicator uses Auto. Explicit styles bypass sampling for that indicator.
-Hidden landscape status controls do not request captures; an enabled Auto home
-indicator can still sample independently.
-No app color-scheme setting is required or consulted. SnapDOM can reuse captures
-and resources between updates; periodic refreshes also invalidate its style cache
-to pick up CSSOM edits. Long captures yield to keep the page responsive. Resolved
-color changes use a 120ms CSS transition, disabled by reduced motion.
+This happens in the browser's rendering pipeline, without DOM screenshots,
+JavaScript pixel reads, observers, or polling. It sees the rendered backdrop,
+including the capsule blur. No app color-scheme setting is required or consulted.
+Explicit `light` and `dark` styles bypass the filter. Hidden status controls and
+their capsule are not rendered; an enabled Auto home indicator remains independent.
 
-Same-origin iframes are captured at their own viewport size and scroll position.
-The capture does not pin or resize their live document, including when the preview
-is zoomed or rotated. Nested same-origin iframes follow the same behavior.
+The sample is a center-weighted neighborhood average, not a uniform average of
+the control's bounds or a calibration of Apple's algorithm. Automatic flips are
+instantaneous, without hysteresis; the CSS 120ms color transition applies only
+between explicit black/white styles and respects reduced motion.
 
-This is DOM reconstruction, not direct access to browser-composited pixels or a
-calibration of Apple's selection algorithm. SVG capture support varies by browser.
-Protected video, tainted canvases, and cross-origin resources without CORS can be
-omitted or replaced with placeholders; cross-origin iframes cannot be captured
-faithfully. A failed capture retains the previous choice (initially black); use
-explicit indicator styles when content cannot be sampled reliably. The capsule
-blur is excluded from the measurement. Resolved colors remain local to rendering;
-provider state stores only the requested modes.
+This experimental filter-and-mask combination passes focused checks in Chrome
+154.0.8037.93 for light/dark adaptation, status visibility, portrait locking, and
+same-origin iframe backdrops in the React 16 and React 19 demos. Cross-version
+parity, particularly at fractional zoom and with thin home-indicator masks, is
+not established. Other browser engines are not validated.
+CSS syntax detection cannot establish full SVG backdrop-filter
+support; use explicit styles where Auto does not render correctly. Browsers
+without backdrop-filter syntax support fall back to black. Provider state stores
+only the requested modes.
 
 ### Safe area and iframe content
 

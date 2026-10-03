@@ -136,9 +136,25 @@
 .duo-status > span {
   flex-shrink: 0;
 }
-.duo-status-glyph,
-.duo-status-glyph svg {
+.duo-indicator {
+  position: relative;
   display: block;
+  color: #000;
+}
+.duo-indicator svg {
+  display: block;
+}
+.duo-indicator-defs {
+  position: absolute;
+}
+.duo-indicator-auto {
+  position: absolute;
+  inset: 0;
+}
+@supports (backdrop-filter: url("#filter")) {
+  .duo-indicator-fixed[data-auto] {
+    visibility: hidden;
+  }
 }
 [data-duo-resolved-style] {
   transition: color 120ms ease-out;
@@ -156,8 +172,6 @@
 }
 .duo-home {
   position: absolute;
-  border-radius: 3px;
-  background: currentColor;
 }
 .duo-divider {
   position: absolute;

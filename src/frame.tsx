@@ -2,7 +2,7 @@ import * as React from "react";
 import { resolveZoom, safeAreaStyle, validateZoom } from "./geometry";
 import { ScreenContext, useBrowserLayoutEffect, useDuoState, useDuoStore } from "./provider";
 import type { DuoDisplay, DuoZoom } from "./types";
-import { SystemChrome } from "./system-chrome";
+import { SystemChrome, SystemMaterial } from "./system-chrome";
 import { frameBezel, frameOutset, Hardware } from "./hardware";
 import { orientationRotation, rotatedSize } from "./view-controls";
 import { useRotation } from "./use-rotation";
@@ -105,8 +105,9 @@ function DisplaySurface({
             <div className="duo-accessory-host" data-duo-accessory-host="tab" ref={attachTabBar} />
           </div>
         </div>
-        <SystemChrome screen={screen} showIndicators={showSystemUI} />
+        {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
       </div>
+      <SystemChrome screen={screen} showIndicators={showSystemUI} scale={scale} />
     </div>
   );
 }

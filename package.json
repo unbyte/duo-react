@@ -29,7 +29,6 @@
     "watch": "vp pack --watch"
   },
   "dependencies": {
-    "@zumer/snapdom": "3.2.0",
     "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {

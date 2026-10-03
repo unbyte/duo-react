@@ -3,18 +3,26 @@ import { useDuoState } from "./provider";
 import { getSystemLayout, systemMetrics } from "./system-layout";
 import type { DuoRect, DuoScreenInfo } from "./types";
 import { StatusGlyph } from "./status-glyph";
-import { useIndicatorContrast } from "./use-indicator-contrast";
+import { SystemIndicator } from "./system-indicator";
 
 function boundsStyle(bounds: DuoRect) {
   return { left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height };
 }
 
+export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
+  return (
+    <div className="duo-status-material" style={boundsStyle(getSystemLayout(screen).material)} />
+  );
+}
+
 export function SystemChrome({
   screen,
   showIndicators,
+  scale,
 }: {
   screen: DuoScreenInfo;
   showIndicators: boolean;
+  scale: number;
 }) {
   const { time, battery, charging, indicatorStyles, homeIndicatorVisible } = useDuoState(
     (state) => state.system,
@@ -22,18 +30,8 @@ export function SystemChrome({
   const appearance = indicatorStyles[screen.display];
   const showStatus = showIndicators && screen.statusBarVisible;
   const layout = React.useMemo(() => getSystemLayout(screen), [screen]);
-  const chrome = React.useRef<HTMLDivElement>(null);
-  const contrast = useIndicatorContrast(
-    chrome,
-    screen,
-    showStatus && appearance.statusBar === "auto",
-    showIndicators && homeIndicatorVisible && appearance.homeIndicator === "auto",
-  );
-  const statusColor = (control: "time" | "glyph") =>
-    appearance.statusBar === "auto" ? contrast.colors[control] : appearance.statusBar;
   return (
-    <div ref={chrome} className="duo-system" aria-hidden="true">
-      {showStatus && <div className="duo-status-material" style={boundsStyle(layout.material)} />}
+    <div className="duo-system" aria-hidden="true">
       {layout.camera && <div className="duo-camera-cutout" style={boundsStyle(layout.camera)} />}
       {showIndicators && (
         <>
@@ -49,38 +47,63 @@ export function SystemChrome({
                 lineHeight: `${systemMetrics.lineHeight}px`,
               }}
             >
-              <span
-                ref={contrast.time}
+              <SystemIndicator
                 className="duo-status-time"
-                data-duo-indicator-style={appearance.statusBar}
-                data-duo-resolved-style={statusColor("time")}
-                style={{ width: systemMetrics.timeWidth }}
+                scale={scale}
+                appearance={appearance.statusBar}
+                width={systemMetrics.timeWidth}
+                height={systemMetrics.lineHeight}
               >
-                {time}
-              </span>
-              <span
-                ref={contrast.glyph}
+                <svg
+                  width={systemMetrics.timeWidth}
+                  height={systemMetrics.lineHeight}
+                  focusable="false"
+                >
+                  <text
+                    x="50%"
+                    y="50%"
+                    dominantBaseline="central"
+                    textAnchor="middle"
+                    fill="currentColor"
+                  >
+                    {time}
+                  </text>
+                </svg>
+              </SystemIndicator>
+              <SystemIndicator
                 className="duo-status-glyph"
-                data-duo-indicator-style={appearance.statusBar}
-                data-duo-resolved-style={statusColor("glyph")}
-                style={{ width: systemMetrics.glyphWidth, height: systemMetrics.glyphHeight }}
+                scale={scale}
+                appearance={appearance.statusBar}
+                width={systemMetrics.glyphWidth}
+                height={systemMetrics.glyphHeight}
               >
-                <StatusGlyph battery={battery} charging={charging} />
-              </span>
+                <StatusGlyph
+                  battery={battery}
+                  charging={charging}
+                  width={systemMetrics.glyphWidth}
+                  height={systemMetrics.glyphHeight}
+                />
+              </SystemIndicator>
             </div>
           )}
           {homeIndicatorVisible && (
-            <div
-              ref={contrast.home}
+            <SystemIndicator
               className="duo-home"
-              data-duo-indicator-style={appearance.homeIndicator}
-              data-duo-resolved-style={
-                appearance.homeIndicator === "auto"
-                  ? contrast.colors.home
-                  : appearance.homeIndicator
-              }
-              style={boundsStyle(layout.home)}
-            />
+              scale={scale}
+              appearance={appearance.homeIndicator}
+              width={layout.home.width}
+              height={layout.home.height}
+              style={{ left: layout.home.x, top: layout.home.y }}
+            >
+              <svg width={layout.home.width} height={layout.home.height} focusable="false">
+                <rect
+                  width={layout.home.width}
+                  height={layout.home.height}
+                  rx={3}
+                  fill="currentColor"
+                />
+              </svg>
+            </SystemIndicator>
           )}
         </>
       )}
