@@ -32,15 +32,16 @@ Each demo consumes the built package with its own React runtime. The launch
 commands build the library first; run `pnpm watch` in another terminal to rebuild
 while editing. `pnpm dev` starts the React 19 demo.
 
-Both demos have React and iframe content modes. Change a counter or enter text,
-switch the inner window between left, right, and full, then use the toolbar's
-display buttons to switch to the outer display and back. Content should keep
-its state. Both content modes contain only a counter
-and a text input. The Background selector previews light, dark, gray, and mixed
-content; Icons selects automatic, white, or black indicators. Switching content
-modes reloads the page intentionally.
+Both demos render one React app with a counter and a text input. Change either,
+switch the inner window between left, right, and full, then switch to the outer
+display and back. Content should keep its state.
 
-Enable **Show layout regions** for translucent safe-area and reserved-region
+The appearance controls share one row and wrap on smaller screens. **Background**
+previews light, dark, gray, and mixed content; **Icons** selects automatic, white,
+or black indicators. **Regions** toggles the layout overlay, and **Bars** toggles
+the example app toolbar and tab bar.
+
+Enable **Regions** for translucent safe-area and reserved-region
 blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
 display and app-window boundaries. Outlines sit 2 logical pixels inside the
 region boundaries; labels report the original dimensions. The overlay follows
@@ -229,7 +230,7 @@ Children choose how to respond through `useDuoState()` and `useDuoScreen()`.
 Apps may adjust important controls or columns around the division; continuous
 scrolling content can stay continuous. The frame does not impose app padding or
 split an app into panels. It stays flat, with no hinge angle or folding animation.
-Enable **Show layout regions** to inspect the fold's active/inactive status.
+Enable **Regions** to inspect the fold's active/inactive status.
 See the [calibration and Apple guidance](docs/calibration/folding-region.md).
 
 ### Indicator appearance
@@ -294,9 +295,9 @@ after a frame applies changed screen geometry or visibility. Camera magnificatio
 does not generate a window event. The current prototype applies placement changes
 immediately and does not expose animation lifecycle events.
 
-React context and CSS properties do not cross iframe document boundaries. The
-iframe demo shows a consumer-owned `postMessage` bridge with source and origin
-checks. The library does not inject code into consumer iframe documents.
+React context and CSS properties do not cross iframe document boundaries.
+Consumers embedding an iframe own any `postMessage` bridge, including source and
+origin checks. The library does not inject code into consumer iframe documents.
 
 ### App bar positioning
 
@@ -357,7 +358,7 @@ safe area. Keep your content clear of your chosen bar dimensions.
 Use `[data-duo-bar-placement="left" | "right" | "top" | "bottom"]` to adapt your
 styles. The helper uses a column on the side and a row in portrait; your own
 nested navigation container may also need to change its direction. The demos'
-**Show app bars** toggle demonstrates both helpers with React and iframe content.
+**Bars** toggle demonstrates both helpers alongside the React app.
 
 ### Zoom ownership
 

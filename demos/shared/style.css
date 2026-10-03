@@ -19,30 +19,100 @@ input {
 .demo-app h2 {
   font-size: 20px;
 }
-.demo nav {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-.demo nav [aria-current="page"] {
-  font-weight: bold;
-}
 .demo-frame {
   position: relative;
   height: 70vh;
   min-height: 320px;
   margin-top: 16px;
 }
-.demo-appearance {
+.demo-controls {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 20px;
 }
-
-.demo-region-toggle {
-  display: block;
-  margin-top: 12px;
+.demo-select,
+.demo-toggle {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 44px;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #d8dfe7;
+  border-radius: 12px;
+  background: #fff;
+  color: #526174;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px #18283b05;
+}
+.demo-select select {
+  min-width: 0;
+  min-height: 42px;
+  border: 0;
+  background: transparent;
+  color: #25313e;
+  font: inherit;
+  cursor: pointer;
+}
+.demo-select:focus-within,
+.demo-toggle:has(input:focus-visible) {
+  outline: 2px solid #0879ed;
+  outline-offset: 2px;
+}
+.demo-select select:focus-visible {
+  outline: none;
+}
+.demo-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+.demo-toggle:hover {
+  background: #f5f8fc;
+}
+.demo-toggle:has(input:checked) {
+  background: #e7f1ff;
+  border-color: #b9d8fc;
+  color: #0968c9;
+}
+.demo-toggle input {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 28px;
+  height: 16px;
+  margin: 0;
+  border: 1px solid #8794a4;
+  border-radius: 999px;
+  background: #8794a4;
+  cursor: pointer;
+}
+.demo-toggle input::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: white;
+}
+.demo-toggle input:checked {
+  border-color: #0879ed;
+  background: #0879ed;
+}
+.demo-toggle input:checked::before {
+  transform: translateX(12px);
+}
+@media (forced-colors: active) {
+  .demo-toggle input {
+    appearance: auto;
+  }
+  .demo-toggle input::before {
+    content: none;
+  }
 }
 .demo-state {
   margin-top: 12px;
@@ -105,13 +175,6 @@ input {
 .demo-app input {
   max-width: 70%;
 }
-.demo-iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
 .demo-bottom-background {
   position: absolute;
   inset: 50% 0 0;
