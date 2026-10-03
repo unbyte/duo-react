@@ -32,6 +32,14 @@ export interface DuoReservedRegion extends DuoRect {
   readonly type: "occlusion" | "division";
 }
 
+export interface DuoFoldingRegion {
+  /** Full-display coordinates, including the fold's avoidance margins. */
+  readonly frame: DuoRect;
+  readonly margins: DuoInsets;
+  /** False for the fully open inner display supported by the 2D frame. */
+  readonly active: boolean;
+}
+
 export interface DuoScreenInfo {
   readonly display: DuoDisplay;
   readonly placement: DuoPlacement;
@@ -42,6 +50,8 @@ export interface DuoScreenInfo {
   readonly window: DuoRect;
   readonly safeArea: DuoInsets;
   readonly reservedRegions: readonly DuoReservedRegion[];
+  /** Inner display fold metadata; separate from active, window-local reserved regions. */
+  readonly foldingRegion?: DuoFoldingRegion;
   readonly cornerRadii: readonly [number, number, number, number];
   readonly windowCornerRadii: readonly [number, number, number, number];
 }

@@ -49,6 +49,16 @@ function getRegions(screen: DuoScreenInfo, cameraActive: boolean): Region[] {
       color: ["#d94b42", "#7954cc", "#957126"][index % 3]!,
       scope: "display" as const,
     })),
+    ...(display.foldingRegion
+      ? [
+          {
+            ...display.foldingRegion.frame,
+            name: `Folding region (${display.foldingRegion.active ? "active" : "inactive"})`,
+            color: "#957126",
+            scope: "display" as const,
+          },
+        ]
+      : []),
   ].filter((region) => region.width > 0 && region.height > 0);
 }
 
@@ -176,9 +186,9 @@ export function RegionOverlay({
   return (
     <svg className="demo-regions" role="img" aria-label="Safe area and reserved region overlay">
       <title>
-        App safe area and insets for the current window; reserved regions for the whole display.
-        Dimensions are logical pixels. Fills show exact bounds; dashed outlines are inset by 2
-        pixels.
+        App safe area and insets for the current window; reserved regions for the whole display. The
+        inner folding region is shown even when inactive. Dimensions are logical pixels. Fills show
+        exact bounds; dashed outlines are inset by 2 pixels.
       </title>
       <defs>
         <clipPath id="demo-frame-clip">

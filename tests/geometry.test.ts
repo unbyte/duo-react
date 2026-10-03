@@ -40,6 +40,54 @@ test("portrait profiles and the outer display retain their reported asymmetry", 
   ).toThrow("No measured Duo profile");
 });
 
+test("the inner fold follows the display axis and stays inactive in fully open layouts", () => {
+  for (const orientation of [
+    "portrait",
+    "portrait-upside-down",
+    "landscape-left",
+    "landscape-right",
+  ] as const) {
+    const portrait = orientation.startsWith("portrait");
+    for (const cameraActive of [false, true]) {
+      const full = getDuoGeometry({ display: "inner", orientation, cameraActive });
+      const fold = full.foldingRegion!;
+      expect(fold.active).toBe(false);
+      expect(fold.frame).toEqual(
+        portrait
+          ? { x: 0, y: 455.5, width: 669, height: 40 }
+          : { x: 455.5, y: 0, width: 40, height: 669 },
+      );
+      expect(fold.frame.x + fold.frame.width / 2).toBe(full.size.width / 2);
+      expect(fold.frame.y + fold.frame.height / 2).toBe(full.size.height / 2);
+      expect(fold.frame.width - fold.margins.left - fold.margins.right).toBe(portrait ? 669 : 0);
+      expect(fold.frame.height - fold.margins.top - fold.margins.bottom).toBe(portrait ? 0 : 669);
+      expect(full.reservedRegions.some((region) => region.type === "division")).toBe(false);
+      expect(Object.isFrozen(fold.frame)).toBe(true);
+      expect(Object.isFrozen(fold.margins)).toBe(true);
+      if (!portrait) {
+        const left = getDuoGeometry({
+          display: "inner",
+          orientation,
+          cameraActive,
+          placement: "left",
+        });
+        const right = getDuoGeometry({
+          display: "inner",
+          orientation,
+          cameraActive,
+          placement: "right",
+        });
+        expect(left.foldingRegion).toEqual(fold);
+        expect(right.foldingRegion).toEqual(fold);
+        expect(right.window.x - (left.window.x + left.window.width)).toBe(13);
+      }
+    }
+  }
+  expect(
+    getDuoGeometry({ display: "outer", orientation: "portrait" }).foldingRegion,
+  ).toBeUndefined();
+});
+
 test("fit responds to container bounds while numeric zoom preserves app scale", () => {
   const device = { width: 951, height: 669 };
   expect(resolveZoom("fit", { width: 499.5, height: 1000 }, device, 12)).toBe(0.5);

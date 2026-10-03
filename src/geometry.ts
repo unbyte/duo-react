@@ -1,4 +1,4 @@
-import { profiles } from "./profiles/xcode-27.1";
+import { foldingRegions, profiles } from "./profiles/xcode-27.1";
 import type {
   DuoDisplay,
   DuoInsets,
@@ -47,6 +47,7 @@ export function getDuoGeometry({
       : placement === "right"
         ? [splitRadius, cornerRadii[1], cornerRadii[2], splitRadius]
         : [...cornerRadii];
+  const fold = display === "inner" ? foldingRegions[orientation] : undefined;
   return {
     display,
     orientation,
@@ -56,6 +57,13 @@ export function getDuoGeometry({
     safeArea: Object.freeze({ ...profile.safeArea }),
     cornerRadii: Object.freeze(cornerRadii),
     windowCornerRadii: Object.freeze(windowCornerRadii),
+    foldingRegion: fold
+      ? Object.freeze({
+          ...fold,
+          frame: Object.freeze({ ...fold.frame }),
+          margins: Object.freeze({ ...fold.margins }),
+        })
+      : undefined,
     reservedRegions: Object.freeze(
       profile.reservedRegions.map((region) => Object.freeze({ ...region })),
     ),

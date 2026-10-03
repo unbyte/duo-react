@@ -6,6 +6,7 @@ export type { DuoActions } from "./store";
 export type {
   DuoDefaults,
   DuoDisplay,
+  DuoFoldingRegion,
   DuoInsets,
   DuoIndicatorStyle,
   DuoIndicatorStyles,

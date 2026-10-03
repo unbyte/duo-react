@@ -253,8 +253,9 @@ export function Demo({ version }: { version: string }) {
         <ProviderState />
         {showRegions && (
           <p className="demo-region-note">
-            App safe area and insets; whole-display reserved regions. All measurements are logical
-            pixels. Fills show exact bounds; dashed outlines sit 2 px inside them.
+            App safe area and insets; whole-display reserved regions and the inactive inner fold.
+            All measurements are logical pixels. Fills show exact bounds; dashed outlines sit 2 px
+            inside them.
           </p>
         )}
         <div

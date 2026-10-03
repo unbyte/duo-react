@@ -44,7 +44,12 @@ Enable **Show layout regions** for translucent safe-area and reserved-region
 blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
 display and app-window boundaries. Outlines sit 2 logical pixels inside the
 region boundaries; labels report the original dimensions. The overlay follows
-placement, orientation, and zoom without remounting content.
+placement, orientation, and zoom without remounting content. It also shows the
+inner display’s inactive folding region: 669 × 40pt in portrait, 40 × 669pt in
+landscape. `useDuoScreen().foldingRegion` exposes its full-display frame, margins,
+and activity separately from active reserved regions. The
+[folding-region calibration](docs/calibration/folding-region.md) explains why
+this band does not change the 13px Split View gap.
 
 Resize the browser window and use the zoom control to compare resizing with
 scaling. The parent supplies a definite height while the frame uses `height: 100%`.
