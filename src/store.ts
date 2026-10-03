@@ -61,7 +61,11 @@ function validateModel(model: Model) {
   }
 }
 
-export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOptions = {}) {
+export function createDuoStore(
+  defaults: DuoDefaults = {},
+  system: DuoSystemOptions = {},
+  outerPortraitLocked = false,
+) {
   const indicatorStyles = Object.freeze({ statusBar: "auto", homeIndicator: "auto" } as const);
   const initial: Model = {
     posture: defaults.posture ?? "open",
@@ -94,11 +98,14 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     const screens = {} as Record<DuoDisplay, DuoScreenInfo>;
     for (const display of ["inner", "outer"] as const) {
       const old = previous?.screens[display];
-      // The closed upside-down source has no safe-area measurements. Keep the
-      // previous app layout while its complete surface rotates with the shell.
+      // Unsupported outer orientations retain the app layout while the shell turns.
       const orientation =
-        display === "outer" && model.orientation === "portrait-upside-down"
-          ? (old?.orientation ?? "portrait")
+        display === "outer"
+          ? outerPortraitLocked
+            ? "portrait"
+            : model.orientation === "portrait-upside-down"
+              ? (old?.orientation ?? "portrait")
+              : model.orientation
           : model.orientation;
       const placement = display === "inner" ? model.innerPlacement : "full";
       const visible = display === "inner" ? model.posture !== "closed" : model.posture === "closed";
@@ -123,6 +130,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     }
     return Object.freeze({
       ...model,
+      outerPortraitLocked,
       zoom: controlledZoom ?? model.zoom,
       zoomReadOnly: controlledZoom !== undefined && !onZoomChange,
       renderedZoom,
@@ -138,6 +146,7 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
   function publish(next = snapshot(state)) {
     if (
       next.posture === state.posture &&
+      next.outerPortraitLocked === state.outerPortraitLocked &&
       next.orientation === state.orientation &&
       next.rotation === state.rotation &&
       next.innerPlacement === state.innerPlacement &&
@@ -214,6 +223,10 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
 
   return {
     actions,
+    configureOuterPortraitLock: (locked: boolean) => {
+      outerPortraitLocked = locked;
+      publish();
+    },
     getSnapshot: () => state,
     getServerSnapshot: () => serverSnapshot,
     subscribe: (listener: Listener) => {

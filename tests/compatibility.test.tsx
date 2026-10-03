@@ -19,6 +19,26 @@ function ReadState() {
   return <span>{width}</span>;
 }
 
+test("provider portrait lock reaches frame children on the first server render", () => {
+  function App() {
+    const screen = useDuoScreen();
+    const physical = useDuoState((state) => state.orientation);
+    const locked = useDuoState((state) => state.outerPortraitLocked);
+    return <span>{`${physical}:${screen.orientation}:${screen.window.width}:${locked}`}</span>;
+  }
+  const html = renderToString(
+    <DuoProvider
+      outerPortraitLocked
+      defaultState={{ posture: "closed", orientation: "landscape-left" }}
+    >
+      <DuoFrame>
+        <App />
+      </DuoFrame>
+    </DuoProvider>,
+  );
+  expect(html).toContain("landscape-left:portrait:466:true");
+});
+
 test("provider and selector hooks render with the React 16.8 baseline", () => {
   expect(React.version).toBe("16.8.6");
   expect(

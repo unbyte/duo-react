@@ -166,6 +166,15 @@ layout and rotate together with the shell. Starting upside down uses portrait
 as that outer layout. This fallback is a preview policy, not calibrated native
 behavior. App state and iframe instances remain mounted throughout.
 
+Set `<DuoProvider outerPortraitLocked={true}>` to keep the outer app in portrait
+through every physical rotation. This reactive prop defaults to `false`; changing
+it updates the existing app without remounting it. The inner display still follows
+device orientation. Children read the effective layout from `useDuoScreen().orientation`,
+and can read the physical orientation and lock policy through
+`useDuoState(state => state.orientation)` and `state.outerPortraitLocked`.
+Unlocking applies the current device orientation, or retains portrait if the
+device is upside down. Reset preserves the current provider lock setting.
+
 `setOrientation()` sets the normalized angle and animates the nearest turn from
 the previous target. `resetDevice()` restores the initial device orientation and angle.
 The same operations are available through `rotate("left" | "right")`, `zoomIn()`,

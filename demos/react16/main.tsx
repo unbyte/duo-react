@@ -6,7 +6,7 @@ const root = document.getElementById("root");
 if (!root) throw new Error("Missing demo root");
 render(
   <React.StrictMode>
-    <Demo version={React.version} />
+    <Demo />
   </React.StrictMode>,
   root,
 );

@@ -13,14 +13,21 @@ export interface DuoProviderProps {
   children?: React.ReactNode;
   defaultState?: DuoDefaults;
   defaultSystem?: DuoSystemOptions;
+  outerPortraitLocked?: boolean;
 }
 
 export function DuoProvider({
   children,
   defaultState,
   defaultSystem,
+  outerPortraitLocked = false,
 }: DuoProviderProps): React.ReactElement {
-  const [store] = React.useState(() => createDuoStore(defaultState, defaultSystem));
+  const [store] = React.useState(() =>
+    createDuoStore(defaultState, defaultSystem, outerPortraitLocked),
+  );
+  useBrowserLayoutEffect(() => {
+    store.configureOuterPortraitLock(outerPortraitLocked);
+  }, [store, outerPortraitLocked]);
   return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
 }
 

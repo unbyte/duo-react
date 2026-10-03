@@ -171,20 +171,28 @@ function ExampleBars() {
   );
 }
 
-export function Demo({ version }: { version: string }) {
+export function Demo() {
   const [background, setBackground] = React.useState<Background>("light");
   const [showRegions, setShowRegions] = React.useState(false);
   const [showBars, setShowBars] = React.useState(false);
   const [showBlock, setShowBlock] = React.useState(true);
   const [blockColor, setBlockColor] = React.useState("#0066ff");
+  const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false);
   const frame = React.useRef<HTMLDivElement>(null);
   return (
-    <DuoProvider>
+    <DuoProvider outerPortraitLocked={outerPortraitLocked}>
       <main className="demo">
-        <h1>React {version}</h1>
         <div className="demo-controls" role="group" aria-label="Preview appearance">
           <BackgroundPicker value={background} onChange={setBackground} />
           <CameraToggle />
+          <label className="demo-toggle" title="Keep the outer app in portrait while rotating">
+            <input
+              type="checkbox"
+              checked={outerPortraitLocked}
+              onChange={(event) => setOuterPortraitLocked(event.currentTarget.checked)}
+            />
+            <span>Outer portrait lock</span>
+          </label>
           <label className="demo-toggle" title="Show draggable color block">
             <input
               type="checkbox"

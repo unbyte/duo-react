@@ -43,7 +43,7 @@ export interface DuoFoldingRegion {
 export interface DuoScreenInfo {
   readonly display: DuoDisplay;
   readonly placement: DuoPlacement;
-  /** App layout orientation; the outer display retains its supported layout when upside down. */
+  /** Effective app layout, honoring the outer portrait lock and upside-down fallback. */
   readonly orientation: DuoOrientation;
   readonly visible: boolean;
   readonly size: Readonly<{ width: number; height: number }>;
@@ -78,6 +78,8 @@ export interface DuoDefaults {
 
 export interface DuoState {
   readonly posture: DuoPosture;
+  /** Provider policy: keep the outer app in portrait while the physical device rotates. */
+  readonly outerPortraitLocked: boolean;
   /** Requested device orientation. Each screen reports its effective app layout separately. */
   readonly orientation: DuoOrientation;
   /** Target clockwise angle from upright portrait, normalized to [0, 360) degrees. */

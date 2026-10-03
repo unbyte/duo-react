@@ -281,3 +281,57 @@ test("zoom steps respect controlled fit and fixed zoom", () => {
   expect(requested).toHaveBeenCalledTimes(2);
   expect(store.getSnapshot().zoom).toBe(0.5);
 });
+
+test("outer portrait lock preserves app geometry through physical rotations and display changes", () => {
+  const store = createDuoStore({ posture: "closed", orientation: "portrait" }, {}, true);
+  const outer = store.getSnapshot().screens.outer;
+  for (const orientation of [
+    "landscape-left",
+    "portrait-upside-down",
+    "landscape-right",
+    "portrait",
+  ] as const) {
+    store.actions.rotate("right");
+    const state = store.getSnapshot();
+    expect(state.orientation).toBe(orientation);
+    expect(state.screens.inner.orientation).toBe(orientation);
+    expect(state.screens.outer).toBe(outer);
+    expect(state.outerPortraitLocked).toBe(true);
+  }
+  store.actions.setOrientation("landscape-right");
+  store.actions.setPosture("partially-open");
+  expect(store.getSnapshot().screens.inner.orientation).toBe("landscape-right");
+  store.actions.setPosture("closed");
+  expect(store.getSnapshot().screens.outer).toEqual(outer);
+});
+
+test("provider lock changes update only outer layout and reset preserves the current policy", () => {
+  const store = createDuoStore({ posture: "closed", orientation: "landscape-left" });
+  const initial = store.getSnapshot();
+  const listener = vi.fn();
+  store.subscribe(listener);
+  store.configureOuterPortraitLock(true);
+  const locked = store.getSnapshot();
+  expect(locked).toMatchObject({ outerPortraitLocked: true, rotation: 90 });
+  expect(locked.screens.inner).toBe(initial.screens.inner);
+  expect(locked.screens.outer.orientation).toBe("portrait");
+  store.configureOuterPortraitLock(true);
+  expect(store.getSnapshot()).toBe(locked);
+  expect(listener).toHaveBeenCalledTimes(1);
+  store.actions.rotate("right");
+  store.actions.resetDevice();
+  expect(store.getSnapshot()).toMatchObject({ outerPortraitLocked: true, rotation: 90 });
+  expect(store.getSnapshot().screens.outer.orientation).toBe("portrait");
+  store.configureOuterPortraitLock(false);
+  expect(store.getSnapshot().screens.outer).toEqual(initial.screens.outer);
+});
+
+test("unlocking upside down retains portrait until a supported orientation is reached", () => {
+  const store = createDuoStore({ orientation: "portrait-upside-down" }, {}, true);
+  store.configureOuterPortraitLock(false);
+  expect(store.getSnapshot().screens.outer.orientation).toBe("portrait");
+  store.actions.rotate("left");
+  expect(store.getSnapshot().screens.outer.orientation).toBe("landscape-left");
+  store.actions.rotate("right");
+  expect(store.getSnapshot().screens.outer.orientation).toBe("landscape-left");
+});
