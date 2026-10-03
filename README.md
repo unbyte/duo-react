@@ -360,6 +360,10 @@ and resources between updates; periodic refreshes also invalidate its style cach
 to pick up CSSOM edits. Long captures yield to keep the page responsive. Resolved
 color changes use a 120ms CSS transition, disabled by reduced motion.
 
+Same-origin iframes are captured at their own viewport size and scroll position.
+The capture does not pin or resize their live document, including when the preview
+is zoomed or rotated. Nested same-origin iframes follow the same behavior.
+
 This is DOM reconstruction, not direct access to browser-composited pixels or a
 calibration of Apple's selection algorithm. SVG capture support varies by browser.
 Protected video, tainted canvases, and cross-origin resources without CORS can be

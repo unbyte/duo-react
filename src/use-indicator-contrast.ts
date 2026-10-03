@@ -1,5 +1,6 @@
 import * as React from "react";
 import { chooseIndicatorStyle } from "./indicator-contrast";
+import { createIframeCapture } from "./iframe-capture";
 import type { ResolvedIndicatorStyle } from "./indicator-contrast";
 import type { DuoScreenInfo } from "./types";
 
@@ -72,6 +73,7 @@ export function useIndicatorContrast(
           excludeMode: "remove",
           fast: false,
           invalidate: refreshStyles,
+          plugins: [createIframeCapture(snapdom)],
         });
         if (stopped) return;
         const context = canvas.getContext("2d", { willReadFrequently: true });
