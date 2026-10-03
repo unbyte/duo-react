@@ -8,6 +8,7 @@ const require = createRequire(import.meta.url);
 export default defineConfig({
   plugins: [react({ jsxRuntime: "classic" })],
   optimizeDeps: { rolldownOptions: { transform: { jsx: { runtime: "classic" } } } },
+  build: { rolldownOptions: { output: { comments: { legal: true } } } },
   resolve: {
     alias: {
       react: dirname(require.resolve("react/package.json")),

@@ -46,9 +46,9 @@ Drag the blue block beneath the system controls to inspect the capsule's blur.
 Mouse, touch, and pen dragging follow preview zoom and rotation. Focus the block
 and use arrow keys to move it (Shift for finer movement), or Home to reset it.
 **Block** hides it for solid-background comparisons; its relative position is
-preserved when switching displays, layouts, or visibility. Select white or black
-**Icons** to inspect the material independently of the provisional automatic
-indicator coloring.
+preserved when switching displays, layouts, or visibility. With **Icons** set to
+Auto, the clock and combined indicator independently choose black or white from
+the content beneath them. Fixed white or black settings override that selection.
 
 Enable **Regions** for the library's interactive `DuoRegionMask`. It shows the
 app safe area and nonzero insets, active whole-display reserved regions, and the
@@ -341,14 +341,26 @@ other display and the other indicator's setting. Reset restores provider
 defaults. Changing appearance does not resize or remount app content. Iframe
 owners can forward an explicit preference through their own message bridge.
 
-**Automatic rendering is provisional.** It currently retains CSS `difference`
-blending, which inverts pixels independently, can produce colored or low-contrast
-results, and can split one icon across light/dark backgrounds. It does **not** yet
-meet the intended whole-control black-or-white behavior. Explicit `light` and
-`dark` modes do. State stores the requested mode only; no resolved color or
-JavaScript sampling loop is present. The next rendering step must select one
-color for the complete control without pretending that arbitrary DOM or
-cross-origin iframe pixels are readable.
+**Auto samples each control separately.** A lazy-loaded `html2canvas` renderer
+reconstructs the display content into a canvas, excluding the system chrome.
+The clock, 3-in-1 indicator, and optional home indicator each use the average
+linear luminance within their own bounds to choose one black or white foreground.
+A small threshold band prevents flicker near equal contrast. Moving a dark block
+under only the 3-in-1 can turn it white while the clock remains black.
+
+Sampling responds to content, scrolling, size, and transform changes, with a
+500ms periodic refresh for canvas, video, and CSS animation. Captures run one at a
+time and update asynchronously; they pause in hidden documents and stop when no
+visible indicator uses Auto. Explicit styles bypass sampling for that indicator.
+No app color-scheme setting is required or consulted.
+
+This is DOM reconstruction, not direct access to browser-composited pixels or a
+calibration of Apple's selection algorithm. Unsupported CSS, protected video,
+tainted canvases, and cross-origin content without CORS can be omitted by the
+renderer. A failed capture retains the previous choice (initially black); use
+explicit indicator styles when content cannot be sampled reliably. The capsule
+blur is excluded from the measurement. Resolved colors remain local to rendering;
+provider state stores only the requested modes.
 
 ### Safe area and iframe content
 

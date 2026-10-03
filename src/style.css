@@ -140,16 +140,11 @@
 .duo-status-glyph svg {
   display: block;
 }
-[data-duo-indicator-style="light"],
-[data-duo-indicator-style="auto"] {
+[data-duo-resolved-style="light"] {
   color: #fff;
 }
-[data-duo-indicator-style="dark"] {
+[data-duo-resolved-style="dark"] {
   color: #000;
-}
-/* Provisional auto mode: per-pixel inversion, not whole-control contrast selection. */
-[data-duo-indicator-style="auto"] {
-  mix-blend-mode: difference;
 }
 .duo-home {
   position: absolute;

@@ -3,6 +3,7 @@ import { useDuoState } from "./provider";
 import { getSystemLayout, systemMetrics } from "./system-layout";
 import type { DuoRect, DuoScreenInfo } from "./types";
 import { StatusGlyph } from "./status-glyph";
+import { useIndicatorContrast } from "./use-indicator-contrast";
 
 function boundsStyle(bounds: DuoRect) {
   return { left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height };
@@ -20,8 +21,17 @@ export function SystemChrome({
   );
   const appearance = indicatorStyles[screen.display];
   const layout = React.useMemo(() => getSystemLayout(screen), [screen]);
+  const chrome = React.useRef<HTMLDivElement>(null);
+  const contrast = useIndicatorContrast(
+    chrome,
+    screen,
+    showIndicators && appearance.statusBar === "auto",
+    showIndicators && homeIndicatorVisible && appearance.homeIndicator === "auto",
+  );
+  const statusColor = (control: "time" | "glyph") =>
+    appearance.statusBar === "auto" ? contrast.colors[control] : appearance.statusBar;
   return (
-    <div className="duo-system" aria-hidden="true">
+    <div ref={chrome} className="duo-system" aria-hidden="true">
       {showIndicators && (
         <div className="duo-status-material" style={boundsStyle(layout.material)} />
       )}
@@ -31,7 +41,6 @@ export function SystemChrome({
           {layout.divider && <div className="duo-divider" style={boundsStyle(layout.divider)} />}
           <div
             className="duo-status"
-            data-duo-indicator-style={appearance.statusBar}
             style={{
               ...boundsStyle(layout.status),
               flexDirection: layout.horizontal ? "row" : "column",
@@ -40,9 +49,20 @@ export function SystemChrome({
               lineHeight: `${systemMetrics.lineHeight}px`,
             }}
           >
-            <span style={{ width: systemMetrics.timeWidth }}>{time}</span>
             <span
+              ref={contrast.time}
+              className="duo-status-time"
+              data-duo-indicator-style={appearance.statusBar}
+              data-duo-resolved-style={statusColor("time")}
+              style={{ width: systemMetrics.timeWidth }}
+            >
+              {time}
+            </span>
+            <span
+              ref={contrast.glyph}
               className="duo-status-glyph"
+              data-duo-indicator-style={appearance.statusBar}
+              data-duo-resolved-style={statusColor("glyph")}
               style={{ width: systemMetrics.glyphWidth, height: systemMetrics.glyphHeight }}
             >
               <StatusGlyph battery={battery} charging={charging} />
@@ -50,8 +70,14 @@ export function SystemChrome({
           </div>
           {homeIndicatorVisible && (
             <div
+              ref={contrast.home}
               className="duo-home"
               data-duo-indicator-style={appearance.homeIndicator}
+              data-duo-resolved-style={
+                appearance.homeIndicator === "auto"
+                  ? contrast.colors.home
+                  : appearance.homeIndicator
+              }
               style={boundsStyle(layout.home)}
             />
           )}
