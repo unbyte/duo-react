@@ -1,10 +1,11 @@
 import { getSystemLayout } from "./system-layout";
 import type { DuoScreenInfo } from "./types";
 
-// The guide defines edge placement, not these gaps. The 84px rail follows the
-// measured side inset; Split View's left rail uses the same width by convention.
+// HIG images place the control axis about 48 logical pixels from the edge,
+// with approximately 48px controls. See docs/calibration/app-bars.md.
+const sideInset = 24;
+const controlWidth = 48;
 const edgeGap = 16;
-const railWidth = 84;
 
 export function getAccessoryLayout(screen: DuoScreenInfo) {
   const { window, safeArea, placement } = screen;
@@ -19,9 +20,8 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
     };
   }
   const side = placement === "left" || safeArea.left > 0 ? "left" : "right";
-  const width = Math.max(safeArea[side], railWidth);
-  const railLeft = side === "left" ? 0 : window.width - width;
-  const railRight = railLeft + width;
+  const railLeft = side === "left" ? sideInset : window.width - sideInset - controlWidth;
+  const railRight = railLeft + controlWidth;
   let top = edgeGap;
   let bottom = Math.max(edgeGap, safeArea.bottom);
   const status = getSystemLayout(screen).status;
@@ -37,8 +37,8 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
   }
   return {
     side,
-    left: railLeft + edgeGap,
-    right: window.width - railRight + edgeGap,
+    left: railLeft,
+    right: window.width - railRight,
     top,
     bottom,
   } as const;

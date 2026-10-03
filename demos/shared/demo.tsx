@@ -82,15 +82,12 @@ function ProviderState() {
   );
 }
 
-function ExampleApp({ background, showBars }: { background: Background; showBars: boolean }) {
+function ExampleApp({ background }: { background: Background }) {
   const { display } = useDuoScreen();
   const [count, setCount] = React.useState(0);
   const [text, setText] = React.useState("");
   return (
-    <DuoSafeArea
-      className="demo-app"
-      style={showBars ? { display: "grid", alignItems: "center" } : undefined}
-    >
+    <DuoSafeArea className="demo-app">
       {background === "mixed" && <div className="demo-bottom-background" />}
       <div className="demo-content">
         <h2>{display === "inner" ? "Inner screen" : "Outer screen"}</h2>
@@ -145,8 +142,6 @@ const iframeSource = `<!doctype html>
     const { display, safeArea } = event.data.screen;
     document.body.style.background = event.data.appearance.background;
     document.body.style.color = event.data.appearance.color;
-    document.body.style.display = event.data.showBars ? "grid" : "block";
-    document.body.style.alignItems = "center";
     document.getElementById("bottom-background").style.display = event.data.background === "mixed" ? "block" : "none";
     document.querySelector('h1').textContent = display === 'inner' ? 'Inner screen (iframe)' : 'Outer screen (iframe)';
     for (const [side, value] of Object.entries(safeArea)) {
@@ -156,15 +151,15 @@ const iframeSource = `<!doctype html>
 </script>
 </html>`;
 
-function IframeApp({ background, showBars }: { background: Background; showBars: boolean }) {
+function IframeApp({ background }: { background: Background }) {
   const screen = useDuoScreen();
   const frame = React.useRef<HTMLIFrameElement>(null);
   const publish = React.useCallback(() => {
     frame.current?.contentWindow?.postMessage(
-      { type: "demo:layout", screen, background, showBars, appearance: backgrounds[background] },
+      { type: "demo:layout", screen, background, appearance: backgrounds[background] },
       window.location.origin,
     );
-  }, [screen, background, showBars]);
+  }, [screen, background]);
   React.useEffect(publish, [publish]);
   return (
     <iframe
@@ -278,9 +273,9 @@ export function Demo({ version }: { version: string }) {
             inner={
               <>
                 {iframe ? (
-                  <IframeApp background={background} showBars={showBars} />
+                  <IframeApp background={background} />
                 ) : (
-                  <ExampleApp background={background} showBars={showBars} />
+                  <ExampleApp background={background} />
                 )}
                 {showBars && <ExampleBars />}
               </>
@@ -288,9 +283,9 @@ export function Demo({ version }: { version: string }) {
             outer={
               <>
                 {iframe ? (
-                  <IframeApp background={background} showBars={showBars} />
+                  <IframeApp background={background} />
                 ) : (
-                  <ExampleApp background={background} showBars={showBars} />
+                  <ExampleApp background={background} />
                 )}
                 {showBars && <ExampleBars />}
               </>

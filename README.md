@@ -303,9 +303,10 @@ the helper or its children. Both bars scale in logical pixels with the app.
 Helpers cannot run inside an iframe's separate React tree; mount them beside the
 iframe in the frame's React content instead.
 
-The default layout uses 16px edge/group spacing and the measured 84px side rail;
-the split-left rail uses that same width by convention. These gaps are our
-positioning defaults, not calibrated Apple control metrics. Reserved regions and
+Side bars use a 48px-wide column inset 24px from the display edge, following
+[measurements of Apple's guide images](docs/calibration/app-bars.md). The 84px
+safe inset describes app geometry rather than the bar's centerline. Group gaps
+and portrait edge spacing retain provisional 16px defaults. Reserved regions and
 the rendered status bounds constrain available space. Bars share that space and
 scroll when their content exceeds it; there is no automatic overflow menu or
 minimization. They overlay app content and do not change the provider's calibrated

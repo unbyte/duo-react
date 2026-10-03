@@ -11,11 +11,14 @@ test("bar rails follow app placement and measured hardware edges", () => {
   expect(getAccessoryLayout(store.getSnapshot().screens.inner).side).toBe("right");
   store.actions.setInnerPlacement("left");
   const left = getAccessoryLayout(store.getSnapshot().screens.inner);
-  expect(left).toMatchObject({ side: "left", left: 16, top: 16, bottom: 34 });
+  expect(left).toMatchObject({ side: "left", left: 24, top: 16, bottom: 34 });
   store.actions.setInnerPlacement("right");
   const right = getAccessoryLayout(store.getSnapshot().screens.inner);
-  expect(right).toMatchObject({ side: "right", right: 16, bottom: 34 });
+  expect(right).toMatchObject({ side: "right", right: 24, bottom: 34 });
   expect(right.top).toBeGreaterThan(120);
+  for (const layout of [left, right]) {
+    expect(469 - layout.left - layout.right).toBe(48);
+  }
   store.actions.setInnerPlacement("full");
   for (const orientation of ["portrait", "portrait-upside-down"] as const) {
     store.actions.setOrientation(orientation);
