@@ -204,7 +204,6 @@
 
 .duo-region-mask {
   --duo-region-label-background: #fff;
-  --duo-region-highlight-mix: #000;
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -214,12 +213,10 @@
 }
 .duo-region-mask[data-theme="dark"] {
   --duo-region-label-background: #18212b;
-  --duo-region-highlight-mix: #fff;
 }
 @media (prefers-color-scheme: dark) {
   .duo-region-mask[data-theme="auto"] {
     --duo-region-label-background: #18212b;
-    --duo-region-highlight-mix: #fff;
   }
 }
 .duo-region-mask [data-kind="safe-area"] {
@@ -266,9 +263,6 @@
     --duo-region-color: var(--duo-region-dark);
   }
 }
-.duo-region-mask [data-highlighted="true"] {
-  color: color-mix(in srgb, var(--duo-region-color), var(--duo-region-highlight-mix) 30%);
-}
 .duo-region-shapes {
   position: absolute;
   inset: 0;
@@ -277,11 +271,17 @@
 }
 .duo-region-fill {
   fill: currentColor;
-  fill-opacity: 0.14;
+  fill-opacity: 0.12;
+  stroke: none;
   pointer-events: auto;
 }
+.duo-region-mask[data-inspecting="true"] .duo-region-fill[data-highlighted="false"] {
+  fill-opacity: 0.035;
+}
 .duo-region-fill[data-highlighted="true"] {
-  fill-opacity: 0.32;
+  fill-opacity: 0.18;
+  stroke: currentColor;
+  stroke-width: 1.5px;
 }
 .duo-region-labels {
   position: absolute;
@@ -306,6 +306,9 @@
   font-weight: 600;
   text-align: left;
   cursor: default;
+}
+.duo-region-mask[data-inspecting="true"] .duo-region-label[data-highlighted="false"] > * {
+  opacity: 0.4;
 }
 .duo-region-label small {
   font-size: 11px;

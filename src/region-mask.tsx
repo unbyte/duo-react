@@ -105,6 +105,7 @@ export function DuoRegionMask({
       ref={root}
       className={["duo-region-mask", className].filter(Boolean).join(" ")}
       data-theme={theme}
+      data-inspecting={regions.some((region) => region.id === highlighted)}
     >
       {layout && (
         <>
@@ -136,6 +137,7 @@ export function DuoRegionMask({
                           y={region.y}
                           width={region.width}
                           height={region.height}
+                          vectorEffect="non-scaling-stroke"
                           onMouseEnter={() => setHovered(region.id)}
                           onMouseLeave={() => setHovered(undefined)}
                         />

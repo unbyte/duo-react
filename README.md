@@ -45,7 +45,9 @@ the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
 Enable **Regions** for the library's interactive `DuoRegionMask`. It shows the
 app safe area and nonzero insets, active whole-display reserved regions, and the
 Split View gap. Hover a region or its label to highlight both; labels also support
-keyboard focus. Colors darken on light backgrounds and lighten in dark mode.
+keyboard focus. Category colors stay stable. The highlighted region gains a thin
+solid edge while other masks and labels fade together. Labels keep their matching
+category colors in both themes.
 The mask follows placement, orientation, and zoom without remounting content.
 
 Labels use the Safe Area dataset's names: **Safe area**, **Top inset**, **Right
