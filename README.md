@@ -180,9 +180,9 @@ The device has no built-in cast shadow. To add one around its silhouette, pass
 or apply the same filter through `className`.
 
 The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
-level changes the arc's fill; charging displays a lightning mark. These indicators
+level changes the arc's length; charging displays a lightning mark. These indicators
 have no click or gesture behavior. The SVG is drawn from the supplied image with
-a common center for the battery, Wi-Fi, and cellular dots. See the
+a common horizontal axis for the battery, Wi-Fi, and subdued cellular dots. See the
 [reference measurements](docs/calibration/status-controls.md) for proportions and
 calibration assumptions.
 
