@@ -65,14 +65,12 @@ test("helpers require a frame surface and server rendering defers portals", () =
   ).toThrow("inside DuoFrame");
   const html = renderToString(
     <DuoProvider>
-      <DuoFrame
-        inner={
-          <DuoTabBar>
-            <button>Home</button>
-          </DuoTabBar>
-        }
-        outer={<DuoAppToolbar />}
-      />
+      <DuoFrame>
+        <DuoTabBar>
+          <button>Home</button>
+        </DuoTabBar>
+        <DuoAppToolbar />
+      </DuoFrame>
     </DuoProvider>,
   );
   expect(html).toContain('data-duo-accessory-host="tab"');

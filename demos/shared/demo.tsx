@@ -271,29 +271,16 @@ export function Demo({ version }: { version: string }) {
         >
           <DuoFrame
             ref={frame}
-            inner={
-              <>
-                {iframe ? (
-                  <IframeApp background={background} />
-                ) : (
-                  <ExampleApp background={background} />
-                )}
-                {showBars && <ExampleBars />}
-              </>
-            }
-            outer={
-              <>
-                {iframe ? (
-                  <IframeApp background={background} />
-                ) : (
-                  <ExampleApp background={background} />
-                )}
-                {showBars && <ExampleBars />}
-              </>
-            }
             style={{ width: "100%", height: "100%" }}
             aria-label="Duo layout preview"
-          />
+          >
+            {iframe ? (
+              <IframeApp background={background} />
+            ) : (
+              <ExampleApp background={background} />
+            )}
+            {showBars && <ExampleBars />}
+          </DuoFrame>
           {showRegions && <RegionOverlay frameRef={frame} stageRef={stage} />}
         </div>
         <DuoToolbar className="demo-toolbar">

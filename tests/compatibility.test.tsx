@@ -10,6 +10,7 @@ import {
   DuoRotationControls,
   DuoZoomControls,
   useDuoState,
+  useDuoScreen,
 } from "../src";
 
 function ReadState() {
@@ -38,13 +39,34 @@ test("provider and selector hooks render with the React 16.8 baseline", () => {
 test("frame can be server-rendered without browser globals", () => {
   const html = renderToString(
     <DuoProvider>
-      <DuoFrame inner={<span>Inner</span>} outer={<span>Outer</span>} />
+      <DuoFrame>
+        <span>App content</span>
+      </DuoFrame>
     </DuoProvider>,
   );
   expect(html).toContain('data-duo-window="inner"');
-  expect(html).toContain('data-duo-window="outer"');
+  expect(html).not.toContain('data-duo-window="outer"');
+  expect(html).toContain("App content");
   expect(html).not.toContain('class="duo-home"');
   expect(html).not.toContain('class="duo-divider"');
+});
+
+test("frame children receive the active display's screen context on the server", () => {
+  function App() {
+    const screen = useDuoScreen();
+    return <span>{`${screen.display}:${screen.window.width}`}</span>;
+  }
+  for (const posture of ["open", "closed"] as const) {
+    const html = renderToString(
+      <DuoProvider defaultState={{ posture, orientation: "portrait" }}>
+        <DuoFrame>
+          <App />
+        </DuoFrame>
+      </DuoProvider>,
+    );
+    expect(html).toContain(posture === "open" ? "inner:669" : "outer:466");
+    expect(html.match(/class="duo-window"/g)).toHaveLength(1);
+  }
 });
 
 test("split chrome is passive and the home indicator is opt-in", () => {
@@ -54,11 +76,9 @@ test("split chrome is passive and the home indicator is opt-in", () => {
         defaultState={{ innerPlacement: "right" }}
         defaultSystem={{ homeIndicatorVisible: true }}
       >
-        <DuoFrame
-          inner={<span>Inner</span>}
-          outer={<span>Outer</span>}
-          showSystemUI={showSystemUI}
-        />
+        <DuoFrame showSystemUI={showSystemUI}>
+          <span>App content</span>
+        </DuoFrame>
       </DuoProvider>,
     );
   const visible = render(true);

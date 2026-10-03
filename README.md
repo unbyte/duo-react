@@ -2,8 +2,8 @@
 
 A React device frame for previewing applications on iPhone Duo.
 
-The current implementation is a flat layout prototype: a provider, persistent
-inner and outer app surfaces, measured window geometry, safe-area CSS properties,
+The current implementation is a flat layout prototype: a provider, one persistent
+app surface for the active display, measured window geometry, safe-area CSS properties,
 zoom, passive system indicators, and an optional toolbar. Status artwork follows
 the supplied image; its scale calibration still needs visual acceptance. The device
 outline is schematic, with passive buttons and hinge details on both displays,
@@ -66,7 +66,7 @@ The package targets React 16.8 through React 19. The previews use React 16.14 an
 built with React 16 types. React 17 and 18 are within the peer range but do not
 have separate demos. React compatibility does not imply old-browser support:
 the prototype requires ResizeObserver and modern CSS, including container queries
-and native inert for hidden-display isolation.
+for app layout. Only the active display is rendered.
 
 Commit meaningful changes after checking them. Use the demos for manual
 acceptance and focused unit tests for state and geometry. Defer E2E and visual
@@ -90,7 +90,9 @@ import "duo-frame/style.css";
   defaultState={{ orientation: "landscape-left", innerPlacement: "full", zoom: "fit" }}
   defaultSystem={{ time: "9:41", battery: 100 }}
 >
-  <DuoFrame inner={<InnerApp />} outer={<OuterApp />} style={{ width: "100%", height: 640 }} />
+  <DuoFrame style={{ width: "100%", height: 640 }}>
+    <App />
+  </DuoFrame>
   <DuoToolbar className="preview-toolbar">
     <DuoDisplayControls className="preview-group" />
     <DuoRotationControls className="preview-group" />
@@ -101,9 +103,18 @@ import "duo-frame/style.css";
 ```
 
 The display buttons select the inner display for the open posture and
-the outer display for the closed posture. Both app subtrees remain mounted while
-switching. Call `setPosture("open")` or `setPosture("closed")` through
-`useDuoActions()` to select the same states programmatically.
+the outer display for the closed posture. `DuoFrame` renders one `children` tree
+in a stable host, updating its dimensions and screen context when switching.
+The child can adapt through `useDuoScreen()` or `useDuoState()` without remounting.
+Call `setPosture("open")` or `setPosture("closed")` through `useDuoActions()` to
+select the same states programmatically.
+
+Use `<DuoFrame><App /></DuoFrame>` in place of the separate `inner` and `outer`
+props. The frame preserves the child’s identity across display, orientation,
+placement, and zoom changes. Normal React rules still apply inside `App`: changing
+a component type or key remounts that component. Separate per-display app state,
+when needed, belongs to the child. The 2D frame does not animate fold/unfold or
+render two displays simultaneously.
 
 The toolbar is headless. Each control group works independently anywhere under
 `DuoProvider`; omit or reorder groups as needed. `DuoToolbar` is an optional
@@ -182,8 +193,9 @@ provides posture, orientation, inner placement, zoom, system configuration, and
 reset operations. Defaults initialize a provider once. Reset restores those
 defaults without resetting consumer component state.
 
-`useDuoScreen()` is available in both app subtrees. It returns the display,
-placement, visibility, display size, window rectangle, safe insets, and reserved
+`useDuoScreen()` is available within the frame’s children and tracks the active
+display. It returns the display, placement, visibility, display size, window
+rectangle, safe insets, and reserved
 regions. `cornerRadii` describes the display; `windowCornerRadii` describes the
 app window. Both use top-left, top-right, bottom-right, bottom-left order.
 Geometry uses app CSS pixels: one pixel per source device point.
@@ -267,7 +279,7 @@ checks. The library does not inject code into consumer iframe documents.
 ### App bar positioning
 
 `DuoTabBar` and `DuoAppToolbar` position caller-provided content within a frame's
-inner or outer app subtree. `DuoAppToolbar` is the in-app action bar;
+children. `DuoAppToolbar` is the in-app action bar;
 `DuoToolbar` controls the device preview. The positioning helpers do not implement
 navigation, tab selection, menus, or iOS visual styling.
 
@@ -289,8 +301,8 @@ function App() {
 }
 ```
 
-Mount this app through a frame's `inner` or `outer` prop. Use one of each helper
-per display, or omit either. They accept standard div attributes, `style`,
+Mount this app as the frame’s `children`. Use one of each helper, or omit either.
+They accept standard div attributes, `style`,
 `className`, and a forwarded div ref. Supply the appropriate navigation or tab
 semantics on your children; the helpers do not impose ARIA tab behavior.
 
@@ -303,8 +315,8 @@ edges. These rules follow [Apple's Duo guidance](https://developer.apple.com/des
 
 The frame provides private, stable portal hosts, so app scrolling and nested
 positioned ancestors do not move the bars. Children keep their React context and
-state across orientation, placement, and zoom changes. CSS inheritance follows
-the frame host rather than the original DOM ancestry; put appearance styles on
+state across display, orientation, placement, and zoom changes. CSS inheritance
+follows the frame host rather than the original DOM ancestry; put appearance styles on
 the helper or its children. Both bars scale in logical pixels with the app.
 Helpers cannot run inside an iframe's separate React tree; mount them beside the
 iframe in the frame's React content instead.
@@ -356,4 +368,5 @@ scale when fitting; fixed zoom disables all three zoom buttons. These values
 control presentation; app window dimensions remain in logical CSS pixels.
 
 The package can be imported and its frame shell server-rendered without browser
-globals. Portal app content mounts on the client after its host is attached.
+globals. App children render on the server with the active screen context;
+app-bar portals mount on the client after their hosts are attached.

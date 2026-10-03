@@ -50,8 +50,7 @@ export function useDuoActions() {
 
 export function useDuoScreen() {
   const display = React.useContext(ScreenContext);
-  if (!display)
-    throw new Error("useDuoScreen must be used within DuoFrame's inner or outer content.");
+  if (!display) throw new Error("useDuoScreen must be used within DuoFrame's children.");
   return useDuoState((state) => state.screens[display]);
 }
 

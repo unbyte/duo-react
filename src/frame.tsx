@@ -1,5 +1,4 @@
 import * as React from "react";
-import { createPortal } from "react-dom";
 import { resolveZoom, safeAreaStyle, validateZoom } from "./geometry";
 import { ScreenContext, useBrowserLayoutEffect, useDuoState, useDuoStore } from "./provider";
 import type { DuoDisplay, DuoZoom } from "./types";
@@ -11,9 +10,8 @@ import { AccessoryContext } from "./accessory-context";
 import { getAccessoryLayout } from "./accessory-layout";
 import "./style.css";
 
-export interface DuoFrameProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
-  inner: React.ReactNode;
-  outer: React.ReactNode;
+export interface DuoFrameProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
   zoom?: DuoZoom;
   onZoomChange?: (zoom: DuoZoom) => void;
   fitPadding?: number;
@@ -32,11 +30,6 @@ function DisplaySurface({
   showSystemUI: boolean;
 }) {
   const screen = useDuoState((state) => state.screens[display]);
-  const store = useDuoStore();
-  const [host, setHost] = React.useState<HTMLDivElement>();
-  const attachHost = React.useCallback((node: HTMLDivElement | null) => {
-    setHost(node ?? undefined);
-  }, []);
   const [tabBar, setTabBar] = React.useState<HTMLDivElement>();
   const [toolbar, setToolbar] = React.useState<HTMLDivElement>();
   const attachTabBar = React.useCallback(
@@ -49,25 +42,9 @@ function DisplaySurface({
   );
   const { side, ...accessoryBounds } = React.useMemo(() => getAccessoryLayout(screen), [screen]);
   const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side]);
-  const surface = React.useRef<HTMLDivElement>(null);
-  const previous = React.useRef(screen);
-  useBrowserLayoutEffect(() => {
-    const node = surface.current;
-    if (!node) return;
-    if (screen.visible) node.removeAttribute("inert");
-    else node.setAttribute("inert", "");
-  }, [screen.visible]);
-  useBrowserLayoutEffect(() => {
-    if (previous.current !== screen) {
-      const event = { display, previous: previous.current, current: screen };
-      previous.current = screen;
-      store.emitWindowChange(event);
-    }
-  }, [display, screen, store]);
   const bounds = screen.window;
   return (
     <div
-      ref={surface}
       className="duo-display"
       data-duo-display={display}
       data-duo-placement={screen.placement}
@@ -90,7 +67,6 @@ function DisplaySurface({
       <div className="duo-screen">
         <div
           className="duo-window"
-          ref={attachHost}
           data-duo-window={display}
           style={{
             left: bounds.x,
@@ -100,7 +76,11 @@ function DisplaySurface({
             borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
             ...safeAreaStyle(screen.safeArea),
           }}
-        />
+        >
+          <ScreenContext.Provider value={display}>
+            <AccessoryContext.Provider value={accessoryHosts}>{children}</AccessoryContext.Provider>
+          </ScreenContext.Provider>
+        </div>
         <div
           className="duo-accessory-window"
           style={{
@@ -127,22 +107,13 @@ function DisplaySurface({
         </div>
         <SystemChrome screen={screen} showIndicators={showSystemUI} />
       </div>
-      {host &&
-        createPortal(
-          <ScreenContext.Provider value={display}>
-            <AccessoryContext.Provider value={accessoryHosts}>{children}</AccessoryContext.Provider>
-          </ScreenContext.Provider>,
-          host,
-          display,
-        )}
     </div>
   );
 }
 
 export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function DuoFrame(
   {
-    inner,
-    outer,
+    children,
     zoom,
     onZoomChange,
     fitPadding = 24,
@@ -155,6 +126,20 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
 ) {
   const store = useDuoStore();
   const state = useDuoState((value) => value);
+  const previousScreens = React.useRef(state.screens);
+  useBrowserLayoutEffect(() => {
+    const previous = previousScreens.current;
+    previousScreens.current = state.screens;
+    for (const display of ["inner", "outer"] as const) {
+      if (previous[display] !== state.screens[display]) {
+        store.emitWindowChange({
+          display,
+          previous: previous[display],
+          current: state.screens[display],
+        });
+      }
+    }
+  }, [state.screens, store]);
   const root = React.useRef<HTMLDivElement>(null);
   const [size, setSize] = React.useState<{ width: number; height: number }>();
   React.useImperativeHandle(forwardedRef, () => root.current!, []);
@@ -201,11 +186,8 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
       style={style}
     >
       <div className="duo-rotation" style={{ transform: `rotate(${rotation}deg)` }}>
-        <DisplaySurface display="inner" scale={scale} showSystemUI={showSystemUI}>
-          {inner}
-        </DisplaySurface>
-        <DisplaySurface display="outer" scale={scale} showSystemUI={showSystemUI}>
-          {outer}
+        <DisplaySurface display={active.display} scale={scale} showSystemUI={showSystemUI}>
+          {children}
         </DisplaySurface>
       </div>
     </div>

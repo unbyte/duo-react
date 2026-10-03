@@ -14,10 +14,7 @@ function Bar({
   forwardedRef: React.ForwardedRef<HTMLDivElement>;
 }) {
   const hosts = React.useContext(AccessoryContext);
-  if (!hosts)
-    throw new Error(
-      "DuoTabBar and DuoAppToolbar must be inside DuoFrame's inner or outer content.",
-    );
+  if (!hosts) throw new Error("DuoTabBar and DuoAppToolbar must be inside DuoFrame's children.");
   const host = hosts[kind];
   if (!host) return null;
   const placement =
