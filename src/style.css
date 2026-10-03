@@ -140,11 +140,19 @@
 .duo-status-glyph svg {
   display: block;
 }
+[data-duo-resolved-style] {
+  transition: color 120ms ease-out;
+}
 [data-duo-resolved-style="light"] {
   color: #fff;
 }
 [data-duo-resolved-style="dark"] {
   color: #000;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-duo-resolved-style] {
+    transition: none;
+  }
 }
 .duo-home {
   position: absolute;
