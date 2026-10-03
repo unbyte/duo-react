@@ -75,6 +75,28 @@ function BackgroundPicker({
   );
 }
 
+function StatusBarPicker() {
+  const hidden = useDuoState((state) => state.system.prefersStatusBarHidden);
+  const { setSystem } = useDuoActions();
+  return (
+    <label className="demo-select">
+      <span id="demo-status-label">Status bar</span>
+      <select
+        aria-labelledby="demo-status-label"
+        value={hidden === undefined ? "auto" : hidden ? "hide" : "show"}
+        onChange={(event) => {
+          const value = event.currentTarget.value;
+          setSystem({ prefersStatusBarHidden: value === "auto" ? undefined : value === "hide" });
+        }}
+      >
+        <option value="auto">Auto</option>
+        <option value="show">Show</option>
+        <option value="hide">Hide</option>
+      </select>
+    </label>
+  );
+}
+
 function CameraToggle() {
   const cameraActive = useDuoState((state) => state.system.cameraActive);
   const { setSystem } = useDuoActions();
@@ -184,6 +206,7 @@ export function Demo() {
       <main className="demo">
         <div className="demo-controls" role="group" aria-label="Preview appearance">
           <BackgroundPicker value={background} onChange={setBackground} />
+          <StatusBarPicker />
           <CameraToggle />
           <label className="demo-toggle" title="Keep the outer app in portrait while rotating">
             <input

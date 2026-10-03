@@ -335,3 +335,68 @@ test("unlocking upside down retains portrait until a supported orientation is re
   store.actions.rotate("right");
   expect(store.getSnapshot().screens.outer.orientation).toBe("landscape-left");
 });
+
+test("outer status visibility follows effective layout, including retained and locked orientations", () => {
+  const store = createDuoStore({ posture: "closed", orientation: "portrait" });
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true);
+  for (const direction of ["left", "right"] as const) {
+    store.actions.setOrientation("portrait");
+    store.actions.rotate(direction);
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
+    store.actions.rotate(direction);
+    expect(store.getSnapshot().orientation).toBe("portrait-upside-down");
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
+    store.configureOuterPortraitLock(true);
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true);
+    store.configureOuterPortraitLock(false);
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true);
+    store.actions.rotate(direction);
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
+  }
+  for (let turn = 0; turn < 4; turn++) {
+    store.actions.rotate("right");
+    expect(store.getSnapshot().screens.inner.statusBarVisible).toBe(true);
+  }
+});
+
+test("status preference overrides both displays without changing app geometry", () => {
+  const store = createDuoStore({ orientation: "landscape-left" });
+  const initial = store.getSnapshot();
+  store.actions.setSystem({ prefersStatusBarHidden: false });
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true);
+  store.actions.setSystem({ prefersStatusBarHidden: true });
+  const hidden = store.getSnapshot();
+  for (const display of ["inner", "outer"] as const) {
+    expect(hidden.screens[display].statusBarVisible).toBe(false);
+    expect(hidden.screens[display].window).toBe(initial.screens[display].window);
+    expect(hidden.screens[display].safeArea).toBe(initial.screens[display].safeArea);
+    expect(hidden.screens[display].reservedRegions).toBe(initial.screens[display].reservedRegions);
+  }
+  store.actions.setSystem({ time: "12:34" });
+  expect(store.getSnapshot().system.prefersStatusBarHidden).toBe(true);
+  expect(store.getSnapshot().screens).toBe(hidden.screens);
+  store.configureOuterPortraitLock(true);
+  store.actions.rotate("right");
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
+  store.actions.setSystem({ prefersStatusBarHidden: undefined });
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true);
+  expect(store.getSnapshot().screens.inner.statusBarVisible).toBe(true);
+  store.actions.setOrientation("landscape-left");
+  store.configureOuterPortraitLock(false);
+  store.actions.setSystem({ prefersStatusBarHidden: false });
+  store.actions.setSystem({ prefersStatusBarHidden: undefined });
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
+});
+
+test("status preference initializes from provider defaults and reset restores it", () => {
+  for (const prefersStatusBarHidden of [true, false]) {
+    const store = createDuoStore({}, { prefersStatusBarHidden });
+    for (const screen of Object.values(store.getSnapshot().screens)) {
+      expect(screen.statusBarVisible).toBe(!prefersStatusBarHidden);
+    }
+    store.actions.setSystem({ prefersStatusBarHidden: undefined });
+    store.actions.resetDevice();
+    expect(store.getSnapshot().system.prefersStatusBarHidden).toBe(prefersStatusBarHidden);
+    expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(!prefersStatusBarHidden);
+  }
+});

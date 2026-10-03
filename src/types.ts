@@ -46,6 +46,8 @@ export interface DuoScreenInfo {
   /** Effective app layout, honoring the outer portrait lock and upside-down fallback. */
   readonly orientation: DuoOrientation;
   readonly visible: boolean;
+  /** Resolved app preference and layout default; DuoFrame.showSystemUI can suppress rendering. */
+  readonly statusBarVisible: boolean;
   readonly size: Readonly<{ width: number; height: number }>;
   readonly window: DuoRect;
   readonly safeArea: DuoInsets;
@@ -62,6 +64,8 @@ export interface DuoSystem {
   readonly charging: boolean;
   readonly cameraActive: boolean;
   readonly homeIndicatorVisible: boolean;
+  /** Undefined follows the layout default; true hides status controls and false shows them. */
+  readonly prefersStatusBarHidden?: boolean;
   readonly indicatorStyles: Readonly<Record<DuoDisplay, DuoIndicatorStyles>>;
 }
 

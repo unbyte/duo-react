@@ -206,7 +206,37 @@ a common horizontal axis for the battery, Wi-Fi, and subdued cellular dots. See 
 calibration assumptions.
 
 The status group occupies the full display's safe-area edge strip, independently
-of app placement. The outer camera cutout uses the square occlusion region in the
+of app placement. By default, on the outer display, the clock, 3-in-1 control, and capsule are
+visible only when the effective app layout is portrait. They remain visible during
+physical rotation with `outerPortraitLocked`. Upside-down rotation retains the
+visibility of the previous supported layout. Inner status controls remain visible
+in all orientations. `useDuoScreen().statusBarVisible` exposes the resolved app
+preference and layout default;
+`showSystemUI={false}` can additionally suppress rendering. The policy does not
+depend on whether that display is currently active (`screen.visible`).
+
+Apps can override the default with `prefersStatusBarHidden`, applying to both displays:
+
+```tsx
+<DuoProvider defaultSystem={{ prefersStatusBarHidden: true }}>
+  <DuoFrame>
+    <App />
+  </DuoFrame>
+</DuoProvider>;
+
+// Inside a component, call setSystem from an event handler or effect.
+const { setSystem } = useDuoActions();
+setSystem({ prefersStatusBarHidden: false }); // Show, including outer landscape.
+setSystem({ prefersStatusBarHidden: true }); // Hide the time, 3-in-1, and capsule.
+setSystem({ prefersStatusBarHidden: undefined }); // Restore the layout default.
+```
+
+Omitting the property in a partial `setSystem` update preserves the current preference.
+Reset restores `defaultSystem`. This preference leaves the camera, home indicator,
+app bounds, and measured safe areas intact. `getDuoGeometry()` reports the default
+visibility for a layout; `useDuoScreen()` includes the app's preference.
+
+The outer camera cutout uses the square occlusion region in the
 geometry profile as a provisional approximation of the visible hole; the inner
 display currently renders no camera visual, including when `cameraActive` adds
 a reserved region. The home indicator is hidden by default; set
@@ -224,7 +254,8 @@ reset operations. Defaults initialize a provider once. Reset restores those
 defaults without resetting consumer component state.
 
 `useDuoScreen()` is available within the frame’s children and tracks the active
-display. It returns the display, placement, visibility, display size, window
+display. It returns the display, placement, effective orientation, visibility,
+status-bar visibility, display size, window
 rectangle, safe insets, and reserved
 regions. `cornerRadii` describes the display; `windowCornerRadii` describes the
 app window. Both use top-left, top-right, bottom-right, bottom-left order.
@@ -364,6 +395,8 @@ Sampling responds to content, scrolling, size, and transform changes, with a
 500ms periodic refresh for canvas, video, and CSS animation. Captures run one at a
 time and update asynchronously; they pause in hidden documents and stop when no
 visible indicator uses Auto. Explicit styles bypass sampling for that indicator.
+Hidden landscape status controls do not request captures; an enabled Auto home
+indicator can still sample independently.
 No app color-scheme setting is required or consulted. SnapDOM can reuse captures
 and resources between updates; periodic refreshes also invalidate its style cache
 to pick up CSSOM edits. Long captures yield to keep the page responsive. Resolved

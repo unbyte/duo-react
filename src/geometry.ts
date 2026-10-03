@@ -70,6 +70,7 @@ export function getDuoGeometry({
     display,
     orientation,
     placement,
+    statusBarVisible: display === "inner" || orientation === "portrait",
     size: Object.freeze({ ...profile.size }),
     window: Object.freeze({ ...profile.window }),
     safeArea: Object.freeze({ ...profile.safeArea }),

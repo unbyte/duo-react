@@ -1,6 +1,9 @@
 import type { DuoFoldingRegion, DuoOrientation, DuoScreenInfo } from "../types";
 
-interface Profile extends Omit<DuoScreenInfo, "visible" | "windowCornerRadii"> {
+interface Profile extends Omit<
+  DuoScreenInfo,
+  "visible" | "statusBarVisible" | "windowCornerRadii"
+> {
   readonly cameraActive: boolean;
 }
 

@@ -123,6 +123,64 @@ test("split chrome is passive and the home indicator is opt-in", () => {
   expect(hidden).not.toContain('class="duo-status-material"');
 });
 
+test("outer landscape hides status and capsule while retaining the camera and optional home indicator", () => {
+  function App() {
+    return <span>{`status:${useDuoScreen().statusBarVisible}`}</span>;
+  }
+  for (const orientation of ["portrait", "landscape-left", "landscape-right"] as const) {
+    for (const locked of [false, true]) {
+      for (const showSystemUI of [false, true]) {
+        const expected = locked || orientation === "portrait";
+        const html = renderToString(
+          <DuoProvider
+            outerPortraitLocked={locked}
+            defaultState={{ posture: "closed", orientation }}
+            defaultSystem={{ homeIndicatorVisible: true }}
+          >
+            <DuoFrame showSystemUI={showSystemUI}>
+              <App />
+            </DuoFrame>
+          </DuoProvider>,
+        );
+        expect(html).toContain(`status:${expected}`);
+        expect(html.includes('class="duo-status"')).toBe(expected && showSystemUI);
+        expect(html.includes('class="duo-status-material"')).toBe(expected && showSystemUI);
+        expect(html).toContain('class="duo-camera-cutout"');
+        expect(html.includes('class="duo-home"')).toBe(showSystemUI);
+      }
+    }
+  }
+});
+
+test("app status preference reaches children and rendering while retaining independent chrome", () => {
+  function App() {
+    return <span>{`status:${useDuoScreen().statusBarVisible}`}</span>;
+  }
+  for (const posture of ["open", "closed"] as const) {
+    for (const prefersStatusBarHidden of [true, false]) {
+      for (const showSystemUI of [true, false]) {
+        const html = renderToString(
+          <DuoProvider
+            defaultState={{ posture }}
+            defaultSystem={{ prefersStatusBarHidden, homeIndicatorVisible: true }}
+          >
+            <DuoFrame showSystemUI={showSystemUI}>
+              <App />
+            </DuoFrame>
+          </DuoProvider>,
+        );
+        expect(html).toContain(`status:${!prefersStatusBarHidden}`);
+        expect(html.includes('class="duo-status"')).toBe(showSystemUI && !prefersStatusBarHidden);
+        expect(html.includes('class="duo-status-material"')).toBe(
+          showSystemUI && !prefersStatusBarHidden,
+        );
+        expect(html.includes('class="duo-home"')).toBe(showSystemUI);
+        expect(html.includes('class="duo-camera-cutout"')).toBe(posture === "closed");
+      }
+    }
+  }
+});
+
 test("headless control groups compose independently with the React 16.8 baseline", () => {
   const standalone = renderToString(
     <DuoProvider>

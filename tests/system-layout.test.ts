@@ -17,7 +17,7 @@ test("status belongs to the display while the home indicator follows the app win
   }
 });
 
-test("the outer cutout uses measured coordinates and only shifts status when above it", () => {
+test("the outer cutout uses measured coordinates independently of status visibility", () => {
   const store = createDuoStore({ orientation: "portrait" });
   const portrait = getSystemLayout(store.getSnapshot().screens.outer);
   expect(portrait.camera).toMatchObject({ x: 399.67, y: 29.33, width: 37, height: 37 });
@@ -25,11 +25,12 @@ test("the outer cutout uses measured coordinates and only shifts status when abo
   expect(getSystemLayout(store.getSnapshot().screens.inner).camera).toBeUndefined();
   store.actions.setOrientation("landscape-left");
   const landscape = getSystemLayout(store.getSnapshot().screens.outer);
-  expect(landscape.status.y + landscape.status.height).toBeLessThan(landscape.camera!.y);
+  expect(landscape.camera).toMatchObject({ x: 611.67, y: 399.67, width: 37, height: 37 });
+  expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false);
 });
 
-test("status stays in the reserved edge strip in all supported orientations", () => {
-  const store = createDuoStore();
+test("explicitly shown status stays in the reserved edge strip in all supported orientations", () => {
+  const store = createDuoStore({}, { prefersStatusBarHidden: false });
   for (const orientation of [
     "portrait",
     "portrait-upside-down",
@@ -38,6 +39,7 @@ test("status stays in the reserved edge strip in all supported orientations", ()
   ] as const) {
     store.actions.setOrientation(orientation);
     for (const screen of Object.values(store.getSnapshot().screens)) {
+      if (!screen.statusBarVisible) continue;
       const { status } = getSystemLayout(screen);
       const { safeArea, size } = screen;
       expect(status.x).toBeGreaterThanOrEqual(0);
@@ -52,7 +54,7 @@ test("status stays in the reserved edge strip in all supported orientations", ()
 });
 
 test("capsule encloses the complete control group with consistent padding in every orientation", () => {
-  const store = createDuoStore();
+  const store = createDuoStore({}, { prefersStatusBarHidden: false });
   for (const orientation of [
     "portrait",
     "portrait-upside-down",
@@ -61,6 +63,7 @@ test("capsule encloses the complete control group with consistent padding in eve
   ] as const) {
     store.actions.setOrientation(orientation);
     for (const screen of Object.values(store.getSnapshot().screens)) {
+      if (!screen.statusBarVisible) continue;
       const { material, status, camera } = getSystemLayout(screen);
       for (const bounds of camera ? [camera, status] : [status]) {
         expect(material.x).toBeLessThan(bounds.x);

@@ -109,6 +109,10 @@ export function createDuoStore(
           : model.orientation;
       const placement = display === "inner" ? model.innerPlacement : "full";
       const visible = display === "inner" ? model.posture !== "closed" : model.posture === "closed";
+      const statusBarVisible = !(
+        model.system.prefersStatusBarHidden ??
+        (display === "outer" && orientation !== "portrait")
+      );
       const sameGeometry =
         old &&
         old.orientation === orientation &&
@@ -126,7 +130,9 @@ export function createDuoStore(
             posture: model.posture,
           });
       screens[display] =
-        sameGeometry && old.visible === visible ? old : Object.freeze({ ...geometry, visible });
+        sameGeometry && old.visible === visible && old.statusBarVisible === statusBarVisible
+          ? old
+          : Object.freeze({ ...geometry, visible, statusBarVisible });
     }
     return Object.freeze({
       ...model,
