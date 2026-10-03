@@ -1,5 +1,6 @@
-import { getDuoGeometry, validatePosture, validateZoom } from "./geometry";
-import { normalizeRotation, orientationAtRotation, orientationRotation } from "./view-controls";
+import { getDuoGeometry, validatePosture } from "./geometry";
+import { validateZoom } from "./zoom";
+import { normalizeRotation, orientationAtRotation, orientationRotation } from "./rotation";
 import type {
   DuoDefaults,
   DuoDisplay,

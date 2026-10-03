@@ -1,8 +1,9 @@
 import * as React from "react";
-import { useBrowserLayoutEffect, useDuoState } from "./provider";
-import { getMaskRegions, roundedBoundary } from "./region-mask-layout";
-import type { DuoRect } from "./types";
-import "./style.css";
+import { useDuoState } from "../../context/hooks";
+import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect";
+import { getMaskRegions, roundedBoundary } from "../../core/layout/regions";
+import type { DuoRect } from "../../core/types";
+import "../../style.css";
 
 export interface DuoRegionMaskProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   frameRef: React.RefObject<HTMLDivElement | null>;

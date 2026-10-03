@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { createDuoStore } from "../src/store";
-import { getMaskRegions } from "../src/region-mask-layout";
+import { createDuoStore } from "../src/core/store";
+import { getMaskRegions } from "../src/core/layout/regions";
 
 function regions(store: ReturnType<typeof createDuoStore>) {
   const state = store.getSnapshot();

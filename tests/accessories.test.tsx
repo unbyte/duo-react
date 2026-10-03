@@ -1,10 +1,10 @@
 import * as React from "react";
 import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { getDuoGeometry } from "../src/geometry";
-import { getAccessoryLayout } from "../src/accessory-layout";
-import { getSystemLayout } from "../src/system-layout";
-import { createDuoStore } from "../src/store";
+import { getDuoGeometry } from "../src/core/geometry";
+import { getAccessoryLayout } from "../src/core/layout/accessories";
+import { getSystemLayout } from "../src/core/layout/system";
+import { createDuoStore } from "../src/core/store";
 import { DuoAppToolbar, DuoFrame, DuoProvider, DuoTabBar } from "../src";
 
 test("bar rails follow app placement and measured hardware edges", () => {

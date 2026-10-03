@@ -1,7 +1,7 @@
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
-import { StatusGlyph } from "../src/status-glyph";
+import { StatusGlyph } from "../src/components/system-chrome/status-glyph";
 
 function render(battery: number, charging = false) {
   return renderToStaticMarkup(<StatusGlyph battery={battery} charging={charging} />);

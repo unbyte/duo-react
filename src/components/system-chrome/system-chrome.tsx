@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useDuoState } from "./provider";
-import { getSystemLayout, systemMetrics } from "./system-layout";
-import type { DuoRect, DuoScreenInfo } from "./types";
+import { useDuoState } from "../../context/hooks";
+import { getSystemLayout, systemMetrics } from "../../core/layout/system";
+import type { DuoRect, DuoScreenInfo } from "../../core/types";
 import { StatusGlyph } from "./status-glyph";
 import { SystemIndicator } from "./system-indicator";
 

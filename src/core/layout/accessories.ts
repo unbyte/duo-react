@@ -1,6 +1,6 @@
-import { getSystemLayout } from "./system-layout";
+import { getSystemLayout } from "./system";
 import { sideControlMetrics } from "./control-metrics";
-import type { DuoScreenInfo } from "./types";
+import type { DuoScreenInfo } from "../types";
 
 const { edgeInset: sideInset, width: controlWidth } = sideControlMetrics;
 const edgeGap = 16;

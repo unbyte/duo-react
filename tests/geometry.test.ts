@@ -1,6 +1,8 @@
 import { expect, test } from "vite-plus/test";
-import { rotatedSize } from "../src/view-controls";
-import { getDuoGeometry, resolveZoom, safeAreaStyle } from "../src/geometry";
+import { rotatedSize } from "../src/core/rotation";
+import { getDuoGeometry } from "../src/core/geometry";
+import { resolveZoom } from "../src/core/zoom";
+import { safeAreaStyle } from "../src/core/safe-area";
 
 test("split windows preserve a common pixel density and local reserved-region coordinates", () => {
   const options = { display: "inner", orientation: "landscape-left", cameraActive: true } as const;

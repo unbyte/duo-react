@@ -1,6 +1,6 @@
 import { sideControlMetrics } from "./control-metrics";
-import { getDuoGeometry } from "./geometry";
-import type { DuoRect, DuoScreenInfo } from "./types";
+import { getDuoGeometry } from "../geometry";
+import type { DuoRect, DuoScreenInfo } from "../types";
 
 // Reference-image pixels mapped to app CSS pixels using the provisional camera cutout.
 // This matches the supplied crop's proportions, not a confirmed physical-hole measurement.

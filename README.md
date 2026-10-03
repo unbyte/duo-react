@@ -243,7 +243,7 @@ a reserved region. The home indicator is hidden by default; set
 `defaultSystem={{ homeIndicatorVisible: true }}` or call
 `setSystem({ homeIndicatorVisible: true })` to show it beneath the current app
 window. Split View has a black gap and a passive vertical divider grabber.
-Artwork dimensions and spacing are defined in `src/system-layout.ts` in app CSS
+Artwork dimensions and spacing are defined in `src/core/layout/system.ts` in app CSS
 pixels and scale with the screen. The safe-area dataset establishes the available
 regions, not exact icon sizes or native status layouts in every orientation;
 those still require manual comparison.
@@ -270,7 +270,7 @@ window origins. Split windows retain the display's outer corner radii and use a
 provisional 32px radius beside the divider, estimated from the
 [supplied illustration](docs/calibration/split-view.png). The divider's 4 × 48px
 grabber is also provisional. Geometry provenance is recorded in
-[src/profiles/xcode-27.1.ts](src/profiles/xcode-27.1.ts).
+[src/core/profiles/xcode-27.1.ts](src/core/profiles/xcode-27.1.ts).
 
 ### Partial folding
 

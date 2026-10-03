@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test";
-import { normalizeRotation, rotationStart } from "../src/view-controls";
+import { normalizeRotation, rotationStart } from "../src/core/rotation";
 
 test("normalization handles negative angles and whole turns without negative zero", () => {
   expect(normalizeRotation(-90)).toBe(270);

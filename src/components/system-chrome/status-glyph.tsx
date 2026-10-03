@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { DuoSystem } from "./types";
+import type { DuoSystem } from "../../core/types";
 
 export const statusArtwork = { width: 104, height: 108 } as const;
 

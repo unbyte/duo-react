@@ -1,8 +1,10 @@
-export { DuoProvider, useDuoState, useDuoActions, useDuoScreen, useDuoEvent } from "./provider";
-export type { DuoProviderProps } from "./provider";
-export { getDuoGeometry, safeAreaStyle } from "./geometry";
-export type { DuoGeometryOptions } from "./geometry";
-export type { DuoActions } from "./store";
+export { DuoProvider } from "./context/provider";
+export { useDuoState, useDuoActions, useDuoScreen, useDuoEvent } from "./context/hooks";
+export type { DuoProviderProps } from "./context/provider";
+export { getDuoGeometry } from "./core/geometry";
+export { safeAreaStyle } from "./core/safe-area";
+export type { DuoGeometryOptions } from "./core/geometry";
+export type { DuoActions } from "./core/store";
 export type {
   DuoDefaults,
   DuoDisplay,
@@ -21,20 +23,19 @@ export type {
   DuoSystemOptions,
   DuoWindowChange,
   DuoZoom,
-} from "./types";
-export { DuoFrame, DuoSafeArea } from "./frame";
-export type { DuoFrameProps } from "./frame";
-export {
-  DuoToolbar,
-  DuoDisplayControls,
-  DuoRotationControls,
-  DuoLayoutControls,
-  DuoZoomControls,
-} from "./toolbar";
-export type { DuoToolbarProps, DuoControlGroupProps } from "./toolbar";
+} from "./core/types";
+export { DuoFrame } from "./components/frame/frame";
+export { DuoSafeArea } from "./components/safe-area/safe-area";
+export type { DuoFrameProps } from "./components/frame/frame";
+export { DuoToolbar } from "./components/toolbar/toolbar";
+export { DuoDisplayControls } from "./components/toolbar/display-controls";
+export { DuoRotationControls } from "./components/toolbar/rotation-controls";
+export { DuoLayoutControls } from "./components/toolbar/layout-controls";
+export { DuoZoomControls } from "./components/toolbar/zoom-controls";
+export type { DuoToolbarProps, DuoControlGroupProps } from "./components/toolbar/types";
 
-export { DuoTabBar, DuoAppToolbar } from "./accessories";
-export type { DuoBarProps } from "./accessories";
+export { DuoTabBar, DuoAppToolbar } from "./components/accessories/bars";
+export type { DuoBarProps } from "./components/accessories/bars";
 
-export { DuoRegionMask } from "./region-mask";
-export type { DuoRegionMaskProps } from "./region-mask";
+export { DuoRegionMask } from "./components/region-mask/region-mask";
+export type { DuoRegionMaskProps } from "./components/region-mask/region-mask";

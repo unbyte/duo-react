@@ -1,35 +1,9 @@
 import * as React from "react";
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector";
-import { createDuoStore } from "./store";
-import type { DuoStore } from "./store";
-import type { DuoDefaults, DuoDisplay, DuoState, DuoSystemOptions, DuoWindowChange } from "./types";
-
-const StoreContext = React.createContext<DuoStore | undefined>(undefined);
-export const ScreenContext = React.createContext<DuoDisplay | undefined>(undefined);
-export const useBrowserLayoutEffect =
-  typeof document === "undefined" ? React.useEffect : React.useLayoutEffect;
-
-export interface DuoProviderProps {
-  children?: React.ReactNode;
-  defaultState?: DuoDefaults;
-  defaultSystem?: DuoSystemOptions;
-  outerPortraitLocked?: boolean;
-}
-
-export function DuoProvider({
-  children,
-  defaultState,
-  defaultSystem,
-  outerPortraitLocked = false,
-}: DuoProviderProps): React.ReactElement {
-  const [store] = React.useState(() =>
-    createDuoStore(defaultState, defaultSystem, outerPortraitLocked),
-  );
-  useBrowserLayoutEffect(() => {
-    store.configureOuterPortraitLock(outerPortraitLocked);
-  }, [store, outerPortraitLocked]);
-  return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
-}
+import type { DuoState, DuoWindowChange } from "../core/types";
+import { useBrowserLayoutEffect } from "../hooks/use-browser-layout-effect";
+import { StoreContext } from "./store-context";
+import { ScreenContext } from "./screen-context";
 
 export function useDuoStore() {
   const store = React.useContext(StoreContext);

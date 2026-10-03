@@ -1,5 +1,5 @@
-import { getDuoGeometry } from "./geometry";
-import type { DuoPosture, DuoRect, DuoScreenInfo } from "./types";
+import { getDuoGeometry } from "../geometry";
+import type { DuoPosture, DuoRect, DuoScreenInfo } from "../types";
 
 export interface MaskRegion extends DuoRect {
   id: string;

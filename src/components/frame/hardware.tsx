@@ -1,5 +1,5 @@
 import * as React from "react";
-import type { DuoDisplay, DuoOrientation } from "./types";
+import type { DuoDisplay, DuoOrientation } from "../../core/types";
 
 export const frameBezel = { inner: 18, outer: 12 } as const;
 

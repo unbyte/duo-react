@@ -1,6 +1,6 @@
 import { expect, test } from "vite-plus/test";
-import { createDuoStore } from "../src/store";
-import { getSystemLayout } from "../src/system-layout";
+import { createDuoStore } from "../src/core/store";
+import { getSystemLayout } from "../src/core/layout/system";
 
 test("status belongs to the display while the home indicator follows the app window", () => {
   const store = createDuoStore();

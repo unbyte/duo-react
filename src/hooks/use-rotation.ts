@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useBrowserLayoutEffect } from "./provider";
-import { rotationStart } from "./view-controls";
+import { useBrowserLayoutEffect } from "./use-browser-layout-effect";
+import { rotationStart } from "../core/rotation";
 
 export function useRotation(target: number) {
   const [rotation, setRotation] = React.useState(target);

@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vite-plus/test";
-import { createDuoStore } from "../src/store";
+import { createDuoStore } from "../src/core/store";
 
 test("independent stores keep stable snapshots and ignore no-op actions", () => {
   const one = createDuoStore();

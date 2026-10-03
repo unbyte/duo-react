@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useBrowserLayoutEffect } from "./provider";
-import type { DuoIndicatorStyle } from "./types";
+import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect";
+import type { DuoIndicatorStyle } from "../../core/types";
 
 let nextIndicatorId = 0;
 
