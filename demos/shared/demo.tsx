@@ -74,6 +74,21 @@ function BackgroundPicker({
   );
 }
 
+function CameraToggle() {
+  const cameraActive = useDuoState((state) => state.system.cameraActive);
+  const { setSystem } = useDuoActions();
+  return (
+    <label className="demo-toggle" title="Simulate inner camera activity">
+      <input
+        type="checkbox"
+        checked={cameraActive}
+        onChange={(event) => setSystem({ cameraActive: event.currentTarget.checked })}
+      />
+      <span>Camera</span>
+    </label>
+  );
+}
+
 function ProviderState() {
   const state = useDuoState((value) => value);
   return (
@@ -158,6 +173,7 @@ export function Demo({ version }: { version: string }) {
         <h1>React {version}</h1>
         <div className="demo-controls" role="group" aria-label="Preview appearance">
           <BackgroundPicker value={background} onChange={setBackground} />
+          <CameraToggle />
           <label className="demo-toggle" title="Show layout regions">
             <input
               type="checkbox"

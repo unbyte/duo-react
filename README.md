@@ -38,8 +38,9 @@ display and back. Content should keep its state.
 
 The appearance controls share one row and wrap on smaller screens. **Background**
 previews light, dark, gray, and mixed content; **Icons** selects automatic, white,
-or black indicators. **Regions** toggles the layout overlay, and **Bars** toggles
-the example app toolbar and tab bar.
+or black indicators. **Camera** simulates inner-camera activity through
+`cameraActive`; enable **Regions** to see its reserved area. **Regions** toggles
+the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
 
 Enable **Regions** for translucent safe-area and reserved-region
 blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
