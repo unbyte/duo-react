@@ -292,7 +292,9 @@ It renders its measured regions only in the browser and supports React 16.8–19
 
 The controls sit on a rounded, blurred backdrop: the inner capsule encloses the
 clock and combined indicator, and the outer capsule includes the camera as well.
-The foreground stays sharp. The material follows display rotation and preview
+The capsule has no fill or tint: uniform backgrounds retain their color, while
+nearby color boundaries are blurred. Without backdrop-filter support it remains
+transparent. The foreground stays sharp. The material follows display rotation and preview
 zoom, and hides with `showSystemUI={false}`; the outer camera remains visible.
 The [calibration note](docs/calibration/status-controls.md#capsule-material) records
 the simulator references and estimated material parameters.

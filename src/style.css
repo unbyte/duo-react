@@ -120,14 +120,8 @@
 .duo-status-material {
   position: absolute;
   border-radius: 999px;
-  background: rgb(128 128 128 / 4%);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .duo-status-material {
-    background: rgb(128 128 128 / 24%);
-  }
 }
 .duo-status {
   position: absolute;
