@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   DuoFrame,
+  DuoRegionMask,
   DuoProvider,
   DuoSafeArea,
   DuoTabBar,
@@ -15,7 +16,6 @@ import {
   useDuoScreen,
 } from "duo-frame";
 import type { DuoIndicatorStyle } from "duo-frame";
-import { RegionOverlay } from "./region-overlay";
 import "duo-frame/style.css";
 import "./style.css";
 
@@ -166,7 +166,6 @@ export function Demo({ version }: { version: string }) {
   const [showRegions, setShowRegions] = React.useState(false);
   const [showBars, setShowBars] = React.useState(false);
   const frame = React.useRef<HTMLDivElement>(null);
-  const stage = React.useRef<HTMLDivElement>(null);
   return (
     <DuoProvider>
       <main className="demo">
@@ -194,15 +193,7 @@ export function Demo({ version }: { version: string }) {
           </label>
         </div>
         <ProviderState />
-        {showRegions && (
-          <p className="demo-region-note">
-            App safe area and insets; whole-display reserved regions and the inner fold's activity.
-            All measurements are logical pixels. Fills show exact bounds; dashed outlines sit 2 px
-            inside them.
-          </p>
-        )}
         <div
-          ref={stage}
           className="demo-frame"
           data-regions={showRegions}
           style={
@@ -220,7 +211,9 @@ export function Demo({ version }: { version: string }) {
             <ExampleApp background={background} />
             {showBars && <ExampleBars />}
           </DuoFrame>
-          {showRegions && <RegionOverlay frameRef={frame} stageRef={stage} />}
+          {showRegions && (
+            <DuoRegionMask frameRef={frame} theme={background === "dark" ? "dark" : "light"} />
+          )}
         </div>
         <DuoToolbar className="demo-toolbar">
           <DuoDisplayControls className="demo-toolbar-group" />

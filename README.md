@@ -42,16 +42,23 @@ or black indicators. **Camera** simulates inner-camera activity through
 `cameraActive`; enable **Regions** to see its reserved area. **Regions** toggles
 the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
 
-Enable **Regions** for translucent safe-area and reserved-region
-blocks, dashed outlines, and labels outside the frame. Fills follow the rounded
-display and app-window boundaries. Outlines sit 2 logical pixels inside the
-region boundaries; labels report the original dimensions. The overlay follows
-placement, orientation, and zoom without remounting content. It also shows the
-inner display’s folding region, active only while partially open: 669 × 40pt in
-portrait, 40 × 669pt in landscape. `useDuoScreen().foldingRegion` exposes its full-display frame, margins,
-and activity separately from active reserved regions. The
-[folding-region calibration](docs/calibration/folding-region.md) explains why
-this band does not change the 13px Split View gap.
+Enable **Regions** for the library's interactive `DuoRegionMask`. It shows the
+app safe area and nonzero insets, active whole-display reserved regions, and the
+Split View gap. Hover a region or its label to highlight both; labels also support
+keyboard focus. Colors darken on light backgrounds and lighten in dark mode.
+The mask follows placement, orientation, and zoom without remounting content.
+
+Labels use the Safe Area dataset's names: **Safe area**, **Top inset**, **Right
+inset**, **Bottom inset**, **Left inset**, `occlusion`, and `division`. Separate
+occlusions retain the same source name and show their respective dimensions.
+**Split View gap** is a descriptive label for the inferred gap, not an Xcode
+reserved-region kind. Dimensions are in device points (pt); one point maps to one
+app CSS pixel before preview zoom.
+
+The 40pt `division` appears only while partially open; the 13pt Split View gap
+appears whenever a split window is selected. In split view, the folding region
+extends 13.5pt into each app window: 13.5 + 13 + 13.5 = 40pt. See the
+[folding-region calibration](docs/calibration/folding-region.md).
 
 Resize the browser window and use the zoom control to compare resizing with
 scaling. The parent supplies a definite height while the frame uses `height: 100%`.
@@ -206,7 +213,7 @@ Geometry uses app CSS pixels: one pixel per source device point.
 The inner display supports fully open and partially open layouts in all four
 orientations. The closed outer display supports portrait and both landscape
 orientations, with the upside-down fallback described above. Inner split windows
-are supported in landscape in both open postures. The 13px split gap is inferred from the reported widths; the source does not supply
+are supported in landscape in both open postures. The 13pt split gap is inferred from the reported widths; the source does not supply
 window origins. Split windows retain the display's outer corner radii and use a
 provisional 32px radius beside the divider, estimated from the
 [supplied illustration](docs/calibration/split-view.png). The divider's 4 × 48px
@@ -223,7 +230,7 @@ an optional `posture` with the same behavior, defaulting to `"open"`.
 
 For a full landscape window, the division is `(455.5, 0, 40, 669)`. Left and right
 split windows receive `(455.5, 0, 13.5, 669)` and `(0, 0, 13.5, 669)` respectively.
-Portrait uses `(0, 455.5, 669, 40)`. Window sizes, safe insets, and the 13px split gap
+Portrait uses `(0, 455.5, 669, 40)`. Window sizes, safe insets, and the 13pt split gap
 stay unchanged. A posture change emits `windowchange` after the frame commits,
 even when only region activity changes.
 
@@ -231,8 +238,53 @@ Children choose how to respond through `useDuoState()` and `useDuoScreen()`.
 Apps may adjust important controls or columns around the division; continuous
 scrolling content can stay continuous. The frame does not impose app padding or
 split an app into panels. It stays flat, with no hinge angle or folding animation.
-Enable **Regions** to inspect the fold's active/inactive status.
+Enable **Regions** to inspect the active division; inactive folds are omitted.
 See the [calibration and Apple guidance](docs/calibration/folding-region.md).
+
+### Region mask
+
+`DuoRegionMask` renders an inspection overlay beside a `DuoFrame` under the same
+provider. Pass the frame's ref and place both in a positioned container with room
+for the labels. The mask fills that container; reserve 220px on the right, or
+280px below when its width is less than 640px. Labels wrap below the frame on
+narrow containers and scroll if space runs out.
+
+```tsx
+const frame = React.useRef<HTMLDivElement>(null);
+
+<DuoProvider>
+  <div className="preview-with-regions">
+    <DuoFrame ref={frame} style={{ height: "100%" }}>
+      <App />
+    </DuoFrame>
+    <DuoRegionMask frameRef={frame} />
+  </div>
+</DuoProvider>;
+```
+
+```css
+.preview-with-regions {
+  position: relative;
+  box-sizing: border-box;
+  height: 700px;
+  padding-right: 220px;
+}
+/* For a preview that fills the viewport width. */
+@media (max-width: 639px) {
+  .preview-with-regions {
+    padding-right: 0;
+    padding-bottom: 280px;
+  }
+}
+```
+
+`theme` accepts `"auto"` (system color preference), `"light"`, or `"dark"`.
+The demo follows its Background selector. Normal div attributes, `className`, and
+`style` are supported. Each mask has independent hover/focus state and clipping
+IDs, so multiple providers can show masks on the same page. Only active reserved
+regions and nonzero rectangles are rendered. The mask intercepts pointer events
+on its regions while mounted; hide it to interact with the app beneath it.
+It renders its measured regions only in the browser and supports React 16.8–19.
 
 ### Indicator appearance
 

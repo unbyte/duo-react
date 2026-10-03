@@ -35,3 +35,6 @@ export type { DuoToolbarProps, DuoControlGroupProps } from "./toolbar";
 
 export { DuoTabBar, DuoAppToolbar } from "./accessories";
 export type { DuoBarProps } from "./accessories";
+
+export { DuoRegionMask } from "./region-mask";
+export type { DuoRegionMaskProps } from "./region-mask";

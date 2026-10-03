@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { expect, test } from "vite-plus/test";
 import {
   DuoFrame,
+  DuoRegionMask,
   DuoProvider,
   DuoToolbar,
   DuoDisplayControls,
@@ -49,6 +50,17 @@ test("frame can be server-rendered without browser globals", () => {
   expect(html).toContain("App content");
   expect(html).not.toContain('class="duo-home"');
   expect(html).not.toContain('class="duo-divider"');
+});
+
+test("region masks can be server-rendered before frame measurement", () => {
+  const html = renderToString(
+    <DuoProvider>
+      <DuoRegionMask frameRef={React.createRef<HTMLDivElement>()} theme="dark" />
+    </DuoProvider>,
+  );
+  expect(html).toContain('class="duo-region-mask"');
+  expect(html).toContain('data-theme="dark"');
+  expect(html).not.toContain("clipPath");
 });
 
 test("frame children receive the active display's screen context on the server", () => {
