@@ -119,7 +119,8 @@ Each click adds or subtracts 90°; repeated turns retain their direction across
 the transition. Reduced-motion preferences disable the animation. Rotating a
 split window into either portrait position selects full width.
 
-`state.rotation` is the accumulated clockwise target angle from upright portrait;
+`state.rotation` is the clockwise target angle from upright portrait, normalized
+to `[0, 360)` (0, 90, 180, or 270 degrees);
 `state.orientation` is the requested device orientation. Each display's
 `screen.orientation` reports its effective app layout. The inner display has
 measured geometry for all four positions. The outer display has no upside-down
@@ -128,8 +129,8 @@ layout and rotate together with the shell. Starting upside down uses portrait
 as that outer layout. This fallback is a preview policy, not calibrated native
 behavior. App state and iframe instances remain mounted throughout.
 
-`setOrientation()` selects the nearest equivalent angle without discarding full
-turns. `resetDevice()` restores the initial device orientation and angle.
+`setOrientation()` sets the normalized angle and animates the nearest turn from
+the previous target. `resetDevice()` restores the initial device orientation and angle.
 The same operations are available through `rotate("left" | "right")`, `zoomIn()`,
 and `zoomOut()` on `useDuoActions()`.
 

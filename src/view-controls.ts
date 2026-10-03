@@ -7,16 +7,25 @@ export const orientationRotation: Record<DuoOrientation, number> = {
   "landscape-right": 270,
 };
 
+export function normalizeRotation(rotation: number) {
+  return ((rotation % 360) + 360) % 360;
+}
+
 export function orientationAtRotation(rotation: number): DuoOrientation {
-  const index = (((rotation / 90) % 4) + 4) % 4;
+  const index = normalizeRotation(rotation) / 90;
   return (["portrait", "landscape-left", "portrait-upside-down", "landscape-right"] as const)[
     index
   ];
 }
 
-export function nearestRotation(rotation: number, orientation: DuoOrientation) {
-  const target = orientationRotation[orientation];
+function nearestRotation(rotation: number, target: number) {
   return target + Math.round((rotation - target) / 360) * 360;
+}
+
+export function rotationStart(current: number, previousTarget: number, target: number) {
+  // Rebase unfinished motion into the new target's turn, preserving its direction
+  // across zero without accumulating full revolutions in the animation either.
+  return target + ((current - nearestRotation(previousTarget, target)) % 360);
 }
 
 export function rotatedSize(size: { width: number; height: number }, rotation: number) {

@@ -70,9 +70,7 @@ export interface DuoState {
   readonly posture: DuoPosture;
   /** Requested device orientation. Each screen reports its effective app layout separately. */
   readonly orientation: DuoOrientation;
-  /** Target clockwise angle in degrees from upright portrait. Accumulates beyond 360
-   * so repeated turns keep their direction. The frame animates toward this value.
-   */
+  /** Target clockwise angle from upright portrait, normalized to [0, 360) degrees. */
   readonly rotation: number;
   readonly innerPlacement: DuoPlacement;
   /** Requested scale, or "fit" to let the frame calculate it from available space.

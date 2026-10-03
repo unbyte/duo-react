@@ -1,5 +1,5 @@
 import { getDuoGeometry, validateZoom } from "./geometry";
-import { nearestRotation, orientationAtRotation, orientationRotation } from "./view-controls";
+import { normalizeRotation, orientationAtRotation, orientationRotation } from "./view-controls";
 import type {
   DuoDefaults,
   DuoDisplay,
@@ -183,10 +183,10 @@ export function createDuoStore(defaults: DuoDefaults = {}, system: DuoSystemOpti
     setOrientation: (orientation: DuoOrientation) =>
       update({
         orientation,
-        rotation: nearestRotation(model.rotation, orientation),
+        rotation: orientationRotation[orientation],
       }),
     rotate: (direction: "left" | "right") => {
-      const rotation = model.rotation + (direction === "left" ? -90 : 90);
+      const rotation = normalizeRotation(model.rotation + (direction === "left" ? -90 : 90));
       const orientation = orientationAtRotation(rotation);
       update({
         rotation,

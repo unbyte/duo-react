@@ -130,19 +130,22 @@ test("unsupported indicator styles reject the whole system update", () => {
   expect(store.getSnapshot()).toBe(initial);
 });
 
-test("rotation continues in both directions and resets to the initial angle", () => {
+test("rotation wraps in both directions and resets to the initial angle", () => {
   const store = createDuoStore({ innerPlacement: "left" });
   const listener = vi.fn();
   store.subscribe(listener);
   const initial = store.getSnapshot();
-  for (const rotation of [180, 270, 360, 450, 540, 630, 720, 810]) {
+  for (const rotation of [180, 270, 0, 90, 180, 270, 0, 90]) {
     store.actions.rotate("right");
     expect(store.getSnapshot().rotation).toBe(rotation);
   }
   expect(store.getSnapshot().orientation).toBe(initial.orientation);
   expect(listener).toHaveBeenCalledTimes(8);
-  for (let i = 0; i < 12; i++) store.actions.rotate("left");
-  expect(store.getSnapshot()).toMatchObject({ rotation: -270, orientation: initial.orientation });
+  for (let i = 0; i < 1000; i++) {
+    store.actions.rotate("left");
+    expect(store.getSnapshot().rotation).toBe([0, 270, 180, 90][i % 4]);
+  }
+  expect(store.getSnapshot()).toMatchObject({ rotation: 90, orientation: initial.orientation });
   store.actions.resetDevice();
   expect(store.getSnapshot()).toMatchObject({ rotation: 90, innerPlacement: "left" });
 });
@@ -169,13 +172,13 @@ test("upside-down inner geometry is measured while outer content retains its sup
   ).toBe("portrait");
 });
 
-test("explicit orientation selects a nearby turn without discarding accumulated rotations", () => {
+test("explicit orientation uses a normalized angle after repeated turns", () => {
   const store = createDuoStore();
   for (let i = 0; i < 8; i++) store.actions.rotate("right");
   store.actions.setOrientation("portrait");
-  expect(store.getSnapshot()).toMatchObject({ rotation: 720, orientation: "portrait" });
+  expect(store.getSnapshot()).toMatchObject({ rotation: 0, orientation: "portrait" });
   store.actions.setOrientation("landscape-right");
-  expect(store.getSnapshot()).toMatchObject({ rotation: 630, orientation: "landscape-right" });
+  expect(store.getSnapshot()).toMatchObject({ rotation: 270, orientation: "landscape-right" });
 });
 
 test("reset restores the initial outer fallback when starting upside down", () => {
