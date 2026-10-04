@@ -1,0 +1,42 @@
+{
+  "name": "duo-frame",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A React device frame for iPhone Duo previews.",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json",
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test",
+    "watch": "vp pack --watch"
+  },
+  "dependencies": {
+    "use-sync-external-store": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/use-sync-external-store": "^1.5.0",
+    "lucide-react": "^1.49.0",
+    "react": "16.8.6",
+    "react-dom": "16.8.6"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "inlinedDependencies": {
+    "lucide-react": "1.49.0"
+  }
+}

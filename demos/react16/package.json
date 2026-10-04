@@ -5,17 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev --host 127.0.0.1 --port 5116 --strictPort",
-    "build": "vp build",
-    "check": "tsc --noEmit"
+    "build": "vp build"
   },
   "dependencies": {
-    "duo-frame": "workspace:*",
+    "@duo-frame/demo-shared": "workspace:*",
     "react": "16.14.0",
     "react-dom": "16.14.0"
   },
   "devDependencies": {
     "@types/react": "^16.14.0",
-    "@types/react-dom": "^16.9.0",
-    "vite-plus": "catalog:"
+    "@types/react-dom": "^16.9.0"
   }
 }

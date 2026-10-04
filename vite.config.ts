@@ -1,15 +1,8 @@
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
-  pack: {
-    platform: "browser",
-    target: "es2020",
-    outputOptions: { comments: { legal: true } },
-    deps: { neverBundle: [/^react(?:-dom)?(?:\/|$)/, /^use-sync-external-store(?:\/|$)/] },
-    dts: {
-      generator: "tsgo",
-    },
-    exports: { legacy: true },
+  test: {
+    projects: ["packages/*/vite.config.ts"],
   },
   lint: {
     options: {
@@ -19,6 +12,6 @@ export default defineConfig({
   },
   fmt: {
     // Preserve reference snapshots byte for byte so their provenance hashes stay valid.
-    ignorePatterns: ["docs/calibration/sources/**"],
+    ignorePatterns: ["packages/duo-frame/docs/calibration/sources/**"],
   },
 });
