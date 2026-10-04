@@ -112,6 +112,64 @@ function CameraToggle() {
   )
 }
 
+function SignalControls() {
+  const { battery, charging, wifiStrength, cellularStrength } = useDuoState((state) => state.system)
+  const { setSystem } = useDuoActions()
+  return (
+    <div className="demo-controls" role="group" aria-label="Battery and signal">
+      <label className="demo-range">
+        <span id="demo-battery-label">Battery</span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={battery}
+          aria-labelledby="demo-battery-label"
+          aria-valuetext={`${battery}%`}
+          onChange={(event) => setSystem({ battery: Number(event.currentTarget.value) })}
+        />
+        <span className="demo-range-value">{battery}%</span>
+      </label>
+      <label className="demo-toggle">
+        <input
+          type="checkbox"
+          checked={charging}
+          onChange={(event) => setSystem({ charging: event.currentTarget.checked })}
+        />
+        <span>Charging</span>
+      </label>
+      <label className="demo-select">
+        <span id="demo-wifi-label">Wi-Fi</span>
+        <select
+          aria-labelledby="demo-wifi-label"
+          value={wifiStrength}
+          onChange={(event) => setSystem({ wifiStrength: Number(event.currentTarget.value) })}
+        >
+          <option value={0}>0 — None</option>
+          <option value={1}>1 — Weak</option>
+          <option value={2}>2 — Medium</option>
+          <option value={3}>3 — Strong</option>
+        </select>
+      </label>
+      <label className="demo-select">
+        <span id="demo-cellular-label">Cellular</span>
+        <select
+          aria-labelledby="demo-cellular-label"
+          value={cellularStrength}
+          onChange={(event) => setSystem({ cellularStrength: Number(event.currentTarget.value) })}
+        >
+          <option value={0}>0 — None</option>
+          <option value={1}>1 — Weak</option>
+          <option value={2}>2 — Fair</option>
+          <option value={3}>3 — Good</option>
+          <option value={4}>4 — Strong</option>
+        </select>
+      </label>
+    </div>
+  )
+}
+
 function ProviderState() {
   const state = useDuoState((value) => value)
   return (
@@ -252,6 +310,7 @@ export function Demo() {
             <span>Bars</span>
           </label>
         </div>
+        <SignalControls />
         <ProviderState />
         <div
           className="demo-frame"

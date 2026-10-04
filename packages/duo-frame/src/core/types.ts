@@ -62,6 +62,10 @@ export interface DuoSystem {
   readonly time: string
   readonly battery: number
   readonly charging: boolean
+  /** Active Wi-Fi segments, from 0 to 3. */
+  readonly wifiStrength: number
+  /** Active cellular dots, from 0 to 4. */
+  readonly cellularStrength: number
   readonly cameraActive: boolean
   readonly homeIndicatorVisible: boolean
   /** Undefined follows the layout default; true hides status controls and false shows them. */

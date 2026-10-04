@@ -199,10 +199,16 @@ The device has no built-in cast shadow. To add one around its silhouette, pass
 `style={{ filter: "drop-shadow(0 12px 20px rgb(0 0 0 / 18%))" }}` to `DuoFrame`,
 or apply the same filter through `className`.
 
-The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Battery
-level changes the arc's length; charging displays a lightning mark. These indicators
-have no click or gesture behavior. The SVG is drawn from the supplied image with
-a common horizontal axis for the battery, Wi-Fi, and subdued cellular dots. See the
+The status glyph combines a battery arc, Wi-Fi arcs, and cellular dots. Set
+`battery` from 0 to 100 to change the arc's length. While `charging`, the battery
+arc turns green with a gap at the top for a small lightning mark; Wi-Fi remains
+visible. `wifiStrength` accepts integers from 0 to 3, lighting the dot
+then the inner and outer arcs. `cellularStrength` accepts integers from 0 to 4,
+lighting dots from left to right. Inactive segments remain dim. The defaults are
+100% battery, no charging, Wi-Fi strength 3, and cellular strength 0. Configure
+these through `defaultSystem` or `setSystem`; both demos expose the same controls.
+These indicators have no click or gesture behavior. The SVG is drawn from the supplied image with
+a common horizontal axis for the battery, Wi-Fi, and cellular dots. See the
 [reference measurements](docs/calibration/status-controls.md) for proportions and
 calibration assumptions.
 

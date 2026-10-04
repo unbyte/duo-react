@@ -54,6 +54,13 @@ function validateModel(model: Model) {
     model.system.battery > 100
   )
     throw new RangeError("Battery must be between 0 and 100.")
+  for (const [name, value, maximum] of [
+    ["Wi-Fi", model.system.wifiStrength, 3],
+    ["Cellular", model.system.cellularStrength, 4],
+  ] as const) {
+    if (!Number.isInteger(value) || value < 0 || value > maximum)
+      throw new RangeError(`${name} strength must be an integer between 0 and ${maximum}.`)
+  }
   for (const styles of Object.values(model.system.indicatorStyles)) {
     for (const style of [styles.statusBar, styles.homeIndicator]) {
       if (style !== "auto" && style !== "light" && style !== "dark")
@@ -79,6 +86,8 @@ export function createDuoStore(
         time: "9:41",
         battery: 100,
         charging: false,
+        wifiStrength: 3,
+        cellularStrength: 0,
         cameraActive: false,
         homeIndicatorVisible: false,
         indicatorStyles: Object.freeze({ inner: indicatorStyles, outer: indicatorStyles }),

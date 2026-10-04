@@ -12,6 +12,7 @@ export function SystemIndicator({
   className,
   style,
   children,
+  foreground,
 }: {
   width: number
   height: number
@@ -20,6 +21,7 @@ export function SystemIndicator({
   className: string
   style?: React.CSSProperties
   children: React.ReactNode
+  foreground?: React.ReactNode
 }) {
   const [id, setId] = React.useState<string>()
   useBrowserLayoutEffect(() => {
@@ -109,6 +111,7 @@ export function SystemIndicator({
       <span className="duo-indicator-fixed" data-auto={automatic || undefined}>
         {children}
       </span>
+      {foreground && <span className="duo-indicator-foreground">{foreground}</span>}
     </span>
   )
 }

@@ -124,6 +124,29 @@ test("system changes only recompute geometry for camera activity", () => {
   expect(store.getSnapshot().system.battery).toBe(25)
 })
 
+test("signal updates preserve geometry, reject invalid levels, and reset to provider defaults", () => {
+  const store = createDuoStore({}, { wifiStrength: 2, cellularStrength: 3 })
+  const initial = store.getSnapshot()
+  store.actions.setSystem({ wifiStrength: 0, cellularStrength: 4 })
+  const changed = store.getSnapshot()
+  expect(changed.screens).toBe(initial.screens)
+  expect(changed.system).toMatchObject({ wifiStrength: 0, cellularStrength: 4 })
+  const listener = vi.fn()
+  store.subscribe(listener)
+  store.actions.setSystem({ wifiStrength: 0, cellularStrength: 4 })
+  expect(store.getSnapshot()).toBe(changed)
+  for (const key of ["wifiStrength", "cellularStrength"] as const) {
+    for (const value of [-1, 0.5, key === "wifiStrength" ? 4 : 5, NaN, Infinity]) {
+      expect(() => createDuoStore({}, { [key]: value })).toThrow(RangeError)
+      expect(() => store.actions.setSystem({ battery: 25, [key]: value })).toThrow(RangeError)
+      expect(store.getSnapshot()).toBe(changed)
+    }
+  }
+  expect(listener).not.toHaveBeenCalled()
+  store.actions.resetDevice()
+  expect(store.getSnapshot().system).toBe(initial.system)
+})
+
 test("reset restores provider defaults and separate providers can register their own frame", () => {
   const store = createDuoStore({ zoom: 0.5, innerPlacement: "left" }, { battery: 50 })
   store.actions.setInnerPlacement("right")

@@ -24,9 +24,15 @@ export function SystemChrome({
   showIndicators: boolean
   scale: number
 }) {
-  const { time, battery, charging, indicatorStyles, homeIndicatorVisible } = useDuoState(
-    (state) => state.system,
-  )
+  const {
+    time,
+    battery,
+    charging,
+    wifiStrength,
+    cellularStrength,
+    indicatorStyles,
+    homeIndicatorVisible,
+  } = useDuoState((state) => state.system)
   const appearance = indicatorStyles[screen.display]
   const showStatus = showIndicators && screen.statusBarVisible
   const layout = React.useMemo(() => getSystemLayout(screen), [screen])
@@ -75,6 +81,19 @@ export function SystemChrome({
               </SystemIndicator>
               <SystemIndicator
                 className="duo-status-glyph"
+                foreground={
+                  charging ? (
+                    <StatusGlyph
+                      battery={battery}
+                      charging={charging}
+                      wifiStrength={wifiStrength}
+                      cellularStrength={cellularStrength}
+                      layer="accent"
+                      width={systemMetrics.glyphWidth}
+                      height={systemMetrics.glyphHeight}
+                    />
+                  ) : undefined
+                }
                 scale={scale}
                 appearance={appearance.statusBar}
                 width={systemMetrics.glyphWidth}
@@ -86,8 +105,11 @@ export function SystemChrome({
                 }}
               >
                 <StatusGlyph
+                  layer="adaptive"
                   battery={battery}
                   charging={charging}
+                  wifiStrength={wifiStrength}
+                  cellularStrength={cellularStrength}
                   width={systemMetrics.glyphWidth}
                   height={systemMetrics.glyphHeight}
                 />

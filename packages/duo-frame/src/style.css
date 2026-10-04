@@ -149,6 +149,10 @@
   position: absolute;
   inset: 0;
 }
+.duo-indicator-foreground {
+  position: absolute;
+  inset: 0;
+}
 @supports (backdrop-filter: url("#filter")) {
   .duo-indicator-fixed[data-auto] {
     visibility: hidden;
