@@ -3,5 +3,5 @@
   "compilerOptions": {
     "declaration": false
   },
-  "include": ["*.tsx", "*.d.ts"]
+  "include": ["src"]
 }

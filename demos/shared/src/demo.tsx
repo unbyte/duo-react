@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Layers2 } from "lucide-react"
 import {
   DuoFrame,
   DuoRegionMask,
@@ -24,58 +25,38 @@ import { StateInspector } from "./state-inspector"
 import "duo-frame/style.css"
 import "./style.css"
 
-const backgrounds = {
-  light: { background: "#fff", color: "#222" },
-  dark: { background: "#111", color: "#fff" },
-  gray: { background: "#808080", color: "#000" },
-  mixed: {
-    background: "#fff",
-    color: "#222",
-  },
-} as const
-type Background = keyof typeof backgrounds
+function foregroundColor(background: string) {
+  const channels = background
+    .slice(1)
+    .match(/.{2}/g)!
+    .map((channel) => {
+      const value = parseInt(channel, 16) / 255
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+    })
+  const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+  return luminance > 0.179 ? "#000000" : "#ffffff"
+}
 
-function BackgroundPicker({
-  value,
-  onChange,
-}: {
-  value: Background
-  onChange: (value: Background) => void
-}) {
+function IndicatorStylePicker() {
   const { setSystem } = useDuoActions()
   const indicatorStyle = useDuoState((state) => state.system.indicatorStyles.outer.statusBar)
   return (
-    <>
-      <label className="demo-select">
-        <span id="demo-background-label">Background</span>
-        <select
-          aria-labelledby="demo-background-label"
-          value={value}
-          onChange={(event) => onChange(event.currentTarget.value as Background)}
-        >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="gray">Gray</option>
-          <option value="mixed">Light top, dark bottom</option>
-        </select>
-      </label>
-      <label className="demo-select">
-        <span id="demo-icons-label">Icons</span>
-        <select
-          aria-labelledby="demo-icons-label"
-          value={indicatorStyle}
-          onChange={(event) => {
-            const next = event.currentTarget.value as DuoIndicatorStyle
-            const styles = { statusBar: next, homeIndicator: next }
-            setSystem({ indicatorStyles: { inner: styles, outer: styles } })
-          }}
-        >
-          <option value="auto">Auto</option>
-          <option value="light">Light (white)</option>
-          <option value="dark">Dark (black)</option>
-        </select>
-      </label>
-    </>
+    <label className="demo-select">
+      <span id="demo-icons-label">Icons</span>
+      <select
+        aria-labelledby="demo-icons-label"
+        value={indicatorStyle}
+        onChange={(event) => {
+          const next = event.currentTarget.value as DuoIndicatorStyle
+          const styles = { statusBar: next, homeIndicator: next }
+          setSystem({ indicatorStyles: { inner: styles, outer: styles } })
+        }}
+      >
+        <option value="auto">Auto</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
   )
 }
 
@@ -97,21 +78,6 @@ function StatusBarPicker() {
         <option value="show">Show</option>
         <option value="hide">Hide</option>
       </select>
-    </label>
-  )
-}
-
-function CameraToggle() {
-  const cameraActive = useDuoState((state) => state.system.cameraActive)
-  const { setSystem } = useDuoActions()
-  return (
-    <label className="demo-toggle" title="Simulate inner camera activity">
-      <input
-        type="checkbox"
-        checked={cameraActive}
-        onChange={(event) => setSystem({ cameraActive: event.currentTarget.checked })}
-      />
-      <span>Camera</span>
     </label>
   )
 }
@@ -153,12 +119,12 @@ function TimeControls() {
           onChange={(event) => setMode(event.currentTarget.value)}
         >
           <option value="automatic">Automatic</option>
-          <option value="specified">Specified time</option>
+          <option value="specified">Manual</option>
         </select>
       </label>
       {mode === "specified" && (
         <label className="demo-time">
-          <span>Time</span>
+          <span>Value</span>
           <input
             type="time"
             aria-label="Specified time"
@@ -231,21 +197,12 @@ function SystemControls() {
   )
 }
 
-function ExampleApp({
-  background,
-  showBlock,
-  blockColor,
-}: {
-  background: Background
-  showBlock: boolean
-  blockColor: string
-}) {
+function ExampleApp({ showBlock, blockColor }: { showBlock: boolean; blockColor: string }) {
   const { display } = useDuoScreen()
   const [count, setCount] = React.useState(0)
   const [text, setText] = React.useState("")
   return (
     <DuoSafeArea className="demo-app">
-      {background === "mixed" && <div className="demo-bottom-background" />}
       <div className="demo-content">
         <h2>{display === "inner" ? "Inner screen" : "Outer screen"}</h2>
         <button type="button" onClick={() => setCount((value) => value + 1)}>
@@ -315,22 +272,63 @@ function BarControls({
           />
           <span>Toolbars</span>
         </label>
-        <label className="demo-select">
-          <span>Toolbar count</span>
-          <select
-            disabled={!settings.toolbarsEnabled}
-            value={settings.toolbarCount}
-            onChange={(event) =>
-              onChange({ ...settings, toolbarCount: Number(event.currentTarget.value) })
-            }
-          >
-            {[1, 2, 3].map((count) => (
-              <option key={count} value={count}>
-                {count}
-              </option>
+        {settings.toolbarsEnabled && (
+          <label className="demo-select">
+            <span>Toolbar count</span>
+            <select
+              value={settings.toolbarCount}
+              onChange={(event) =>
+                onChange({ ...settings, toolbarCount: Number(event.currentTarget.value) })
+              }
+            >
+              {[1, 2, 3].map((count) => (
+                <option key={count} value={count}>
+                  {count}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {settings.toolbarsEnabled && (
+          <div className="demo-toolbar-settings">
+            {settings.toolbars.slice(0, settings.toolbarCount).map((bar) => (
+              <fieldset key={bar.id}>
+                <legend>Toolbar {bar.id}</legend>
+                <label className="demo-select">
+                  <span>Placement</span>
+                  <select
+                    aria-label={`Toolbar ${bar.id} placement`}
+                    value={bar.placement}
+                    onChange={(event) =>
+                      updateToolbar(bar.id, {
+                        placement: event.currentTarget.value as ToolbarLayoutRequest["placement"],
+                      })
+                    }
+                  >
+                    <option value="top-leading">Top leading</option>
+                    <option value="top-trailing">Top trailing</option>
+                    <option value="bottom">Bottom</option>
+                  </select>
+                </label>
+                <label className="demo-select">
+                  <span>Axis</span>
+                  <select
+                    aria-label={`Toolbar ${bar.id} axis`}
+                    value={bar.axis}
+                    onChange={(event) =>
+                      updateToolbar(bar.id, {
+                        axis: event.currentTarget.value as ToolbarLayoutRequest["axis"],
+                      })
+                    }
+                  >
+                    <option value="adaptive">Adaptive</option>
+                    <option value="horizontal">Horizontal</option>
+                  </select>
+                </label>
+              </fieldset>
             ))}
-          </select>
-        </label>
+          </div>
+        )}
         <label className="demo-toggle">
           <input
             type="checkbox"
@@ -341,22 +339,23 @@ function BarControls({
           />
           <span>Tab bar</span>
         </label>
-        <label className="demo-select">
-          <span>Tab distribution</span>
-          <select
-            disabled={!settings.tabbarEnabled}
-            value={settings.distribution}
-            onChange={(event) =>
-              onChange({
-                ...settings,
-                distribution: event.currentTarget.value as BarSettings["distribution"],
-              })
-            }
-          >
-            <option value="packed">Packed</option>
-            <option value="edges">Edges</option>
-          </select>
-        </label>
+        {settings.tabbarEnabled && (
+          <label className="demo-select">
+            <span>Tab distribution</span>
+            <select
+              value={settings.distribution}
+              onChange={(event) =>
+                onChange({
+                  ...settings,
+                  distribution: event.currentTarget.value as BarSettings["distribution"],
+                })
+              }
+            >
+              <option value="packed">Packed</option>
+              <option value="edges">Edges</option>
+            </select>
+          </label>
+        )}
         <label className="demo-toggle">
           <input
             type="checkbox"
@@ -366,46 +365,6 @@ function BarControls({
           <span>Bar bounds</span>
         </label>
       </div>
-      {settings.toolbarsEnabled && (
-        <div className="demo-toolbar-settings">
-          {settings.toolbars.slice(0, settings.toolbarCount).map((bar) => (
-            <fieldset key={bar.id}>
-              <legend>Toolbar {bar.id}</legend>
-              <label className="demo-select">
-                <span>Placement</span>
-                <select
-                  aria-label={`Toolbar ${bar.id} placement`}
-                  value={bar.placement}
-                  onChange={(event) =>
-                    updateToolbar(bar.id, {
-                      placement: event.currentTarget.value as ToolbarLayoutRequest["placement"],
-                    })
-                  }
-                >
-                  <option value="top-leading">Top leading</option>
-                  <option value="top-trailing">Top trailing</option>
-                  <option value="bottom">Bottom</option>
-                </select>
-              </label>
-              <label className="demo-select">
-                <span>Axis</span>
-                <select
-                  aria-label={`Toolbar ${bar.id} axis`}
-                  value={bar.axis}
-                  onChange={(event) =>
-                    updateToolbar(bar.id, {
-                      axis: event.currentTarget.value as ToolbarLayoutRequest["axis"],
-                    })
-                  }
-                >
-                  <option value="adaptive">Adaptive</option>
-                  <option value="horizontal">Horizontal</option>
-                </select>
-              </label>
-            </fieldset>
-          ))}
-        </div>
-      )}
     </section>
   )
 }
@@ -491,8 +450,37 @@ function ExampleBars({
   )
 }
 
+function ControlSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <details className="demo-section" open>
+      <summary>{title}</summary>
+      <div className="demo-section-content">{children}</div>
+    </details>
+  )
+}
+
+function PreviewFrame({ background, children }: { background: string; children: React.ReactNode }) {
+  const size = useDuoState(
+    (state) => state.screens[state.posture === "closed" ? "outer" : "inner"].size,
+  )
+  return (
+    <div
+      className="demo-frame"
+      style={
+        {
+          "--demo-background": background,
+          "--demo-color": foregroundColor(background),
+          "--demo-device-ratio": size.width / size.height,
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </div>
+  )
+}
+
 export function Demo() {
-  const [background, setBackground] = React.useState<Background>("light")
+  const [background, setBackground] = React.useState("#ffffff")
   const [showRegions, setShowRegions] = React.useState(false)
   const [barSettings, setBarSettings] = React.useState(initialBarSettings)
   const [barsLayout, setBarsLayout] = React.useState<BarsLayout>()
@@ -500,85 +488,128 @@ export function Demo() {
   const [showBlock, setShowBlock] = React.useState(true)
   const [blockColor, setBlockColor] = React.useState("#0066ff")
   const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false)
+  const [inspectorOpen, setInspectorOpen] = React.useState(true)
   const frame = React.useRef<HTMLDivElement>(null)
+  const inspectorToggle = React.useRef<HTMLButtonElement>(null)
   return (
-    <DuoProvider outerPortraitLocked={outerPortraitLocked}>
-      <main className="demo">
-        <div className="demo-controls" role="group" aria-label="Preview appearance">
-          <BackgroundPicker value={background} onChange={setBackground} />
-          <StatusBarPicker />
-          <CameraToggle />
-          <label className="demo-toggle" title="Keep the outer app in portrait while rotating">
-            <input
-              type="checkbox"
-              checked={outerPortraitLocked}
-              onChange={(event) => setOuterPortraitLocked(event.currentTarget.checked)}
-            />
-            <span>Outer portrait lock</span>
-          </label>
-          <label className="demo-toggle" title="Show draggable color block">
-            <input
-              type="checkbox"
-              checked={showBlock}
-              onChange={(event) => setShowBlock(event.currentTarget.checked)}
-            />
-            <span>Block</span>
-          </label>
-          <label className="demo-color">
-            <span>Color</span>
-            <input
-              type="color"
-              aria-label="Block color"
-              value={blockColor}
-              onChange={(event) => setBlockColor(event.currentTarget.value)}
-            />
-          </label>
-          <label className="demo-toggle" title="Show layout regions">
-            <input
-              type="checkbox"
-              aria-label="Show layout regions"
-              checked={showRegions}
-              onChange={(event) => setShowRegions(event.currentTarget.checked)}
-            />
-            <span>Regions</span>
-          </label>
-        </div>
-        <SystemControls />
-        <BarControls settings={barSettings} onChange={setBarSettings} />
-        <StateInspector request={request} layout={barsLayout} />
-        <div
-          className="demo-frame"
-          data-regions={showRegions}
-          style={
-            {
-              "--demo-background": backgrounds[background].background,
-              "--demo-color": backgrounds[background].color,
-            } as React.CSSProperties
-          }
+    <DuoProvider defaultSystem={{ cameraActive: true }} outerPortraitLocked={outerPortraitLocked}>
+      <div className="demo" data-inspector-open={inspectorOpen}>
+        <button
+          ref={inspectorToggle}
+          type="button"
+          className="demo-state-toggle"
+          aria-label={inspectorOpen ? "Hide inspector" : "Show inspector"}
+          title={inspectorOpen ? "Hide inspector" : "Show inspector"}
+          aria-expanded={inspectorOpen}
+          aria-controls="demo-state-panel"
+          onClick={() => setInspectorOpen((open) => !open)}
         >
-          <DuoFrame
-            ref={frame}
-            style={{ width: "100%", height: "100%" }}
-            aria-label="Duo layout preview"
-          >
-            <ExampleApp background={background} showBlock={showBlock} blockColor={blockColor} />
-            <ExampleBars
-              request={request}
-              showBounds={barSettings.showBounds}
-              onLayout={setBarsLayout}
-            />
-          </DuoFrame>
-          {showRegions && (
-            <DuoRegionMask frameRef={frame} theme={background === "dark" ? "dark" : "light"} />
-          )}
+          <span className="demo-panel-icon" aria-hidden="true" />
+        </button>
+        <div className="demo-workspace">
+          <aside className="demo-sidebar" aria-label="Demo settings">
+            <div className="demo-sidebar-scroll">
+              <ControlSection title="Appearance">
+                <div className="demo-controls" role="group" aria-label="Preview appearance">
+                  <label className="demo-color">
+                    <span>Background</span>
+                    <input
+                      type="color"
+                      aria-label="Background color"
+                      value={background}
+                      onChange={(event) => setBackground(event.currentTarget.value)}
+                    />
+                  </label>
+                  <IndicatorStylePicker />
+                  <StatusBarPicker />
+                  <label
+                    className="demo-toggle"
+                    title="Keep the outer app in portrait while rotating"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={outerPortraitLocked}
+                      onChange={(event) => setOuterPortraitLocked(event.currentTarget.checked)}
+                    />
+                    <span>Outer portrait lock</span>
+                  </label>
+                </div>
+              </ControlSection>
+              <ControlSection title="System indicators">
+                <SystemControls />
+              </ControlSection>
+              <ControlSection title="App bars">
+                <BarControls settings={barSettings} onChange={setBarSettings} />
+              </ControlSection>
+              <ControlSection title="Draggable block">
+                <div className="demo-controls">
+                  <label className="demo-toggle" title="Show draggable color block">
+                    <input
+                      type="checkbox"
+                      checked={showBlock}
+                      onChange={(event) => setShowBlock(event.currentTarget.checked)}
+                    />
+                    <span>Block</span>
+                  </label>
+                  <label className="demo-color">
+                    <span>Color</span>
+                    <input
+                      type="color"
+                      aria-label="Block color"
+                      value={blockColor}
+                      onChange={(event) => setBlockColor(event.currentTarget.value)}
+                    />
+                  </label>
+                </div>
+              </ControlSection>
+            </div>
+          </aside>
+          <main className="demo-preview" aria-label="Device preview">
+            <div className="demo-canvas">
+              <button
+                type="button"
+                className="demo-regions-toggle"
+                aria-label="Layout regions"
+                aria-pressed={showRegions}
+                title="Layout regions"
+                onClick={() => setShowRegions((visible) => !visible)}
+              >
+                <Layers2 size={18} strokeWidth={1.5} aria-hidden="true" />
+              </button>
+              <PreviewFrame background={background}>
+                <DuoFrame
+                  ref={frame}
+                  style={{ width: "100%", height: "100%" }}
+                  aria-label="Duo layout preview"
+                >
+                  <ExampleApp showBlock={showBlock} blockColor={blockColor} />
+                  <ExampleBars
+                    request={request}
+                    showBounds={barSettings.showBounds}
+                    onLayout={setBarsLayout}
+                  />
+                </DuoFrame>
+                {showRegions && <DuoRegionMask frameRef={frame} theme="light" />}
+              </PreviewFrame>
+            </div>
+            <DuoToolbar className="demo-toolbar">
+              <DuoDisplayControls className="demo-toolbar-group" />
+              <DuoRotationControls className="demo-toolbar-group" />
+              <DuoLayoutControls className="demo-toolbar-group" />
+              <DuoZoomControls className="demo-toolbar-group" />
+            </DuoToolbar>
+          </main>
+          <StateInspector
+            open={inspectorOpen}
+            request={request}
+            layout={barsLayout}
+            onClose={() => {
+              setInspectorOpen(false)
+              inspectorToggle.current?.focus()
+            }}
+          />
         </div>
-        <DuoToolbar className="demo-toolbar">
-          <DuoDisplayControls className="demo-toolbar-group" />
-          <DuoRotationControls className="demo-toolbar-group" />
-          <DuoLayoutControls className="demo-toolbar-group" />
-          <DuoZoomControls className="demo-toolbar-group" />
-        </DuoToolbar>
-      </main>
+      </div>
     </DuoProvider>
   )
 }
