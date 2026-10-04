@@ -155,16 +155,100 @@ input {
   }
 }
 .demo-state {
-  margin-top: 12px;
+  --demo-state-width: min(420px, calc(100% - 48px));
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
 }
-.demo-state summary {
+.demo-state-toggle,
+.demo-state-close {
+  border: 1px solid #d8dfe7;
+  background: #fff;
+  color: #526174;
   cursor: pointer;
 }
-.demo-state pre {
-  max-height: 320px;
-  overflow: auto;
-  padding: 12px;
+.demo-state-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  min-width: 44px;
+  padding: 16px 12px;
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 3px 12px #18283b0a;
+  font-size: 13px;
+  font-weight: 500;
+  writing-mode: vertical-rl;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  transition: right 220ms ease;
+}
+.demo-state[data-open="true"] .demo-state-toggle {
+  right: var(--demo-state-width);
+  background: #e7f1ff;
+  color: #0968c9;
+}
+.demo-state-panel {
+  position: absolute;
+  inset: 0 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--demo-state-width);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-left: 1px solid #d8dfe7;
   background: #f5f6f8;
+  box-shadow: -8px 0 28px #18283b14;
+  visibility: hidden;
+  transform: translateX(100%);
+  transition:
+    transform 220ms ease,
+    visibility 220ms;
+}
+.demo-state[data-open="true"] .demo-state-panel {
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.demo-state-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #d8dfe7;
+  background: #fff;
+}
+.demo-state-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.demo-state-close {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 24px;
+}
+.demo-state-toggle:hover,
+.demo-state-close:hover {
+  background: #f5f8fc;
+}
+.demo-state button:focus-visible,
+.demo-state pre:focus-visible {
+  outline: 2px solid #0879ed;
+  outline-offset: -3px;
+}
+.demo-state pre {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
   font-size: 12px;
   line-height: 1.5;
   tab-size: 2;
@@ -301,7 +385,9 @@ input {
   display: block;
 }
 @media (prefers-reduced-motion: reduce) {
-  .demo-toolbar button {
+  .demo-toolbar button,
+  .demo-state-toggle,
+  .demo-state-panel {
     transition: none;
   }
 }

@@ -229,11 +229,66 @@ function SystemControls() {
 
 function ProviderState() {
   const state = useDuoState((value) => value)
+  const [open, setOpen] = React.useState(false)
+  const toggle = React.useRef<HTMLButtonElement>(null)
+  const closeButton = React.useRef<HTMLButtonElement>(null)
+
+  const close = React.useCallback(() => {
+    setOpen(false)
+    toggle.current?.focus()
+  }, [])
+
+  React.useEffect(() => {
+    if (!open) return
+    closeButton.current?.focus()
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault()
+        close()
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [open, close])
+
   return (
-    <details className="demo-state">
-      <summary>Provider state</summary>
-      <pre>{JSON.stringify(state, undefined, 2)}</pre>
-    </details>
+    <div className="demo-state" data-open={open}>
+      <button
+        ref={toggle}
+        type="button"
+        className="demo-state-toggle"
+        aria-expanded={open}
+        aria-controls="demo-state-panel"
+        onClick={() => (open ? close() : setOpen(true))}
+      >
+        Provider state
+      </button>
+      <aside
+        id="demo-state-panel"
+        className="demo-state-panel"
+        aria-labelledby="demo-state-title"
+        aria-hidden={!open}
+      >
+        <div className="demo-state-header">
+          <h2 id="demo-state-title">Provider state</h2>
+          <button
+            ref={closeButton}
+            type="button"
+            className="demo-state-close"
+            aria-label="Close provider state"
+            tabIndex={open ? 0 : -1}
+            onClick={close}
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        {/* Keyboard users need to focus this region to scroll the JSON. */}
+        {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+        <pre role="region" tabIndex={open ? 0 : -1} aria-label="Provider state JSON">
+          {JSON.stringify(state, undefined, 2)}
+        </pre>
+      </aside>
+    </div>
   )
 }
 
