@@ -32,6 +32,7 @@ input {
   margin-top: 20px;
 }
 .demo-select,
+.demo-time,
 .demo-toggle,
 .demo-range,
 .demo-color {
@@ -49,7 +50,8 @@ input {
   font-weight: 500;
   box-shadow: 0 2px 6px #18283b05;
 }
-.demo-select select {
+.demo-select select,
+.demo-time input {
   min-width: 0;
   min-height: 42px;
   border: 0;
@@ -59,13 +61,15 @@ input {
   cursor: pointer;
 }
 .demo-select:focus-within,
+.demo-time:focus-within,
 .demo-range:focus-within,
 .demo-color:focus-within,
 .demo-toggle:has(input:focus-visible) {
   outline: 2px solid #0879ed;
   outline-offset: 2px;
 }
-.demo-select select:focus-visible {
+.demo-select select:focus-visible,
+.demo-time input:focus-visible {
   outline: none;
 }
 .demo-select select:disabled {

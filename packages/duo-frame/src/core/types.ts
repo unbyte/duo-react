@@ -59,6 +59,7 @@ export interface DuoScreenInfo {
 }
 
 export interface DuoSystem {
+  /** The clock omits a leading hour zero when rendering. */
   readonly time: string
   readonly battery: number
   readonly charging: boolean

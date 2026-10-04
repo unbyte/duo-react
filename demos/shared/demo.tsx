@@ -112,11 +112,68 @@ function CameraToggle() {
   )
 }
 
-function SignalControls() {
+function TimeControls() {
+  const [mode, setMode] = React.useState("automatic")
+  const [specifiedTime, setSpecifiedTime] = React.useState("09:41")
+  const { setSystem } = useDuoActions()
+
+  React.useEffect(() => {
+    if (mode === "specified") {
+      if (specifiedTime) setSystem({ time: specifiedTime })
+      return
+    }
+    const sync = () => {
+      const now = new Date()
+      const hours = String(now.getHours()).padStart(2, "0")
+      const minutes = String(now.getMinutes()).padStart(2, "0")
+      setSystem({ time: `${hours}:${minutes}` })
+    }
+    sync()
+    const timer = window.setInterval(sync, 1000)
+    window.addEventListener("focus", sync)
+    document.addEventListener("visibilitychange", sync)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener("focus", sync)
+      document.removeEventListener("visibilitychange", sync)
+    }
+  }, [mode, specifiedTime, setSystem])
+
+  return (
+    <>
+      <label className="demo-select">
+        <span>Time</span>
+        <select
+          aria-label="Time mode"
+          value={mode}
+          onChange={(event) => setMode(event.currentTarget.value)}
+        >
+          <option value="automatic">Automatic</option>
+          <option value="specified">Specified time</option>
+        </select>
+      </label>
+      {mode === "specified" && (
+        <label className="demo-time">
+          <span>Time</span>
+          <input
+            type="time"
+            aria-label="Specified time"
+            step={60}
+            value={specifiedTime}
+            onChange={(event) => setSpecifiedTime(event.currentTarget.value)}
+          />
+        </label>
+      )}
+    </>
+  )
+}
+
+function SystemControls() {
   const { battery, charging, wifiStrength, cellularStrength } = useDuoState((state) => state.system)
   const { setSystem } = useDuoActions()
   return (
-    <div className="demo-controls" role="group" aria-label="Battery and signal">
+    <div className="demo-controls" role="group" aria-label="System indicators">
+      <TimeControls />
       <label className="demo-range">
         <span id="demo-battery-label">Battery</span>
         <input
@@ -310,7 +367,7 @@ export function Demo() {
             <span>Bars</span>
           </label>
         </div>
-        <SignalControls />
+        <SystemControls />
         <ProviderState />
         <div
           className="demo-frame"
