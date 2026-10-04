@@ -41,7 +41,14 @@ The appearance controls share one row and wrap on smaller screens. **Background*
 previews light, dark, gray, and mixed content; **Icons** selects automatic, white,
 or black indicators. **Camera** simulates inner-camera activity through
 `cameraActive`; enable **Regions** to see its reserved area. **Regions** toggles
-the layout overlay, and **Bars** toggles the example app toolbar and tab bar.
+the layout overlay. Independent **Toolbars** and **Tab bar** toggles exercise all
+four bar-presence combinations. Choose one to three toolbars, edit each
+placement and axis, and switch tabs between **Packed** and **Edges**.
+**Bar bounds** outlines the allocated rectangles independently of the content.
+Toolbar counters and tab selection persist while changing the configuration.
+
+Open **Inspector** on the right to switch between **Provider** state and the
+**Bars** request and resolved layouts, including `rect` and `containerProps`.
 
 Drag the blue block beneath the system controls to inspect the capsule's blur.
 Use the native **Color** picker to try black, white, or any other block color.
@@ -445,6 +452,61 @@ origin checks. The library does not inject code into consumer iframe documents.
 
 ### App bar positioning
 
+`useBars` coordinates custom toolbars and one optional tab bar. Describe them in
+one request, then render your own elements using each result's `containerProps`
+or `rect`. Input `axis` defaults to `"adaptive"`; `"horizontal"` keeps a toolbar
+on a horizontal edge. Returned `axis` is `"horizontal"` or `"vertical"`.
+
+```tsx
+import { useBars } from "duo-frame"
+
+function AppBars() {
+  const bars = useBars({
+    toolbars: [
+      { id: "back", placement: "top-leading", axis: "horizontal" },
+      { id: "actions", placement: "top-trailing" },
+    ],
+    tabbar: { distribution: "packed" },
+  })
+
+  return (
+    <>
+      {bars.toolbars.map((bar) => (
+        <div key={bar.id} {...bar.containerProps}>
+          <YourToolbar id={bar.id} axis={bar.axis} />
+        </div>
+      ))}
+      {bars.tabbar && (
+        <nav {...bars.tabbar.containerProps} aria-label="Destinations">
+          <YourNavigation axis={bars.tabbar.axis} />
+        </nav>
+      )}
+    </>
+  )
+}
+```
+
+Mount this component within `DuoFrame`, with a containing block matching the
+full app window. Coordinates are app-window CSS pixels before zoom and rotation.
+The hook renders no elements or portals. Nested positioned or scrolling ancestors
+affect the supplied absolute positioning, so keep the bars in an app-window
+layer beside scrolling content. Your React context stays in your own tree.
+
+Each `rect` is an allocated drawing area, not a measurement of your content.
+Bars sharing a row or rail receive equal shares after gaps. Toolbar IDs must be
+unique, and results retain input order. Bottom toolbars sit above tabs in inner
+portrait. `tabbar.distribution` accepts `"packed"` (default) or `"edges"`; it
+controls the allocation and alignment without implementing minimization.
+Invalid declarations or exhausted space throw errors. Separate hook calls do
+not coordinate. Content size, visuals, overflow, navigation, and menus remain
+the app's responsibility; bars do not change content safe areas.
+
+The demos' app bar controls use this hook. The [bars design](docs/bars.md) specifies
+allocation rules, numeric defaults, and geometric fallbacks. Native styled bar
+components remain separate work.
+
+### Portal bar helpers
+
 `DuoTabBar` and `DuoAppToolbar` position caller-provided content within a frame's
 children. `DuoAppToolbar` is the in-app action bar;
 `DuoToolbar` controls the device preview. The positioning helpers do not implement
@@ -508,8 +570,8 @@ safe area. Keep your content clear of your chosen bar dimensions.
 
 Use `[data-duo-bar-placement="left" | "right" | "top" | "bottom"]` to adapt your
 styles. The helper uses a column on the side and a row in portrait; your own
-nested navigation container may also need to change its direction. The demos'
-**Bars** toggle demonstrates both helpers alongside the React app.
+nested navigation container may also need to change its direction. These helpers
+use their own portal layout and do not participate in `useBars` allocations.
 
 ### Zoom ownership
 

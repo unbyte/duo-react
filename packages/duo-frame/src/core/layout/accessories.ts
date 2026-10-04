@@ -1,9 +1,8 @@
 import { getSystemLayout } from "./system"
-import { sideControlMetrics } from "./control-metrics"
+import { barProfile as profile } from "../profiles/bars"
 import type { DuoScreenInfo } from "../types"
 
-const { edgeInset: sideInset, width: controlWidth } = sideControlMetrics
-const edgeGap = 16
+const { railInset: sideInset, railWidth: controlWidth, sectionGap: edgeGap } = profile
 
 export function getAccessoryLayout(screen: DuoScreenInfo) {
   const { window, safeArea, placement } = screen
@@ -14,20 +13,24 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
     )
     return {
       side: "horizontal" as const,
-      left: 20,
-      right: 20,
-      top: 24,
-      bottom: 21,
-      toolbarEndInset: Math.max(0, window.width - (statusRegion?.x ?? window.width) - 20),
+      left: profile.horizontalInset,
+      right: profile.horizontalInset,
+      top: profile.top,
+      bottom: profile.bottom,
+      toolbarEndInset: Math.max(
+        0,
+        window.width - (statusRegion?.x ?? window.width) - profile.horizontalInset,
+      ),
     }
   }
   const side = placement === "left" || safeArea.left > 0 ? "left" : "right"
   const railLeft = side === "left" ? sideInset : window.width - sideInset - controlWidth
   const railRight = railLeft + controlWidth
   const inner = screen.display === "inner"
-  let top = inner ? sideControlMetrics.innerTop : edgeGap
+  let top: number = inner ? profile.railTop : edgeGap
   const calibrated = inner || screen.orientation === "portrait"
-  let bottom = calibrated && placement === "full" ? 24 : Math.max(edgeGap, safeArea.bottom)
+  let bottom =
+    calibrated && placement === "full" ? profile.railBottom : Math.max(edgeGap, safeArea.bottom)
   const displayStatus = getSystemLayout(screen).status
   const status = { ...displayStatus, x: displayStatus.x - window.x, y: displayStatus.y - window.y }
   // The measured status reservations include clearance: inner y = 120,

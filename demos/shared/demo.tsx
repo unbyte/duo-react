@@ -4,8 +4,6 @@ import {
   DuoRegionMask,
   DuoProvider,
   DuoSafeArea,
-  DuoTabBar,
-  DuoAppToolbar,
   DuoToolbar,
   DuoDisplayControls,
   DuoRotationControls,
@@ -14,9 +12,15 @@ import {
   useDuoActions,
   useDuoState,
   useDuoScreen,
+  useBars,
+  type BarsLayout,
+  type BarsLayoutRequest,
+  type TabBarLayoutRequest,
+  type ToolbarLayoutRequest,
   type DuoIndicatorStyle,
 } from "duo-frame"
 import { DraggableBlock } from "./draggable-block"
+import { StateInspector } from "./state-inspector"
 import "duo-frame/style.css"
 import "./style.css"
 
@@ -227,71 +231,6 @@ function SystemControls() {
   )
 }
 
-function ProviderState() {
-  const state = useDuoState((value) => value)
-  const [open, setOpen] = React.useState(false)
-  const toggle = React.useRef<HTMLButtonElement>(null)
-  const closeButton = React.useRef<HTMLButtonElement>(null)
-
-  const close = React.useCallback(() => {
-    setOpen(false)
-    toggle.current?.focus()
-  }, [])
-
-  React.useEffect(() => {
-    if (!open) return
-    closeButton.current?.focus()
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault()
-        close()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [open, close])
-
-  return (
-    <div className="demo-state" data-open={open}>
-      <button
-        ref={toggle}
-        type="button"
-        className="demo-state-toggle"
-        aria-expanded={open}
-        aria-controls="demo-state-panel"
-        onClick={() => (open ? close() : setOpen(true))}
-      >
-        Provider state
-      </button>
-      <aside
-        id="demo-state-panel"
-        className="demo-state-panel"
-        aria-labelledby="demo-state-title"
-        aria-hidden={!open}
-      >
-        <div className="demo-state-header">
-          <h2 id="demo-state-title">Provider state</h2>
-          <button
-            ref={closeButton}
-            type="button"
-            className="demo-state-close"
-            aria-label="Close provider state"
-            tabIndex={open ? 0 : -1}
-            onClick={close}
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        {/* Keyboard users need to focus this region to scroll the JSON. */}
-        {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-        <pre role="region" tabIndex={open ? 0 : -1} aria-label="Provider state JSON">
-          {JSON.stringify(state, undefined, 2)}
-        </pre>
-      </aside>
-    </div>
-  )
-}
-
 function ExampleApp({
   background,
   showBlock,
@@ -321,52 +260,243 @@ function ExampleApp({
   )
 }
 
-function ExampleBars() {
-  const [tab, setTab] = React.useState(1)
-  const [count, setCount] = React.useState(0)
+interface BarSettings {
+  readonly toolbarsEnabled: boolean
+  readonly tabbarEnabled: boolean
+  readonly toolbarCount: number
+  readonly toolbars: readonly ToolbarLayoutRequest[]
+  readonly distribution: NonNullable<TabBarLayoutRequest["distribution"]>
+  readonly showBounds: boolean
+}
+
+const initialBarSettings: BarSettings = {
+  toolbarsEnabled: false,
+  tabbarEnabled: false,
+  toolbarCount: 1,
+  toolbars: [
+    { id: "A", placement: "top-trailing", axis: "adaptive" },
+    { id: "B", placement: "top-leading", axis: "horizontal" },
+    { id: "C", placement: "bottom", axis: "adaptive" },
+  ],
+  distribution: "packed",
+  showBounds: false,
+}
+
+function barRequest(settings: BarSettings): BarsLayoutRequest {
+  return {
+    toolbars: settings.toolbarsEnabled ? settings.toolbars.slice(0, settings.toolbarCount) : [],
+    tabbar: settings.tabbarEnabled ? { distribution: settings.distribution } : undefined,
+  }
+}
+
+function BarControls({
+  settings,
+  onChange,
+}: {
+  settings: BarSettings
+  onChange: (settings: BarSettings) => void
+}) {
+  const updateToolbar = (id: string, patch: Partial<ToolbarLayoutRequest>) => {
+    onChange({
+      ...settings,
+      toolbars: settings.toolbars.map((bar) => (bar.id === id ? { ...bar, ...patch } : bar)),
+    })
+  }
   return (
-    <>
-      <DuoAppToolbar className="demo-app-bar" aria-label="App actions">
-        <button
-          type="button"
-          aria-label={`Add item: ${count}`}
-          onClick={() => setCount((value) => value + 1)}
+    <section className="demo-bars-controls" aria-label="App bar configuration">
+      <div className="demo-controls">
+        <label className="demo-toggle">
+          <input
+            type="checkbox"
+            checked={settings.toolbarsEnabled}
+            onChange={(event) =>
+              onChange({ ...settings, toolbarsEnabled: event.currentTarget.checked })
+            }
+          />
+          <span>Toolbars</span>
+        </label>
+        <label className="demo-select">
+          <span>Toolbar count</span>
+          <select
+            disabled={!settings.toolbarsEnabled}
+            value={settings.toolbarCount}
+            onChange={(event) =>
+              onChange({ ...settings, toolbarCount: Number(event.currentTarget.value) })
+            }
+          >
+            {[1, 2, 3].map((count) => (
+              <option key={count} value={count}>
+                {count}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="demo-toggle">
+          <input
+            type="checkbox"
+            checked={settings.tabbarEnabled}
+            onChange={(event) =>
+              onChange({ ...settings, tabbarEnabled: event.currentTarget.checked })
+            }
+          />
+          <span>Tab bar</span>
+        </label>
+        <label className="demo-select">
+          <span>Tab distribution</span>
+          <select
+            disabled={!settings.tabbarEnabled}
+            value={settings.distribution}
+            onChange={(event) =>
+              onChange({
+                ...settings,
+                distribution: event.currentTarget.value as BarSettings["distribution"],
+              })
+            }
+          >
+            <option value="packed">Packed</option>
+            <option value="edges">Edges</option>
+          </select>
+        </label>
+        <label className="demo-toggle">
+          <input
+            type="checkbox"
+            checked={settings.showBounds}
+            onChange={(event) => onChange({ ...settings, showBounds: event.currentTarget.checked })}
+          />
+          <span>Bar bounds</span>
+        </label>
+      </div>
+      {settings.toolbarsEnabled && (
+        <div className="demo-toolbar-settings">
+          {settings.toolbars.slice(0, settings.toolbarCount).map((bar) => (
+            <fieldset key={bar.id}>
+              <legend>Toolbar {bar.id}</legend>
+              <label className="demo-select">
+                <span>Placement</span>
+                <select
+                  aria-label={`Toolbar ${bar.id} placement`}
+                  value={bar.placement}
+                  onChange={(event) =>
+                    updateToolbar(bar.id, {
+                      placement: event.currentTarget.value as ToolbarLayoutRequest["placement"],
+                    })
+                  }
+                >
+                  <option value="top-leading">Top leading</option>
+                  <option value="top-trailing">Top trailing</option>
+                  <option value="bottom">Bottom</option>
+                </select>
+              </label>
+              <label className="demo-select">
+                <span>Axis</span>
+                <select
+                  aria-label={`Toolbar ${bar.id} axis`}
+                  value={bar.axis}
+                  onChange={(event) =>
+                    updateToolbar(bar.id, {
+                      axis: event.currentTarget.value as ToolbarLayoutRequest["axis"],
+                    })
+                  }
+                >
+                  <option value="adaptive">Adaptive</option>
+                  <option value="horizontal">Horizontal</option>
+                </select>
+              </label>
+            </fieldset>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+}
+
+function ExampleBars({
+  request,
+  showBounds,
+  onLayout,
+}: {
+  request: BarsLayoutRequest
+  showBounds: boolean
+  onLayout: (layout: BarsLayout) => void
+}) {
+  const bars = useBars(request)
+  const [tab, setTab] = React.useState(1)
+  const [counts, setCounts] = React.useState<Readonly<Record<string, number>>>({})
+  const [searchActive, setSearchActive] = React.useState(false)
+  React.useEffect(() => onLayout(bars), [bars, onLayout])
+
+  return (
+    <div className="demo-bars-layer" data-show-bounds={showBounds}>
+      {bars.toolbars.map((bar) => (
+        <div key={bar.id} {...bar.containerProps} className="demo-bar-area" data-demo-bar={bar.id}>
+          <div className="demo-app-bar">
+            <button
+              type="button"
+              aria-label={`Toolbar ${bar.id} action: ${counts[bar.id] ?? 0}`}
+              title={`Toolbar ${bar.id}: clicked ${counts[bar.id] ?? 0} times`}
+              onClick={() =>
+                setCounts((current) => ({ ...current, [bar.id]: (current[bar.id] ?? 0) + 1 }))
+              }
+            >
+              {bar.id}
+              {!!counts[bar.id] && <small>{counts[bar.id]}</small>}
+            </button>
+          </div>
+        </div>
+      ))}
+      {bars.tabbar && (
+        <nav
+          {...bars.tabbar.containerProps}
+          className="demo-bar-area demo-tab-area"
+          data-demo-bar="tabs"
+          aria-label="App destinations"
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
-      </DuoAppToolbar>
-      <DuoTabBar className="demo-app-bar" aria-label="App destinations">
-        {[1, 2].map((value) => (
-          <button
-            type="button"
-            key={value}
-            aria-label={`Destination ${value}`}
-            aria-pressed={tab === value}
-            onClick={() => setTab(value)}
-          >
-            {value}
-          </button>
-        ))}
-      </DuoTabBar>
-    </>
+          <div className="demo-app-bar">
+            {[1, 2].map((value) => (
+              <button
+                type="button"
+                key={value}
+                aria-label={`Destination ${value}`}
+                aria-pressed={tab === value}
+                onClick={() => setTab(value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+          <div className="demo-app-bar">
+            <button
+              type="button"
+              aria-label="Search"
+              aria-pressed={searchActive}
+              onClick={() => setSearchActive((active) => !active)}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                aria-hidden="true"
+              >
+                <circle cx="10" cy="10" r="6" />
+                <path d="m15 15 5 5" />
+              </svg>
+            </button>
+          </div>
+        </nav>
+      )}
+    </div>
   )
 }
 
 export function Demo() {
   const [background, setBackground] = React.useState<Background>("light")
   const [showRegions, setShowRegions] = React.useState(false)
-  const [showBars, setShowBars] = React.useState(false)
+  const [barSettings, setBarSettings] = React.useState(initialBarSettings)
+  const [barsLayout, setBarsLayout] = React.useState<BarsLayout>()
+  const request = React.useMemo(() => barRequest(barSettings), [barSettings])
   const [showBlock, setShowBlock] = React.useState(true)
   const [blockColor, setBlockColor] = React.useState("#0066ff")
   const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false)
@@ -412,18 +542,10 @@ export function Demo() {
             />
             <span>Regions</span>
           </label>
-          <label className="demo-toggle" title="Show app bars">
-            <input
-              type="checkbox"
-              aria-label="Show app bars"
-              checked={showBars}
-              onChange={(event) => setShowBars(event.currentTarget.checked)}
-            />
-            <span>Bars</span>
-          </label>
         </div>
         <SystemControls />
-        <ProviderState />
+        <BarControls settings={barSettings} onChange={setBarSettings} />
+        <StateInspector request={request} layout={barsLayout} />
         <div
           className="demo-frame"
           data-regions={showRegions}
@@ -440,7 +562,11 @@ export function Demo() {
             aria-label="Duo layout preview"
           >
             <ExampleApp background={background} showBlock={showBlock} blockColor={blockColor} />
-            {showBars && <ExampleBars />}
+            <ExampleBars
+              request={request}
+              showBounds={barSettings.showBounds}
+              onLayout={setBarsLayout}
+            />
           </DuoFrame>
           {showRegions && (
             <DuoRegionMask frameRef={frame} theme={background === "dark" ? "dark" : "light"} />

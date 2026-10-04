@@ -1,5 +1,18 @@
 export { DuoProvider } from "./context/provider"
 export { useDuoState, useDuoActions, useDuoScreen, useDuoEvent } from "./context/hooks"
+export { useBars } from "./hooks/use-bars"
+export type {
+  BarAxis,
+  BarContainerProps,
+  BarPlacement,
+  BarRect,
+  BarsLayout,
+  BarsLayoutRequest,
+  ResolvedBarLayout,
+  ResolvedToolbarLayout,
+  TabBarLayoutRequest,
+  ToolbarLayoutRequest,
+} from "./core/bar-types"
 export type { DuoProviderProps } from "./context/provider"
 export { getDuoGeometry } from "./core/geometry"
 export { safeAreaStyle } from "./core/safe-area"

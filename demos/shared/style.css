@@ -233,6 +233,26 @@ input {
   border-radius: 12px;
   font-size: 24px;
 }
+.demo-state-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #d8dfe7;
+}
+.demo-state-tabs button {
+  flex: 1;
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #526174;
+  font-size: 13px;
+  cursor: pointer;
+}
+.demo-state-tabs button[aria-selected="true"] {
+  color: #0968c9;
+  background: #e7f1ff;
+}
 .demo-state-toggle:hover,
 .demo-state-close:hover {
   background: #f5f8fc;
@@ -392,7 +412,56 @@ input {
   }
 }
 
+.demo-toolbar-settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+.demo-toolbar-settings fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid #d8dfe7;
+  border-radius: 12px;
+}
+.demo-toolbar-settings legend {
+  padding: 0 4px;
+  color: #526174;
+  font-size: 13px;
+}
+.demo-bars-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.demo-bar-area {
+  pointer-events: none;
+}
+.demo-bars-layer[data-show-bounds="true"] .demo-bar-area {
+  outline: 1px dashed #0879ed;
+  outline-offset: -1px;
+  background: #0879ed0d;
+}
+.demo-tab-area {
+  gap: 8px;
+}
+.demo-tab-area > .demo-app-bar:last-child {
+  flex-shrink: 0;
+}
 .demo-app-bar {
+  display: flex;
+  flex-direction: inherit;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  pointer-events: auto;
   gap: 4px;
   padding: 2px;
   border-radius: 28px;
@@ -400,6 +469,7 @@ input {
   color: #25313e;
 }
 .demo-app-bar button {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 44px;
@@ -418,4 +488,7 @@ input {
 .demo-app-bar button:focus-visible {
   outline: 2px solid #0879ed;
   outline-offset: -2px;
+}
+.demo-app-bar button small {
+  font-size: 10px;
 }
