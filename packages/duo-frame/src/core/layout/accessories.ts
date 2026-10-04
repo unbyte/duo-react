@@ -9,12 +9,16 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
   const { window, safeArea, placement } = screen
   const horizontal = screen.display === "inner" && screen.orientation.startsWith("portrait")
   if (horizontal) {
+    const statusRegion = screen.reservedRegions.find(
+      (region) => region.y === 0 && region.height === safeArea.top,
+    )
     return {
       side: "horizontal" as const,
-      left: edgeGap,
-      right: edgeGap,
-      top: safeArea.top + edgeGap,
-      bottom: Math.max(edgeGap, safeArea.bottom),
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 21,
+      toolbarEndInset: Math.max(0, window.width - (statusRegion?.x ?? window.width) - 20),
     }
   }
   const side = placement === "left" || safeArea.left > 0 ? "left" : "right"
@@ -22,16 +26,17 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
   const railRight = railLeft + controlWidth
   const inner = screen.display === "inner"
   let top = inner ? sideControlMetrics.innerTop : edgeGap
-  let bottom = Math.max(edgeGap, safeArea.bottom)
+  const calibrated = inner || screen.orientation === "portrait"
+  let bottom = calibrated && placement === "full" ? 24 : Math.max(edgeGap, safeArea.bottom)
   const displayStatus = getSystemLayout(screen).status
   const status = { ...displayStatus, x: displayStatus.x - window.x, y: displayStatus.y - window.y }
-  // Inner status reservations include their clearance. Adding the physical
-  // obstacle gap again moves the toolbar below its position in Apple's images.
+  // The measured status reservations include clearance: inner y = 120,
+  // outer portrait y = 170. Physical camera obstacles still need a gap.
   const obstacles = [
     ...screen.reservedRegions.map((region) => ({
       ...region,
       gap:
-        inner &&
+        calibrated &&
         region.x <= status.x &&
         region.y <= status.y &&
         region.x + region.width >= status.x + status.width &&
@@ -53,5 +58,6 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
     right: window.width - railRight,
     top,
     bottom,
+    toolbarEndInset: 0,
   } as const
 }

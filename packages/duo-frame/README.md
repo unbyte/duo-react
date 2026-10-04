@@ -482,12 +482,19 @@ the helper or its children. Both bars scale in logical pixels with the app.
 Helpers cannot run inside an iframe's separate React tree; mount them beside the
 iframe in the frame's React content instead.
 
-Side bars use a 48px-wide column inset 24px from the display edge, following
-[measurements of Apple's guide images](docs/calibration/app-bars.md). The 84px
-safe inset describes app geometry rather than the bar's centerline. Group gaps
-and portrait edge spacing retain provisional 16px defaults. In inner landscape,
-status and app bars share one axis; the right toolbar starts at the 120px status
-reservation boundary and the split-left toolbar at 24px from the top. Reserved regions and
+Side bars use a 48px-wide column inset 24px from the display edge. Full-window
+outer portrait and inner landscape use a 24px bottom inset, measured on the
+iOS 27.1 Duo simulator. Their toolbars start at the status reservation boundary:
+170px on outer portrait and 120px on inner landscape. The 84px content safe inset
+remains unchanged. Split placement and outer-landscape bottom offsets retain
+their provisional defaults; the split-left toolbar starts at 24px from the top.
+
+Inner portrait places the toolbar at y = 24, aligned to the right of the top
+area available before the status reservation. That area runs from x = 20 to
+x = 535 in the 669px window. The tab bar is centered separately, 21px above the
+window bottom. These positioning offsets do not impose native group sizes or
+reproduce configurations that spread one toolbar across multiple screen edges.
+Group gaps retain their provisional 16px default. Reserved regions and
 the rendered status bounds constrain available space. Bars share that space and
 scroll when their content exceeds it; there is no automatic overflow menu or
 minimization. They overlay app content and do not change the provider's calibrated

@@ -41,8 +41,6 @@ export function SystemChrome({
               className="duo-status"
               style={{
                 ...boundsStyle(layout.status),
-                flexDirection: layout.horizontal ? "row" : "column",
-                gap: systemMetrics.gap,
                 fontSize: systemMetrics.fontSize,
                 lineHeight: `${systemMetrics.lineHeight}px`,
               }}
@@ -53,6 +51,11 @@ export function SystemChrome({
                 appearance={appearance.statusBar}
                 width={systemMetrics.timeWidth}
                 height={systemMetrics.lineHeight}
+                style={{
+                  position: "absolute",
+                  left: layout.time.x - layout.status.x,
+                  top: layout.time.y - layout.status.y,
+                }}
               >
                 <svg
                   width={systemMetrics.timeWidth}
@@ -76,6 +79,11 @@ export function SystemChrome({
                 appearance={appearance.statusBar}
                 width={systemMetrics.glyphWidth}
                 height={systemMetrics.glyphHeight}
+                style={{
+                  position: "absolute",
+                  left: layout.glyph.x - layout.status.x,
+                  top: layout.glyph.y - layout.status.y,
+                }}
               >
                 <StatusGlyph
                   battery={battery}

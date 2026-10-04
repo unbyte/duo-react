@@ -8,6 +8,7 @@ const referenceScale = 37 / 94
 export const systemMetrics = {
   glyphWidth: 104 * referenceScale,
   glyphHeight: 108 * referenceScale,
+  glyphTopPadding: 1.25 * referenceScale,
   timeWidth: 44,
   fontSize: 16,
   lineHeight: 20,
@@ -34,36 +35,59 @@ export function getSystemLayout(screen: DuoScreenInfo) {
         )
       : undefined
   const horizontal = safeArea.top > 0
-  let status: DuoRect
+  let time: DuoRect
+  let glyph: DuoRect
 
   if (horizontal) {
-    const region = reservedRegions.find((entry) => entry.y === 0 && entry.height === safeArea.top)
-    if (!region) throw new Error("Missing measured top status region.")
-    const width = metrics.timeWidth + metrics.gap + metrics.glyphWidth
-    status = {
-      x: region.x + (region.width - width) / 2,
-      y: region.y + (region.height - metrics.glyphHeight) / 2,
-      width,
+    // iOS 27.1, 669 × 951: clock ink center (569.67, 48.33),
+    // combined indicator ink bounds (601, 27.67, 41, 41.33).
+    time = {
+      x: size.width - 99.5 - metrics.timeWidth / 2,
+      y: 48 + 1 / 3 - metrics.lineHeight / 2,
+      width: metrics.timeWidth,
+      height: metrics.lineHeight,
+    }
+    glyph = {
+      x: size.width - 47.5 - metrics.glyphWidth / 2,
+      y: 27 + 2 / 3 - metrics.glyphTopPadding,
+      width: metrics.glyphWidth,
       height: metrics.glyphHeight,
     }
   } else {
+    const calibrated = screen.display === "inner" || screen.orientation === "portrait"
     const height = metrics.lineHeight + metrics.gap + metrics.glyphHeight
-    const center = camera
-      ? camera.x + camera.width / 2
-      : size.width - sideControlMetrics.edgeInset - sideControlMetrics.width / 2
-    const top = camera
+    const sideCenter = size.width - sideControlMetrics.edgeInset - sideControlMetrics.width / 2
+    const center = calibrated ? sideCenter : camera ? camera.x + camera.width / 2 : sideCenter
+    // Explicitly shown outer-landscape status retains the provisional camera-relative layout.
+    const fallbackTop = camera
       ? camera.y < size.height / 2
         ? camera.y + camera.height + metrics.cameraGap
         : camera.y - metrics.cameraGap - height
-      : screen.display === "inner"
-        ? sideControlMetrics.innerStatusTop
-        : metrics.top
-    status = {
+      : metrics.top
+    const inner = screen.display === "inner"
+    time = {
       x: center - metrics.timeWidth / 2,
-      y: top,
+      y: calibrated ? (inner ? 30 : 82 + 2 / 3) : fallbackTop,
       width: metrics.timeWidth,
-      height,
+      height: metrics.lineHeight,
     }
+    // Native ink starts at y = 57 (inner) or 109.67 (outer); SVG padding
+    // is separate from that measured coordinate. Artwork size stays unchanged.
+    glyph = {
+      x: center + (calibrated ? 1 / 6 : 0) - metrics.glyphWidth / 2,
+      y: calibrated
+        ? (inner ? 57 : 109 + 2 / 3) - metrics.glyphTopPadding
+        : fallbackTop + metrics.lineHeight + metrics.gap,
+      width: metrics.glyphWidth,
+      height: metrics.glyphHeight,
+    }
+  }
+
+  const status: DuoRect = {
+    x: Math.min(time.x, glyph.x),
+    y: Math.min(time.y, glyph.y),
+    width: Math.max(time.x + time.width, glyph.x + glyph.width) - Math.min(time.x, glyph.x),
+    height: Math.max(time.y + time.height, glyph.y + glyph.height) - Math.min(time.y, glyph.y),
   }
 
   const left = Math.min(status.x, camera?.x ?? status.x)
@@ -76,6 +100,8 @@ export function getSystemLayout(screen: DuoScreenInfo) {
   return {
     camera,
     status,
+    time,
+    glyph,
     horizontal,
     material: {
       x: left - paddingX,

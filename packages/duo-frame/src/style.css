@@ -125,8 +125,6 @@
 }
 .duo-status {
   position: absolute;
-  display: flex;
-  align-items: center;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 600;
   font-variant-numeric: proportional-nums;
@@ -204,6 +202,10 @@
 .duo-accessory-host[data-duo-accessory-host="tab"] {
   margin-top: auto;
   justify-content: center;
+}
+.duo-accessory-layout[data-duo-bar-axis="horizontal"]
+  .duo-accessory-host[data-duo-accessory-host="toolbar"] {
+  justify-content: flex-end;
 }
 :where(.duo-app-bar) {
   display: flex;

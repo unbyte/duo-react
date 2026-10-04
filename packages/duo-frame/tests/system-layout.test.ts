@@ -1,6 +1,46 @@
 import { expect, test } from "vite-plus/test"
 import { createDuoStore } from "../src/core/store"
-import { getSystemLayout } from "../src/core/layout/system"
+import { getSystemLayout, systemMetrics } from "../src/core/layout/system"
+
+test("clock and glyph anchors match the three native full-window captures", () => {
+  const fixtures = [
+    {
+      display: "outer",
+      orientation: "portrait",
+      clock: [399 + 1 / 3, 86 + 2 / 3, 36, 12],
+      glyph: [397 + 2 / 3, 109 + 2 / 3, 41, 41 + 1 / 3],
+    },
+    {
+      display: "inner",
+      orientation: "landscape-right",
+      clock: [881 + 1 / 3, 34, 43, 12],
+      glyph: [882 + 2 / 3, 57, 41, 41 + 1 / 3],
+    },
+    {
+      display: "inner",
+      orientation: "portrait-upside-down",
+      clock: [549 + 1 / 3, 42 + 2 / 3, 40 + 2 / 3, 11 + 1 / 3],
+      glyph: [601, 27 + 2 / 3, 41, 41 + 1 / 3],
+    },
+  ] as const
+  for (const fixture of fixtures) {
+    const store = createDuoStore({ orientation: fixture.orientation })
+    const { time, glyph, status } = getSystemLayout(store.getSnapshot().screens[fixture.display])
+    // The clock uses a stable text box; ink width varies with the time string and font.
+    expect(
+      Math.abs(time.x + time.width / 2 - (fixture.clock[0] + fixture.clock[2] / 2)),
+    ).toBeLessThan(1)
+    expect(time.y + time.height / 2).toBeCloseTo(fixture.clock[1] + fixture.clock[3] / 2)
+    expect(glyph.x + glyph.width / 2).toBeCloseTo(fixture.glyph[0] + fixture.glyph[2] / 2)
+    expect(glyph.y + systemMetrics.glyphTopPadding).toBeCloseTo(fixture.glyph[1])
+    for (const bounds of [time, glyph]) {
+      expect(bounds.x).toBeGreaterThanOrEqual(status.x)
+      expect(bounds.y).toBeGreaterThanOrEqual(status.y)
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(status.x + status.width)
+      expect(bounds.y + bounds.height).toBeLessThanOrEqual(status.y + status.height)
+    }
+  }
+})
 
 test("status belongs to the display while the home indicator follows the app window", () => {
   const store = createDuoStore()

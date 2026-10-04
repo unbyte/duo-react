@@ -1,7 +1,6 @@
-// Estimated from the HIG's Notes and Split View images in docs/calibration/app-bars.md.
+// Full-window resting rails measured on the iOS 27.1 Duo simulator.
 export const sideControlMetrics = {
   width: 48,
   edgeInset: 24,
   innerTop: 24,
-  innerStatusTop: 32,
 } as const

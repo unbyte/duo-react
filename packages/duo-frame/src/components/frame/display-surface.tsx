@@ -31,7 +31,10 @@ export function DisplaySurface({
     (node: HTMLDivElement | null) => setToolbar(node ?? undefined),
     [],
   )
-  const { side, ...accessoryBounds } = React.useMemo(() => getAccessoryLayout(screen), [screen])
+  const { side, toolbarEndInset, ...accessoryBounds } = React.useMemo(
+    () => getAccessoryLayout(screen),
+    [screen],
+  )
   const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side])
   const bounds = screen.window
   return (
@@ -92,6 +95,7 @@ export function DisplaySurface({
               className="duo-accessory-host"
               data-duo-accessory-host="toolbar"
               ref={attachToolbar}
+              style={{ marginRight: toolbarEndInset }}
             />
             <div className="duo-accessory-host" data-duo-accessory-host="tab" ref={attachTabBar} />
           </div>

@@ -7,6 +7,30 @@ import { getSystemLayout } from "../src/core/layout/system"
 import { createDuoStore } from "../src/core/store"
 import { DuoAppToolbar, DuoFrame, DuoProvider, DuoTabBar } from "../src"
 
+test("full-window bars use measured glass-edge offsets without changing content safe areas", () => {
+  const store = createDuoStore({ orientation: "portrait" })
+  const outer = store.getSnapshot().screens.outer
+  expect(getAccessoryLayout(outer)).toMatchObject({ left: 394, right: 24, top: 170, bottom: 24 })
+  expect(outer.safeArea).toEqual({ top: 0, right: 84, bottom: 34, left: 0 })
+
+  const portrait = store.getSnapshot().screens.inner
+  const horizontal = getAccessoryLayout(portrait)
+  expect(horizontal.top).toBe(24)
+  expect(portrait.window.width - horizontal.right - horizontal.toolbarEndInset).toBe(535)
+  expect(portrait.window.height - horizontal.bottom).toBe(930)
+  expect(portrait.safeArea).toEqual({ top: 82, right: 0, bottom: 34, left: 0 })
+
+  store.actions.setOrientation("landscape-right")
+  const landscape = store.getSnapshot().screens.inner
+  expect(getAccessoryLayout(landscape)).toMatchObject({
+    left: 879,
+    right: 24,
+    top: 120,
+    bottom: 24,
+  })
+  expect(landscape.safeArea).toEqual({ top: 0, right: 84, bottom: 34, left: 0 })
+})
+
 test("bar rails follow app placement and measured hardware edges", () => {
   const store = createDuoStore()
   expect(getAccessoryLayout(store.getSnapshot().screens.inner).side).toBe("right")
@@ -25,10 +49,11 @@ test("bar rails follow app placement and measured hardware edges", () => {
     store.actions.setOrientation(orientation)
     expect(getAccessoryLayout(store.getSnapshot().screens.inner)).toEqual({
       side: "horizontal",
-      left: 16,
-      right: 16,
-      top: 98,
-      bottom: 34,
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 21,
+      toolbarEndInset: 114,
     })
   }
   store.actions.setOrientation("landscape-right")
@@ -86,7 +111,7 @@ test("inner landscape bars and status share the reference axis without doubling 
       }
       const bars = getAccessoryLayout(screen)
       const { status } = getSystemLayout(screen)
-      expect(status.y).toBe(32)
+      expect(status.y).toBe(30)
       expect(screen.size.width - status.x - status.width / 2).toBe(48)
       if (placement === "left") {
         expect(bars.top).toBe(24)
