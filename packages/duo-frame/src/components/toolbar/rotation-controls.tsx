@@ -1,13 +1,13 @@
-import * as React from "react";
-import { RotateCcwSquare, RotateCwSquare } from "lucide-react";
-import { iconProps } from "./icons";
-import { useDuoActions } from "../../context/hooks";
-import { IconButton } from "./icon-button";
-import type { DuoControlGroupProps } from "./types";
+import * as React from "react"
+import { RotateCcwSquare, RotateCwSquare } from "lucide-react"
+import { iconProps } from "./icons"
+import { useDuoActions } from "../../context/hooks"
+import { IconButton } from "./icon-button"
+import type { DuoControlGroupProps } from "./types"
 
 export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGroupProps>(
   function DuoRotationControls(props, ref) {
-    const { rotate } = useDuoActions();
+    const { rotate } = useDuoActions()
     return (
       <div
         role="group"
@@ -23,6 +23,6 @@ export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGr
           <RotateCwSquare {...iconProps} />
         </IconButton>
       </div>
-    );
+    )
   },
-);
+)

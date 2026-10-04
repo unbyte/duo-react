@@ -105,8 +105,8 @@ import {
   DuoRotationControls,
   DuoLayoutControls,
   DuoZoomControls,
-} from "duo-frame";
-import "duo-frame/style.css";
+} from "duo-frame"
+import "duo-frame/style.css"
 
 <DuoProvider
   defaultState={{ orientation: "landscape-left", innerPlacement: "full", zoom: "fit" }}
@@ -121,7 +121,7 @@ import "duo-frame/style.css";
     <DuoLayoutControls className="preview-group" />
     <DuoZoomControls className="preview-group" />
   </DuoToolbar>
-</DuoProvider>;
+</DuoProvider>
 ```
 
 The posture buttons select Closed, Partially open, or Fully open. Closed shows
@@ -223,13 +223,13 @@ Apps can override the default with `prefersStatusBarHidden`, applying to both di
   <DuoFrame>
     <App />
   </DuoFrame>
-</DuoProvider>;
+</DuoProvider>
 
 // Inside a component, call setSystem from an event handler or effect.
-const { setSystem } = useDuoActions();
-setSystem({ prefersStatusBarHidden: false }); // Show, including outer landscape.
-setSystem({ prefersStatusBarHidden: true }); // Hide the time, 3-in-1, and capsule.
-setSystem({ prefersStatusBarHidden: undefined }); // Restore the layout default.
+const { setSystem } = useDuoActions()
+setSystem({ prefersStatusBarHidden: false }) // Show, including outer landscape.
+setSystem({ prefersStatusBarHidden: true }) // Hide the time, 3-in-1, and capsule.
+setSystem({ prefersStatusBarHidden: undefined }) // Restore the layout default.
 ```
 
 Omitting the property in a partial `setSystem` update preserves the current preference.
@@ -303,7 +303,7 @@ for the labels. The mask fills that container; reserve 220px on the right, or
 narrow containers and scroll if space runs out.
 
 ```tsx
-const frame = React.useRef<HTMLDivElement>(null);
+const frame = React.useRef<HTMLDivElement>(null)
 
 <DuoProvider>
   <div className="preview-with-regions">
@@ -312,7 +312,7 @@ const frame = React.useRef<HTMLDivElement>(null);
     </DuoFrame>
     <DuoRegionMask frameRef={frame} />
   </div>
-</DuoProvider>;
+</DuoProvider>
 ```
 
 ```css
@@ -374,9 +374,9 @@ Set initial styles through `defaultSystem`:
 Change them with `useDuoActions().setSystem()`:
 
 ```tsx
-const { display } = useDuoScreen();
-const { setSystem } = useDuoActions();
-setSystem({ indicatorStyles: { [display]: { statusBar: "light" } } });
+const { display } = useDuoScreen()
+const { setSystem } = useDuoActions()
+setSystem({ indicatorStyles: { [display]: { statusBar: "light" } } })
 ```
 
 Call the action from an event handler or effect. Partial updates preserve the
@@ -445,7 +445,7 @@ children. `DuoAppToolbar` is the in-app action bar;
 navigation, tab selection, menus, or iOS visual styling.
 
 ```tsx
-import { DuoTabBar, DuoAppToolbar } from "duo-frame";
+import { DuoTabBar, DuoAppToolbar } from "duo-frame"
 
 function App() {
   return (
@@ -458,7 +458,7 @@ function App() {
         <YourNavigation />
       </DuoTabBar>
     </>
-  );
+  )
 }
 ```
 

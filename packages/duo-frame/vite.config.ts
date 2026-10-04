@@ -1,4 +1,4 @@
-import { defineConfig } from "vite-plus";
+import { defineConfig } from "vite-plus"
 
 export default defineConfig({
   pack: {
@@ -10,4 +10,4 @@ export default defineConfig({
   test: {
     name: "duo-frame",
   },
-});
+})

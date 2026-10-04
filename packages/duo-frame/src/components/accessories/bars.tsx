@@ -1,8 +1,8 @@
-import * as React from "react";
-import { createPortal } from "react-dom";
-import { useAccessoryHosts } from "../../context/accessory-context";
+import * as React from "react"
+import { createPortal } from "react-dom"
+import { useAccessoryHosts } from "../../context/accessory-context"
 
-export type DuoBarProps = React.HTMLAttributes<HTMLDivElement>;
+export type DuoBarProps = React.HTMLAttributes<HTMLDivElement>
 
 function Bar({
   kind,
@@ -10,14 +10,14 @@ function Bar({
   className,
   ...props
 }: DuoBarProps & {
-  kind: "tabBar" | "toolbar";
-  forwardedRef: React.ForwardedRef<HTMLDivElement>;
+  kind: "tabBar" | "toolbar"
+  forwardedRef: React.ForwardedRef<HTMLDivElement>
 }) {
-  const hosts = useAccessoryHosts();
-  const host = hosts[kind];
-  if (!host) return null;
+  const hosts = useAccessoryHosts()
+  const host = hosts[kind]
+  if (!host) return null
   const placement =
-    hosts.side === "horizontal" ? (kind === "tabBar" ? "bottom" : "top") : hosts.side;
+    hosts.side === "horizontal" ? (kind === "tabBar" ? "bottom" : "top") : hosts.side
   return createPortal(
     <div
       {...props}
@@ -27,17 +27,17 @@ function Bar({
       data-duo-bar-placement={placement}
     />,
     host,
-  );
+  )
 }
 
 export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoBarProps>(
   function DuoTabBar(props, ref) {
-    return <Bar {...props} kind="tabBar" forwardedRef={ref} />;
+    return <Bar {...props} kind="tabBar" forwardedRef={ref} />
   },
-);
+)
 
 export const DuoAppToolbar = React.forwardRef<HTMLDivElement, DuoBarProps>(
   function DuoAppToolbar(props, ref) {
-    return <Bar {...props} kind="toolbar" forwardedRef={ref} />;
+    return <Bar {...props} kind="toolbar" forwardedRef={ref} />
   },
-);
+)

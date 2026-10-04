@@ -1,12 +1,12 @@
-import { foldingRegions, profiles } from "./profiles/xcode-27.1";
-import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture, DuoScreenInfo } from "./types";
+import { foldingRegions, profiles } from "./profiles/xcode-27.1"
+import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture, DuoScreenInfo } from "./types"
 
 export interface DuoGeometryOptions {
-  display: DuoDisplay;
-  orientation: DuoOrientation;
-  placement?: DuoPlacement;
-  cameraActive?: boolean;
-  posture?: DuoPosture;
+  display: DuoDisplay
+  orientation: DuoOrientation
+  placement?: DuoPlacement
+  cameraActive?: boolean
+  posture?: DuoPosture
 }
 
 export function getDuoGeometry({
@@ -16,46 +16,46 @@ export function getDuoGeometry({
   cameraActive = false,
   posture = "open",
 }: DuoGeometryOptions): Omit<DuoScreenInfo, "visible"> {
-  validatePosture(posture);
+  validatePosture(posture)
   const profile = profiles.find(
     (entry) =>
       entry.display === display &&
       entry.orientation === orientation &&
       entry.placement === placement &&
       entry.cameraActive === (display === "inner" && cameraActive),
-  );
+  )
   if (!profile)
-    throw new RangeError(`No measured Duo profile for ${display}/${orientation}/${placement}.`);
+    throw new RangeError(`No measured Duo profile for ${display}/${orientation}/${placement}.`)
   // The source repeats outer radii in native portrait order even in landscape.
   // Rotate them into the same oriented coordinates as the screen and camera.
-  const [topLeft, topRight, bottomRight, bottomLeft] = profile.cornerRadii;
+  const [topLeft, topRight, bottomRight, bottomLeft] = profile.cornerRadii
   const cornerRadii: DuoScreenInfo["cornerRadii"] =
     display === "outer" && orientation === "landscape-left"
       ? [bottomLeft, topLeft, topRight, bottomRight]
       : display === "outer" && orientation === "landscape-right"
         ? [topRight, bottomRight, bottomLeft, topLeft]
-        : [...profile.cornerRadii];
+        : [...profile.cornerRadii]
   // Divider-facing corners are estimated from the Split View illustration, not simulator data.
-  const splitRadius = 32;
+  const splitRadius = 32
   const windowCornerRadii: DuoScreenInfo["windowCornerRadii"] =
     placement === "left"
       ? [cornerRadii[0], splitRadius, splitRadius, cornerRadii[3]]
       : placement === "right"
         ? [splitRadius, cornerRadii[1], cornerRadii[2], splitRadius]
-        : [...cornerRadii];
-  const fold = display === "inner" ? foldingRegions[orientation] : undefined;
-  const active = posture === "partially-open";
-  const reservedRegions = profile.reservedRegions.map((region) => Object.freeze({ ...region }));
+        : [...cornerRadii]
+  const fold = display === "inner" ? foldingRegions[orientation] : undefined
+  const active = posture === "partially-open"
+  const reservedRegions = profile.reservedRegions.map((region) => Object.freeze({ ...region }))
   if (fold && active) {
-    const bounds = profile.window;
-    const x = Math.max(fold.frame.x, bounds.x);
-    const y = Math.max(fold.frame.y, bounds.y);
-    const width = Math.min(fold.frame.x + fold.frame.width, bounds.x + bounds.width) - x;
-    const height = Math.min(fold.frame.y + fold.frame.height, bounds.y + bounds.height) - y;
+    const bounds = profile.window
+    const x = Math.max(fold.frame.x, bounds.x)
+    const y = Math.max(fold.frame.y, bounds.y)
+    const width = Math.min(fold.frame.x + fold.frame.width, bounds.x + bounds.width) - x
+    const height = Math.min(fold.frame.y + fold.frame.height, bounds.y + bounds.height) - y
     if (width > 0 && height > 0) {
       reservedRegions.push(
         Object.freeze({ type: "division", x: x - bounds.x, y: y - bounds.y, width, height }),
-      );
+      )
     }
   }
   return {
@@ -77,10 +77,10 @@ export function getDuoGeometry({
         })
       : undefined,
     reservedRegions: Object.freeze(reservedRegions),
-  };
+  }
 }
 
 export function validatePosture(posture: DuoPosture) {
   if (posture !== "open" && posture !== "closed" && posture !== "partially-open")
-    throw new RangeError("Unsupported Duo posture.");
+    throw new RangeError("Unsupported Duo posture.")
 }

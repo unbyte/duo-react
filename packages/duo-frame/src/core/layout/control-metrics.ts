@@ -4,4 +4,4 @@ export const sideControlMetrics = {
   edgeInset: 24,
   innerTop: 24,
   innerStatusTop: 32,
-} as const;
+} as const

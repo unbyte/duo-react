@@ -1,10 +1,10 @@
-import type { DuoFoldingRegion, DuoOrientation, DuoScreenInfo } from "../types";
+import type { DuoFoldingRegion, DuoOrientation, DuoScreenInfo } from "../types"
 
 interface Profile extends Omit<
   DuoScreenInfo,
   "visible" | "statusBarVisible" | "windowCornerRadii"
 > {
-  readonly cameraActive: boolean;
+  readonly cameraActive: boolean
 }
 
 export const profileSource = {
@@ -14,7 +14,7 @@ export const profileSource = {
   sha256: "db97ca47ac6a503554c42aef93020cc41eb7a70edf304595bcd40d628662d20d",
   windowOrigins:
     "Split windows are edge-aligned; the 13px central gap is inferred from reported widths.",
-} as const;
+} as const
 
 // Safe Area's division frames; inactivity and 20pt margins are documented in
 // docs/calibration/folding-region.md. Portrait margins rotate with the fold.
@@ -22,19 +22,19 @@ const portraitFold: DuoFoldingRegion = {
   frame: { x: 0, y: 455.5, width: 669, height: 40 },
   margins: { top: 20, right: 0, bottom: 20, left: 0 },
   active: false,
-};
+}
 const landscapeFold: DuoFoldingRegion = {
   frame: { x: 455.5, y: 0, width: 40, height: 669 },
   margins: { top: 0, right: 20, bottom: 0, left: 20 },
   active: false,
-};
+}
 
 export const foldingRegions: Readonly<Record<DuoOrientation, DuoFoldingRegion>> = {
   portrait: portraitFold,
   "portrait-upside-down": portraitFold,
   "landscape-left": landscapeFold,
   "landscape-right": landscapeFold,
-};
+}
 
 export const profiles: readonly Profile[] = [
   {
@@ -631,4 +631,4 @@ export const profiles: readonly Profile[] = [
       { type: "occlusion", x: 535, y: 0, width: 134, height: 82 },
     ],
   },
-];
+]

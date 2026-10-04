@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 
 export function IconButton({
   label,
@@ -6,12 +6,12 @@ export function IconButton({
   children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  label: string;
-  action: string;
+  label: string
+  action: string
 }) {
   return (
     <button type="button" aria-label={label} title={label} data-duo-action={action} {...props}>
       {children}
     </button>
-  );
+  )
 }

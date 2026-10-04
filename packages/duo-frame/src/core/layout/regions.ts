@@ -1,23 +1,23 @@
-import { getDuoGeometry } from "../geometry";
-import type { DuoPosture, DuoRect, DuoScreenInfo } from "../types";
+import { getDuoGeometry } from "../geometry"
+import type { DuoPosture, DuoRect, DuoScreenInfo } from "../types"
 
 export interface MaskRegion extends DuoRect {
-  id: string;
-  name: string;
-  kind: "safe-area" | "top" | "right" | "bottom" | "left" | "occlusion" | "division" | "gap";
-  scope: "window" | "display";
+  id: string
+  name: string
+  kind: "safe-area" | "top" | "right" | "bottom" | "left" | "occlusion" | "division" | "gap"
+  scope: "window" | "display"
 }
 
 export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, posture: DuoPosture) {
-  const { window: bounds, safeArea: inset } = screen;
-  const { x, y, width, height } = bounds;
+  const { window: bounds, safeArea: inset } = screen
+  const { x, y, width, height } = bounds
   const options = {
     display: screen.display,
     orientation: screen.orientation,
     cameraActive,
     posture,
-  };
-  const display = getDuoGeometry(options);
+  }
+  const display = getDuoGeometry(options)
   const regions: MaskRegion[] = [
     {
       id: "safe-area",
@@ -67,11 +67,11 @@ export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, pos
       kind: region.type,
       scope: "display" as const,
     })),
-  ];
+  ]
   if (screen.display === "inner" && screen.placement !== "full") {
-    const left = getDuoGeometry({ ...options, placement: "left" }).window;
-    const right = getDuoGeometry({ ...options, placement: "right" }).window;
-    const gapStart = left.x + left.width;
+    const left = getDuoGeometry({ ...options, placement: "left" }).window
+    const right = getDuoGeometry({ ...options, placement: "right" }).window
+    const gapStart = left.x + left.width
     regions.push({
       id: "split-gap",
       kind: "gap",
@@ -81,18 +81,18 @@ export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, pos
       y: 0,
       width: right.x - gapStart,
       height: screen.size.height,
-    });
+    })
   }
-  return regions.filter((region) => region.width > 0 && region.height > 0);
+  return regions.filter((region) => region.width > 0 && region.height > 0)
 }
 
 export function roundedBoundary(bounds: DuoRect, radii: DuoScreenInfo["cornerRadii"]) {
-  const { x, y, width, height } = bounds;
-  const right = x + width;
-  const bottom = y + height;
-  const [tl, tr, br, bl] = radii;
+  const { x, y, width, height } = bounds
+  const right = x + width
+  const bottom = y + height
+  const [tl, tr, br, bl] = radii
   return `M ${x + tl} ${y} H ${right - tr} A ${tr} ${tr} 0 0 1 ${right} ${y + tr}
     V ${bottom - br} A ${br} ${br} 0 0 1 ${right - br} ${bottom}
     H ${x + bl} A ${bl} ${bl} 0 0 1 ${x} ${bottom - bl}
-    V ${y + tl} A ${tl} ${tl} 0 0 1 ${x + tl} ${y} Z`;
+    V ${y + tl} A ${tl} ${tl} 0 0 1 ${x + tl} ${y} Z`
 }

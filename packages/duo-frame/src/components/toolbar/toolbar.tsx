@@ -1,5 +1,5 @@
-import * as React from "react";
-import type { DuoToolbarProps } from "./types";
+import * as React from "react"
+import type { DuoToolbarProps } from "./types"
 
 export const DuoToolbar = React.forwardRef<HTMLDivElement, DuoToolbarProps>(function DuoToolbar(
   { className, ...props },
@@ -13,5 +13,5 @@ export const DuoToolbar = React.forwardRef<HTMLDivElement, DuoToolbarProps>(func
       ref={ref}
       className={["duo-toolbar", className].filter(Boolean).join(" ")}
     />
-  );
-});
+  )
+})

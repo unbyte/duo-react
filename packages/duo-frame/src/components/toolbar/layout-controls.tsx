@@ -1,14 +1,14 @@
-import * as React from "react";
-import { LayoutIcon } from "./icons";
-import { useDuoActions, useDuoState } from "../../context/hooks";
-import { IconButton } from "./icon-button";
-import type { DuoControlGroupProps } from "./types";
+import * as React from "react"
+import { LayoutIcon } from "./icons"
+import { useDuoActions, useDuoState } from "../../context/hooks"
+import { IconButton } from "./icon-button"
+import type { DuoControlGroupProps } from "./types"
 
 export const DuoLayoutControls = React.forwardRef<HTMLDivElement, DuoControlGroupProps>(
   function DuoLayoutControls(props, ref) {
-    const state = useDuoState((value) => value);
-    const { setInnerPlacement } = useDuoActions();
-    if (state.posture === "closed") return null;
+    const state = useDuoState((value) => value)
+    const { setInnerPlacement } = useDuoActions()
+    if (state.posture === "closed") return null
     return (
       <div
         role="group"
@@ -36,6 +36,6 @@ export const DuoLayoutControls = React.forwardRef<HTMLDivElement, DuoControlGrou
           </IconButton>
         ))}
       </div>
-    );
+    )
   },
-);
+)

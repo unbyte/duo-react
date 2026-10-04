@@ -1,5 +1,5 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite-plus";
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite-plus"
 
 export default defineConfig({
   plugins: [react({ jsxRuntime: "classic" })],
@@ -8,4 +8,4 @@ export default defineConfig({
   resolve: {
     dedupe: ["react", "react-dom"],
   },
-});
+})

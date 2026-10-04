@@ -1,26 +1,26 @@
-import * as React from "react";
-import type { DuoSystem } from "../../core/types";
+import * as React from "react"
+import type { DuoSystem } from "../../core/types"
 
-export const statusArtwork = { width: 104, height: 108 } as const;
+export const statusArtwork = { width: 104, height: 108 } as const
 
-const center = 52;
-const radius = 47.5;
-const endX = (radius * Math.sqrt(3)) / 2;
-const endY = center + radius / 2;
+const center = 52
+const radius = 47.5
+const endX = (radius * Math.sqrt(3)) / 2
+const endY = center + radius / 2
 function batteryArc(level: number) {
-  const angle = ((150 + level * 2.4) * Math.PI) / 180;
-  return `M${center - endX} ${endY} A${radius} ${radius} 0 ${level > 75 ? 1 : 0} 1 ${center + Math.cos(angle) * radius} ${center + Math.sin(angle) * radius}`;
+  const angle = ((150 + level * 2.4) * Math.PI) / 180
+  return `M${center - endX} ${endY} A${radius} ${radius} 0 ${level > 75 ? 1 : 0} 1 ${center + Math.cos(angle) * radius} ${center + Math.sin(angle) * radius}`
 }
 
-const batteryTrack = batteryArc(100);
+const batteryTrack = batteryArc(100)
 const wifiArcs = [27, 15].map((radius) => {
-  const offset = radius / Math.SQRT2;
-  return `M${center - offset} ${62 - offset} A${radius} ${radius} 0 0 1 ${center + offset} ${62 - offset}`;
-});
+  const offset = radius / Math.SQRT2
+  return `M${center - offset} ${62 - offset} A${radius} ${radius} 0 0 1 ${center + offset} ${62 - offset}`
+})
 const cellularDots = [-30, -10, 10, 30].map((degrees) => {
-  const angle = (degrees * Math.PI) / 180;
-  return { x: center + Math.sin(angle) * 47, y: center + Math.cos(angle) * 47 };
-});
+  const angle = (degrees * Math.PI) / 180
+  return { x: center + Math.sin(angle) * 47, y: center + Math.cos(angle) * 47 }
+})
 
 export function StatusGlyph({
   battery,
@@ -28,8 +28,8 @@ export function StatusGlyph({
   width = "100%",
   height = "100%",
 }: Pick<DuoSystem, "battery" | "charging"> & {
-  width?: number | string;
-  height?: number | string;
+  width?: number | string
+  height?: number | string
 }) {
   return (
     <svg
@@ -59,5 +59,5 @@ export function StatusGlyph({
         ))}
       </g>
     </svg>
-  );
+  )
 }

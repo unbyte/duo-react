@@ -1,13 +1,13 @@
-import * as React from "react";
-import { AccessoryContext } from "../../context/accessory-context";
-import { useDuoState } from "../../context/hooks";
-import { ScreenContext } from "../../context/screen-context";
-import { getAccessoryLayout } from "../../core/layout/accessories";
-import { orientationRotation } from "../../core/rotation";
-import { safeAreaStyle } from "../../core/safe-area";
-import type { DuoDisplay } from "../../core/types";
-import { SystemChrome, SystemMaterial } from "../system-chrome/system-chrome";
-import { frameBezel, Hardware } from "./hardware";
+import * as React from "react"
+import { AccessoryContext } from "../../context/accessory-context"
+import { useDuoState } from "../../context/hooks"
+import { ScreenContext } from "../../context/screen-context"
+import { getAccessoryLayout } from "../../core/layout/accessories"
+import { orientationRotation } from "../../core/rotation"
+import { safeAreaStyle } from "../../core/safe-area"
+import type { DuoDisplay } from "../../core/types"
+import { SystemChrome, SystemMaterial } from "../system-chrome/system-chrome"
+import { frameBezel, Hardware } from "./hardware"
 
 export function DisplaySurface({
   display,
@@ -15,25 +15,25 @@ export function DisplaySurface({
   scale,
   showSystemUI,
 }: {
-  display: DuoDisplay;
-  children: React.ReactNode;
-  scale: number;
-  showSystemUI: boolean;
+  display: DuoDisplay
+  children: React.ReactNode
+  scale: number
+  showSystemUI: boolean
 }) {
-  const screen = useDuoState((state) => state.screens[display]);
-  const [tabBar, setTabBar] = React.useState<HTMLDivElement>();
-  const [toolbar, setToolbar] = React.useState<HTMLDivElement>();
+  const screen = useDuoState((state) => state.screens[display])
+  const [tabBar, setTabBar] = React.useState<HTMLDivElement>()
+  const [toolbar, setToolbar] = React.useState<HTMLDivElement>()
   const attachTabBar = React.useCallback(
     (node: HTMLDivElement | null) => setTabBar(node ?? undefined),
     [],
-  );
+  )
   const attachToolbar = React.useCallback(
     (node: HTMLDivElement | null) => setToolbar(node ?? undefined),
     [],
-  );
-  const { side, ...accessoryBounds } = React.useMemo(() => getAccessoryLayout(screen), [screen]);
-  const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side]);
-  const bounds = screen.window;
+  )
+  const { side, ...accessoryBounds } = React.useMemo(() => getAccessoryLayout(screen), [screen])
+  const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side])
+  const bounds = screen.window
   return (
     <div
       className="duo-display"
@@ -100,5 +100,5 @@ export function DisplaySurface({
       </div>
       <SystemChrome screen={screen} showIndicators={showSystemUI} scale={scale} />
     </div>
-  );
+  )
 }

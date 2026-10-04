@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   DuoFrame,
   DuoRegionMask,
@@ -14,11 +14,11 @@ import {
   useDuoActions,
   useDuoState,
   useDuoScreen,
-} from "duo-frame";
-import type { DuoIndicatorStyle } from "duo-frame";
-import { DraggableBlock } from "./draggable-block";
-import "duo-frame/style.css";
-import "./style.css";
+  type DuoIndicatorStyle,
+} from "duo-frame"
+import { DraggableBlock } from "./draggable-block"
+import "duo-frame/style.css"
+import "./style.css"
 
 const backgrounds = {
   light: { background: "#fff", color: "#222" },
@@ -28,18 +28,18 @@ const backgrounds = {
     background: "#fff",
     color: "#222",
   },
-} as const;
-type Background = keyof typeof backgrounds;
+} as const
+type Background = keyof typeof backgrounds
 
 function BackgroundPicker({
   value,
   onChange,
 }: {
-  value: Background;
-  onChange: (value: Background) => void;
+  value: Background
+  onChange: (value: Background) => void
 }) {
-  const { setSystem } = useDuoActions();
-  const indicatorStyle = useDuoState((state) => state.system.indicatorStyles.outer.statusBar);
+  const { setSystem } = useDuoActions()
+  const indicatorStyle = useDuoState((state) => state.system.indicatorStyles.outer.statusBar)
   return (
     <>
       <label className="demo-select">
@@ -61,9 +61,9 @@ function BackgroundPicker({
           aria-labelledby="demo-icons-label"
           value={indicatorStyle}
           onChange={(event) => {
-            const next = event.currentTarget.value as DuoIndicatorStyle;
-            const styles = { statusBar: next, homeIndicator: next };
-            setSystem({ indicatorStyles: { inner: styles, outer: styles } });
+            const next = event.currentTarget.value as DuoIndicatorStyle
+            const styles = { statusBar: next, homeIndicator: next }
+            setSystem({ indicatorStyles: { inner: styles, outer: styles } })
           }}
         >
           <option value="auto">Auto</option>
@@ -72,12 +72,12 @@ function BackgroundPicker({
         </select>
       </label>
     </>
-  );
+  )
 }
 
 function StatusBarPicker() {
-  const hidden = useDuoState((state) => state.system.prefersStatusBarHidden);
-  const { setSystem } = useDuoActions();
+  const hidden = useDuoState((state) => state.system.prefersStatusBarHidden)
+  const { setSystem } = useDuoActions()
   return (
     <label className="demo-select">
       <span id="demo-status-label">Status bar</span>
@@ -85,8 +85,8 @@ function StatusBarPicker() {
         aria-labelledby="demo-status-label"
         value={hidden === undefined ? "auto" : hidden ? "hide" : "show"}
         onChange={(event) => {
-          const value = event.currentTarget.value;
-          setSystem({ prefersStatusBarHidden: value === "auto" ? undefined : value === "hide" });
+          const value = event.currentTarget.value
+          setSystem({ prefersStatusBarHidden: value === "auto" ? undefined : value === "hide" })
         }}
       >
         <option value="auto">Auto</option>
@@ -94,12 +94,12 @@ function StatusBarPicker() {
         <option value="hide">Hide</option>
       </select>
     </label>
-  );
+  )
 }
 
 function CameraToggle() {
-  const cameraActive = useDuoState((state) => state.system.cameraActive);
-  const { setSystem } = useDuoActions();
+  const cameraActive = useDuoState((state) => state.system.cameraActive)
+  const { setSystem } = useDuoActions()
   return (
     <label className="demo-toggle" title="Simulate inner camera activity">
       <input
@@ -109,17 +109,17 @@ function CameraToggle() {
       />
       <span>Camera</span>
     </label>
-  );
+  )
 }
 
 function ProviderState() {
-  const state = useDuoState((value) => value);
+  const state = useDuoState((value) => value)
   return (
     <details className="demo-state">
       <summary>Provider state</summary>
       <pre>{JSON.stringify(state, undefined, 2)}</pre>
     </details>
-  );
+  )
 }
 
 function ExampleApp({
@@ -127,13 +127,13 @@ function ExampleApp({
   showBlock,
   blockColor,
 }: {
-  background: Background;
-  showBlock: boolean;
-  blockColor: string;
+  background: Background
+  showBlock: boolean
+  blockColor: string
 }) {
-  const { display } = useDuoScreen();
-  const [count, setCount] = React.useState(0);
-  const [text, setText] = React.useState("");
+  const { display } = useDuoScreen()
+  const [count, setCount] = React.useState(0)
+  const [text, setText] = React.useState("")
   return (
     <DuoSafeArea className="demo-app">
       {background === "mixed" && <div className="demo-bottom-background" />}
@@ -148,12 +148,12 @@ function ExampleApp({
       </div>
       <DraggableBlock visible={showBlock} color={blockColor} />
     </DuoSafeArea>
-  );
+  )
 }
 
 function ExampleBars() {
-  const [tab, setTab] = React.useState(1);
-  const [count, setCount] = React.useState(0);
+  const [tab, setTab] = React.useState(1)
+  const [count, setCount] = React.useState(0)
   return (
     <>
       <DuoAppToolbar className="demo-app-bar" aria-label="App actions">
@@ -190,17 +190,17 @@ function ExampleBars() {
         ))}
       </DuoTabBar>
     </>
-  );
+  )
 }
 
 export function Demo() {
-  const [background, setBackground] = React.useState<Background>("light");
-  const [showRegions, setShowRegions] = React.useState(false);
-  const [showBars, setShowBars] = React.useState(false);
-  const [showBlock, setShowBlock] = React.useState(true);
-  const [blockColor, setBlockColor] = React.useState("#0066ff");
-  const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false);
-  const frame = React.useRef<HTMLDivElement>(null);
+  const [background, setBackground] = React.useState<Background>("light")
+  const [showRegions, setShowRegions] = React.useState(false)
+  const [showBars, setShowBars] = React.useState(false)
+  const [showBlock, setShowBlock] = React.useState(true)
+  const [blockColor, setBlockColor] = React.useState("#0066ff")
+  const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false)
+  const frame = React.useRef<HTMLDivElement>(null)
   return (
     <DuoProvider outerPortraitLocked={outerPortraitLocked}>
       <main className="demo">
@@ -283,5 +283,5 @@ export function Demo() {
         </DuoToolbar>
       </main>
     </DuoProvider>
-  );
+  )
 }

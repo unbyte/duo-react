@@ -1,4 +1,4 @@
-import type { DuoInsets } from "./types";
+import type { DuoInsets } from "./types"
 
 export function safeAreaStyle(insets: DuoInsets) {
   return {
@@ -6,5 +6,5 @@ export function safeAreaStyle(insets: DuoInsets) {
     "--duo-safe-area-inset-right": `${insets.right}px`,
     "--duo-safe-area-inset-bottom": `${insets.bottom}px`,
     "--duo-safe-area-inset-left": `${insets.left}px`,
-  };
+  }
 }

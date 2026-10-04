@@ -1,8 +1,8 @@
-import type { DuoZoom } from "./types";
+import type { DuoZoom } from "./types"
 
 export function validateZoom(zoom: DuoZoom) {
   if (zoom !== "fit" && (typeof zoom !== "number" || !Number.isFinite(zoom) || zoom <= 0)) {
-    throw new RangeError('Duo zoom must be "fit" or a positive finite number.');
+    throw new RangeError('Duo zoom must be "fit" or a positive finite number.')
   }
 }
 
@@ -12,8 +12,8 @@ export function resolveZoom(
   device: { width: number; height: number },
   padding = 24,
 ) {
-  validateZoom(zoom);
-  if (container.width <= 0 || container.height <= 0) return 0;
+  validateZoom(zoom)
+  if (container.width <= 0 || container.height <= 0) return 0
   return zoom === "fit"
     ? Math.max(
         0,
@@ -22,5 +22,5 @@ export function resolveZoom(
           (container.height - padding * 2) / device.height,
         ),
       )
-    : zoom;
+    : zoom
 }

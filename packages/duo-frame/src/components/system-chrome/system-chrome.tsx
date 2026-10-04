@@ -1,18 +1,18 @@
-import * as React from "react";
-import { useDuoState } from "../../context/hooks";
-import { getSystemLayout, systemMetrics } from "../../core/layout/system";
-import type { DuoRect, DuoScreenInfo } from "../../core/types";
-import { StatusGlyph } from "./status-glyph";
-import { SystemIndicator } from "./system-indicator";
+import * as React from "react"
+import { useDuoState } from "../../context/hooks"
+import { getSystemLayout, systemMetrics } from "../../core/layout/system"
+import type { DuoRect, DuoScreenInfo } from "../../core/types"
+import { StatusGlyph } from "./status-glyph"
+import { SystemIndicator } from "./system-indicator"
 
 function boundsStyle(bounds: DuoRect) {
-  return { left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height };
+  return { left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height }
 }
 
 export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
   return (
     <div className="duo-status-material" style={boundsStyle(getSystemLayout(screen).material)} />
-  );
+  )
 }
 
 export function SystemChrome({
@@ -20,16 +20,16 @@ export function SystemChrome({
   showIndicators,
   scale,
 }: {
-  screen: DuoScreenInfo;
-  showIndicators: boolean;
-  scale: number;
+  screen: DuoScreenInfo
+  showIndicators: boolean
+  scale: number
 }) {
   const { time, battery, charging, indicatorStyles, homeIndicatorVisible } = useDuoState(
     (state) => state.system,
-  );
-  const appearance = indicatorStyles[screen.display];
-  const showStatus = showIndicators && screen.statusBarVisible;
-  const layout = React.useMemo(() => getSystemLayout(screen), [screen]);
+  )
+  const appearance = indicatorStyles[screen.display]
+  const showStatus = showIndicators && screen.statusBarVisible
+  const layout = React.useMemo(() => getSystemLayout(screen), [screen])
   return (
     <div className="duo-system" aria-hidden="true">
       {layout.camera && <div className="duo-camera-cutout" style={boundsStyle(layout.camera)} />}
@@ -108,5 +108,5 @@ export function SystemChrome({
         </>
       )}
     </div>
-  );
+  )
 }

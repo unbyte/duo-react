@@ -1,35 +1,35 @@
-import * as React from "react";
-import { useDuoScreen } from "duo-frame";
+import * as React from "react"
+import { useDuoScreen } from "duo-frame"
 
-const initialPosition = { x: 0.6, y: 0.55 };
-const clamp = (value: number) => Math.max(0, Math.min(1, value));
+const initialPosition = { x: 0.6, y: 0.55 }
+const clamp = (value: number) => Math.max(0, Math.min(1, value))
 
 export function DraggableBlock({ visible, color }: { visible: boolean; color: string }) {
-  const screen = useDuoScreen();
-  const { width, height } = screen.window;
-  const size = Math.min(144, width, height);
-  const rangeX = width - size;
-  const rangeY = height - size;
-  const [position, setPosition] = React.useState(initialPosition);
-  const drag = React.useRef<{ pointerId: number; offsetX: number; offsetY: number }>();
-  const svg = React.useRef<SVGSVGElement>(null);
-  const x = position.x * rangeX;
-  const y = position.y * rangeY;
+  const screen = useDuoScreen()
+  const { width, height } = screen.window
+  const size = Math.min(144, width, height)
+  const rangeX = width - size
+  const rangeY = height - size
+  const [position, setPosition] = React.useState(initialPosition)
+  const drag = React.useRef<{ pointerId: number; offsetX: number; offsetY: number }>()
+  const svg = React.useRef<SVGSVGElement>(null)
+  const x = position.x * rangeX
+  const y = position.y * rangeY
 
   React.useEffect(() => {
-    drag.current = undefined;
-  }, [width, height, screen.orientation, visible]);
+    drag.current = undefined
+  }, [width, height, screen.orientation, visible])
 
   function localPoint(clientX: number, clientY: number) {
-    const matrix = svg.current?.getScreenCTM();
-    if (!matrix || !svg.current) return;
-    const point = svg.current.createSVGPoint();
-    point.x = clientX;
-    point.y = clientY;
-    return point.matrixTransform(matrix.inverse());
+    const matrix = svg.current?.getScreenCTM()
+    if (!matrix || !svg.current) return
+    const point = svg.current.createSVGPoint()
+    point.x = clientX
+    point.y = clientY
+    return point.matrixTransform(matrix.inverse())
   }
 
-  if (!visible) return null;
+  if (!visible) return null
 
   return (
     <svg
@@ -50,50 +50,50 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         tabIndex={0}
         aria-label="Draggable color block"
         onPointerDown={(event) => {
-          if (!event.isPrimary || event.button !== 0 || drag.current) return;
-          const point = localPoint(event.clientX, event.clientY);
-          if (!point) return;
-          event.preventDefault();
-          event.currentTarget.focus({ preventScroll: true });
-          event.currentTarget.setPointerCapture(event.pointerId);
+          if (!event.isPrimary || event.button !== 0 || drag.current) return
+          const point = localPoint(event.clientX, event.clientY)
+          if (!point) return
+          event.preventDefault()
+          event.currentTarget.focus({ preventScroll: true })
+          event.currentTarget.setPointerCapture(event.pointerId)
           drag.current = {
             pointerId: event.pointerId,
             offsetX: point.x - x,
             offsetY: point.y - y,
-          };
+          }
         }}
         onPointerMove={(event) => {
-          const current = drag.current;
-          if (!current || current.pointerId !== event.pointerId) return;
-          const point = localPoint(event.clientX, event.clientY);
-          if (!point) return;
+          const current = drag.current
+          if (!current || current.pointerId !== event.pointerId) return
+          const point = localPoint(event.clientX, event.clientY)
+          if (!point) return
           setPosition({
             x: rangeX ? clamp((point.x - current.offsetX) / rangeX) : 0,
             y: rangeY ? clamp((point.y - current.offsetY) / rangeY) : 0,
-          });
+          })
         }}
         onPointerUp={(event) => {
-          if (drag.current?.pointerId !== event.pointerId) return;
-          drag.current = undefined;
-          event.currentTarget.releasePointerCapture(event.pointerId);
+          if (drag.current?.pointerId !== event.pointerId) return
+          drag.current = undefined
+          event.currentTarget.releasePointerCapture(event.pointerId)
         }}
         onPointerCancel={() => (drag.current = undefined)}
         onLostPointerCapture={() => (drag.current = undefined)}
         onKeyDown={(event) => {
           if (["Home", "Enter", " "].includes(event.key)) {
-            event.preventDefault();
-            setPosition(initialPosition);
-            return;
+            event.preventDefault()
+            setPosition(initialPosition)
+            return
           }
-          const step = event.shiftKey ? 1 : 10;
-          const dx = event.key === "ArrowLeft" ? -step : event.key === "ArrowRight" ? step : 0;
-          const dy = event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0;
-          if (!dx && !dy) return;
-          event.preventDefault();
+          const step = event.shiftKey ? 1 : 10
+          const dx = event.key === "ArrowLeft" ? -step : event.key === "ArrowRight" ? step : 0
+          const dy = event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0
+          if (!dx && !dy) return
+          event.preventDefault()
           setPosition((current) => ({
             x: rangeX ? clamp(current.x + dx / rangeX) : 0,
             y: rangeY ? clamp(current.y + dy / rangeY) : 0,
-          }));
+          }))
         }}
       >
         <title>Drag to move. Arrow keys move; Shift moves precisely; Home resets.</title>
@@ -102,5 +102,5 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         Drag me
       </text>
     </svg>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 
 export const DuoSafeArea = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   function DuoSafeArea({ style, ...props }, ref) {
@@ -15,6 +15,6 @@ export const DuoSafeArea = React.forwardRef<HTMLDivElement, React.HTMLAttributes
           ...style,
         }}
       />
-    );
+    )
   },
-);
+)

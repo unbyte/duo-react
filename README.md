@@ -60,3 +60,18 @@ the demos consume its package exports from `packages/duo-frame/dist`.
 Use a package filter for focused work, such as `pnpm --filter duo-frame test --run`.
 The [package development guide](packages/duo-frame/README.md#preview-and-development)
 describes manual preview checks and React compatibility.
+
+## Code style and diagnostics
+
+The root Vite Plus config enables import, React, accessibility, and type-aware
+promise checks alongside Oxlint's correctness rules. Duplicate imports are
+errors; auto-fixes merge compatible imports and keep type-only names marked with
+`type`. React effect dependencies include the library's `useBrowserLayoutEffect`.
+
+Oxfmt omits optional JavaScript/TypeScript semicolons and uses its default
+100-column print width. This is a wrapping target; long strings and URLs can
+exceed it. Markdown code blocks keep their authored formatting so usage examples
+can remain fragments. Reference snapshots remain excluded from formatting.
+
+Run `pnpm check` to report problems, or `pnpm exec vp check --fix` to apply safe
+lint fixes and formatting. The same root settings apply throughout the workspace.

@@ -1,8 +1,8 @@
-import * as React from "react";
-import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect";
-import type { DuoIndicatorStyle } from "../../core/types";
+import * as React from "react"
+import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
+import type { DuoIndicatorStyle } from "../../core/types"
 
-let nextIndicatorId = 0;
+let nextIndicatorId = 0
 
 export function SystemIndicator({
   width,
@@ -13,28 +13,28 @@ export function SystemIndicator({
   style,
   children,
 }: {
-  width: number;
-  height: number;
-  appearance: DuoIndicatorStyle;
-  scale: number;
-  className: string;
-  style?: React.CSSProperties;
-  children: React.ReactNode;
+  width: number
+  height: number
+  appearance: DuoIndicatorStyle
+  scale: number
+  className: string
+  style?: React.CSSProperties
+  children: React.ReactNode
 }) {
-  const [id, setId] = React.useState<string>();
+  const [id, setId] = React.useState<string>()
   useBrowserLayoutEffect(() => {
-    setId(`duo-indicator-${nextIndicatorId++}`);
-  }, []);
+    setId(`duo-indicator-${nextIndicatorId++}`)
+  }, [])
   // Average over a broad neighborhood even for short controls such as the time label.
-  const blurX = Math.max(width / 4, 16);
-  const blurY = Math.max(height / 4, 16);
+  const blurX = Math.max(width / 4, 16)
+  const blurY = Math.max(height / 4, 16)
   // Leave room for three standard deviations around the center sample.
-  const padding = Math.ceil(Math.max(16, blurX * 3 - width / 2, blurY * 3 - height / 2));
-  const filterWidth = width + padding * 2;
-  const filterHeight = height + padding * 2;
+  const padding = Math.ceil(Math.max(16, blurX * 3 - width / 2, blurY * 3 - height / 2))
+  const filterWidth = width + padding * 2
+  const filterHeight = height + padding * 2
   // Keep the center patch rasterizable when the frame is scaled down.
-  const sampleSize = Math.min(width, height, 2 / scale);
-  const automatic = appearance === "auto" && id !== undefined;
+  const sampleSize = Math.min(width, height, 2 / scale)
+  const automatic = appearance === "auto" && id !== undefined
   return (
     <span
       className={`duo-indicator ${className}`}
@@ -110,5 +110,5 @@ export function SystemIndicator({
         {children}
       </span>
     </span>
-  );
+  )
 }

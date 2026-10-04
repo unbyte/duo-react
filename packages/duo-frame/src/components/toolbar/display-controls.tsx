@@ -1,13 +1,13 @@
-import * as React from "react";
-import { DisplayIcon, PartialFoldIcon } from "./icons";
-import { useDuoActions, useDuoState } from "../../context/hooks";
-import { IconButton } from "./icon-button";
-import type { DuoControlGroupProps } from "./types";
+import * as React from "react"
+import { DisplayIcon, PartialFoldIcon } from "./icons"
+import { useDuoActions, useDuoState } from "../../context/hooks"
+import { IconButton } from "./icon-button"
+import type { DuoControlGroupProps } from "./types"
 
 export const DuoDisplayControls = React.forwardRef<HTMLDivElement, DuoControlGroupProps>(
   function DuoDisplayControls(props, ref) {
-    const posture = useDuoState((state) => state.posture);
-    const { setPosture } = useDuoActions();
+    const posture = useDuoState((state) => state.posture)
+    const { setPosture } = useDuoActions()
     return (
       <div role="group" aria-label="Posture" data-duo-toolbar-group="display" {...props} ref={ref}>
         <IconButton
@@ -35,6 +35,6 @@ export const DuoDisplayControls = React.forwardRef<HTMLDivElement, DuoControlGro
           <DisplayIcon inner />
         </IconButton>
       </div>
-    );
+    )
   },
-);
+)
