@@ -33,7 +33,6 @@ export function SystemChrome({
     indicatorStyles,
     homeIndicatorVisible,
   } = useDuoState((state) => state.system)
-  const displayTime = time.replace(/^0(?=\d:)/, "")
   const appearance = indicatorStyles[screen.display]
   const showStatus = showIndicators && screen.statusBarVisible
   const layout = React.useMemo(() => getSystemLayout(screen), [screen])
@@ -76,7 +75,7 @@ export function SystemChrome({
                     textAnchor="middle"
                     fill="currentColor"
                   >
-                    {displayTime}
+                    {time}
                   </text>
                 </svg>
               </SystemIndicator>

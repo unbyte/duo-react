@@ -117,7 +117,7 @@ import "duo-frame/style.css"
 
 <DuoProvider
   defaultState={{ orientation: "landscape-left", innerPlacement: "full", zoom: "fit" }}
-  defaultSystem={{ time: "9:41", battery: 100 }}
+  defaultSystem={{ time: "09:41", battery: 100 }}
 >
   <DuoFrame style={{ width: "100%", height: 640 }}>
     <App />

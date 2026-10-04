@@ -72,18 +72,9 @@ test("frame can be server-rendered without browser globals", () => {
   expect(html).not.toContain('class="duo-divider"')
 })
 
-test("both displays omit a leading hour zero while retaining two-digit minutes", () => {
+test("both displays preserve the supplied time including leading zeros", () => {
   for (const posture of ["open", "closed"] as const) {
-    for (const [time, expected] of [
-      ["00:00", "0:00"],
-      ["00:05", "0:05"],
-      ["01:09", "1:09"],
-      ["09:41", "9:41"],
-      ["9:41", "9:41"],
-      ["10:05", "10:05"],
-      ["12:00", "12:00"],
-      ["23:59", "23:59"],
-    ]) {
+    for (const time of ["00:00", "00:05", "01:09", "09:41", "9:41", "10:05", "12:00", "23:59"]) {
       const html = renderToString(
         <DuoProvider defaultState={{ posture, orientation: "portrait" }} defaultSystem={{ time }}>
           <DuoFrame>
@@ -91,7 +82,7 @@ test("both displays omit a leading hour zero while retaining two-digit minutes",
           </DuoFrame>
         </DuoProvider>,
       )
-      expect(html.match(/<text\b[^>]*>([^<]*)<\/text>/)?.[1]).toBe(expected)
+      expect(html.match(/<text\b[^>]*>([^<]*)<\/text>/)?.[1]).toBe(time)
     }
   }
 })

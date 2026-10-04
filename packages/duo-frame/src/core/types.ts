@@ -59,7 +59,7 @@ export interface DuoScreenInfo {
 }
 
 export interface DuoSystem {
-  /** The clock omits a leading hour zero when rendering. */
+  /** Displayed as provided. Use HH:mm for zero-padded hours. */
   readonly time: string
   readonly battery: number
   readonly charging: boolean

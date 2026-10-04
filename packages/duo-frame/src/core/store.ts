@@ -83,7 +83,7 @@ export function createDuoStore(
     zoom: defaults.zoom ?? "fit",
     system: mergeSystem(
       Object.freeze({
-        time: "9:41",
+        time: "09:41",
         battery: 100,
         charging: false,
         wifiStrength: 3,
