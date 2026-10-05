@@ -1,6 +1,6 @@
 import * as React from "react"
 import { renderToString } from "react-dom/server"
-import { expect, test } from "vite-plus/test"
+import { expect, expectTypeOf, test } from "vite-plus/test"
 import {
   DuoFrame,
   DuoProvider,
@@ -210,7 +210,7 @@ test("the hook renders custom content with application context on React 16.8 and
     return (
       <>
         <nav {...bars.toolbars[0].containerProps}>{label}</nav>
-        <nav {...bars.tabbar!.containerProps}>Tabs</nav>
+        <nav {...bars.tabbar.containerProps}>Tabs</nav>
       </>
     )
   }
@@ -231,5 +231,41 @@ test("the hook renders custom content with application context on React 16.8 and
       `data-duo-bar-placement="${orientation === "portrait" ? "top" : "right"}"`,
     )
     expect(html).toContain(`left:${orientation === "portrait" ? 20 : 879}px`)
+  }
+})
+
+test("the hook infers tab bar presence from the request", () => {
+  function App({ request }: { request: BarsLayoutRequest }) {
+    const requested = useBars({ tabbar: {} })
+    const omitted = useBars({ toolbars: [] })
+    const empty = useBars()
+    const explicitlyAbsent = useBars({ tabbar: undefined })
+    const conditional = useBars({ tabbar: request.tabbar })
+    const dynamic = useBars(request)
+
+    expectTypeOf(requested.tabbar).toEqualTypeOf<ResolvedBarLayout>()
+    expectTypeOf(omitted.tabbar).toEqualTypeOf<undefined>()
+    expectTypeOf(empty.tabbar).toEqualTypeOf<undefined>()
+    expectTypeOf(explicitlyAbsent.tabbar).toEqualTypeOf<undefined>()
+    expectTypeOf(conditional.tabbar).toEqualTypeOf<ResolvedBarLayout | undefined>()
+    expectTypeOf(dynamic.tabbar).toEqualTypeOf<ResolvedBarLayout | undefined>()
+
+    expect(requested.tabbar.rect.width).toBeGreaterThan(0)
+    expect(omitted.tabbar).toBeUndefined()
+    expect(empty.tabbar).toBeUndefined()
+    expect(explicitlyAbsent.tabbar).toBeUndefined()
+    expect(conditional.tabbar !== undefined).toBe(request.tabbar !== undefined)
+    expect(dynamic.tabbar !== undefined).toBe(request.tabbar !== undefined)
+    return null
+  }
+
+  for (const request of [{}, { tabbar: {} }]) {
+    renderToString(
+      <DuoProvider>
+        <DuoFrame>
+          <App request={request} />
+        </DuoFrame>
+      </DuoProvider>,
+    )
   }
 })
