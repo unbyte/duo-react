@@ -367,6 +367,35 @@ zoom, and hides with `showSystemUI={false}`; the outer camera remains visible.
 The [calibration note](docs/calibration/status-controls.md#capsule-material) records
 the simulator references and estimated material parameters.
 
+### System color mode
+
+Set the simulated system appearance through the provider. `colorMode` accepts
+`"light"` (the default) or `"dark"`, independently of the host page's preference:
+
+```tsx
+<DuoProvider defaultSystem={{ colorMode: "dark" }}>
+  <DuoFrame>
+    <App />
+  </DuoFrame>
+</DuoProvider>
+```
+
+Read it with `useDuoState((state) => state.system.colorMode)` and switch it from
+an event handler with `useDuoActions().setSystem({ colorMode: "light" })`.
+`defaultSystem` supplies initial values; `resetDevice()` restores them.
+Switching mode preserves app state and screen geometry.
+
+The display exposes `data-duo-color-mode` and sets CSS `color-scheme`, default
+background, and text colors. Native controls and portaled accessories inherit
+the color scheme; `DuoTabBar` follows it unless explicitly overridden. Apps can
+read the context value or use the display attribute in CSS to select their own
+palette. Explicit app background and text styles remain under app control.
+
+Same-document `prefers-color-scheme` queries still describe the host page.
+Embedded iframe media queries can follow the embedding element's color scheme
+through [native browser behavior](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-color-scheme#embedded_elements).
+The library does not override `matchMedia` or inject code into iframe documents.
+
 ### Indicator appearance
 
 Each display has independent status-bar and home-indicator styles. `"light"`
@@ -566,8 +595,9 @@ The component accepts standard div attributes except `children` and the DOM
 but the resolved layout owns positioning styles. Private horizontal and vertical
 variants share a WebGL glass renderer, spring motion, and artwork loading. Hold
 or drag the lens to expand it; holding the vertical rail also reveals labels.
-The bar respects reduced motion and defaults to the prototype's light material.
-Set `style={{ colorScheme: "dark" }}` to select its dark material.
+The bar respects reduced motion and follows `system.colorMode` for its material.
+Set `style={{ colorScheme: "light" }}` or `style={{ colorScheme: "dark" }}` to
+override the material for an individual bar.
 
 The renderer consumes the frame's shared app capture for backdrop refraction.
 Its neutral backdrop is used only before the first completed capture.

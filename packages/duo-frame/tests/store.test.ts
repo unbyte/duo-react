@@ -124,6 +124,43 @@ test("system changes only recompute geometry for camera activity", () => {
   expect(store.getSnapshot().system.battery).toBe(25)
 })
 
+test("system color mode defaults to light and changes without disturbing app state or geometry", () => {
+  const independent = createDuoStore()
+  expect(independent.getSnapshot().system.colorMode).toBe("light")
+  const store = createDuoStore({}, { colorMode: "dark", battery: 25 })
+  const initial = store.getSnapshot()
+  const listener = vi.fn()
+  store.subscribe(listener)
+
+  store.actions.setSystem({ colorMode: "light" })
+  const changed = store.getSnapshot()
+  expect(changed.screens).toBe(initial.screens)
+  expect(changed.system).toMatchObject({ colorMode: "light", battery: 25 })
+  expect(changed.system.indicatorStyles).toBe(initial.system.indicatorStyles)
+  store.actions.setSystem({ colorMode: "light" })
+  expect(store.getSnapshot()).toBe(changed)
+  expect(listener).toHaveBeenCalledTimes(1)
+
+  store.actions.resetDevice()
+  expect(store.getSnapshot().system).toBe(initial.system)
+  expect(independent.getSnapshot().system.colorMode).toBe("light")
+})
+
+test("invalid system color modes are rejected without publishing partial updates", () => {
+  for (const colorMode of ["auto", "sepia", "", undefined]) {
+    // @ts-expect-error Validate JavaScript callers too.
+    expect(() => createDuoStore({}, { colorMode })).toThrow(RangeError)
+    const store = createDuoStore()
+    const initial = store.getSnapshot()
+    const listener = vi.fn()
+    store.subscribe(listener)
+    // @ts-expect-error Validate JavaScript callers too.
+    expect(() => store.actions.setSystem({ colorMode, battery: 25 })).toThrow(RangeError)
+    expect(store.getSnapshot()).toBe(initial)
+    expect(listener).not.toHaveBeenCalled()
+  }
+})
+
 test("signal updates preserve geometry, reject invalid levels, and reset to provider defaults", () => {
   const store = createDuoStore({}, { wifiStrength: 2, cellularStrength: 3 })
   const initial = store.getSnapshot()

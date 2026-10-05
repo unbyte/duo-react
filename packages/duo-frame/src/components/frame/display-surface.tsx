@@ -24,6 +24,7 @@ export function DisplaySurface({
   showSystemUI: boolean
 }) {
   const screen = useDuoState((state) => state.screens[display])
+  const colorMode = useDuoState((state) => state.system.colorMode)
   const [backdrop] = React.useState(createBackdropStore)
   const source = React.useRef<HTMLDivElement>(null)
   const screenRef = React.useRef(screen)
@@ -31,7 +32,7 @@ export function DisplaySurface({
   useBrowserLayoutEffect(() => {
     screenRef.current = screen
     capture.current?.invalidate()
-  }, [screen])
+  }, [screen, colorMode])
   React.useEffect(() => {
     const observer = observeBackdrop(source.current!, () => screenRef.current, backdrop)
     capture.current = observer
@@ -52,9 +53,11 @@ export function DisplaySurface({
       <div
         className="duo-display"
         data-duo-display={display}
+        data-duo-color-mode={colorMode}
         data-duo-placement={screen.placement}
         aria-hidden={!screen.visible}
         style={{
+          colorScheme: colorMode,
           width: screen.size.width,
           height: screen.size.height,
           marginLeft: -screen.size.width / 2,

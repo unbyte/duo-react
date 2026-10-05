@@ -48,6 +48,8 @@ function mergeSystem(current: DuoSystem, patch: DuoSystemOptions) {
 function validateModel(model: Model) {
   validateZoom(model.zoom)
   validatePosture(model.posture)
+  if (model.system.colorMode !== "light" && model.system.colorMode !== "dark")
+    throw new RangeError('System color mode must be "light" or "dark".')
   if (
     !Number.isFinite(model.system.battery) ||
     model.system.battery < 0 ||
@@ -83,6 +85,7 @@ export function createDuoStore(
     zoom: defaults.zoom ?? "fit",
     system: mergeSystem(
       Object.freeze({
+        colorMode: "light",
         time: "09:41",
         battery: 100,
         charging: false,

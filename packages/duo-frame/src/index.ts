@@ -19,6 +19,7 @@ export { safeAreaStyle } from "./core/safe-area"
 export type { DuoGeometryOptions } from "./core/geometry"
 export type { DuoActions } from "./core/store"
 export type {
+  DuoColorMode,
   DuoDefaults,
   DuoDisplay,
   DuoFoldingRegion,

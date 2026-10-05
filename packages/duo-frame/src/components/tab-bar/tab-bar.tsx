@@ -1,6 +1,7 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useAccessoryHost } from "../../context/accessory-context"
+import { useDuoState } from "../../context/hooks"
 import { HorizontalTabBar } from "./horizontal"
 import { VerticalTabBar } from "./vertical"
 import type { ResolvedBarLayout } from "../../core/bar-types"
@@ -29,7 +30,8 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
   ref,
 ) {
   const host = useAccessoryHost()
-  const dark = style?.colorScheme === "dark"
+  const colorMode = useDuoState((state) => state.system.colorMode)
+  const dark = (style?.colorScheme ?? colorMode) === "dark"
   const ids = new Set<string>()
   for (const item of items) {
     if (!item.id.trim()) throw new Error("DuoTabBar: each item needs a non-empty id.")

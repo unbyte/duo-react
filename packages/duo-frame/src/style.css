@@ -20,8 +20,12 @@
   left: 50%;
   top: 50%;
   transform-origin: center;
+  background: #fff;
+  color: #17202a;
+}
+.duo-display[data-duo-color-mode="dark"] {
   background: #111;
-  color: #fff;
+  color: #f4f4f4;
 }
 .duo-screen {
   position: absolute;
@@ -101,7 +105,7 @@
   overflow: hidden;
   container-type: size;
   container-name: duo-screen;
-  color: #17202a;
+  color: inherit;
 }
 .duo-display[data-duo-placement="left"],
 .duo-display[data-duo-placement="right"] {

@@ -19,6 +19,28 @@ function ReadState() {
   return <span>{width}</span>
 }
 
+test("system color mode reaches app context and the active display on the first render", () => {
+  function App() {
+    const colorMode = useDuoState((state) => state.system.colorMode)
+    return <span>{`mode:${colorMode}`}</span>
+  }
+  for (const posture of ["open", "closed"] as const) {
+    for (const colorMode of ["light", "dark"] as const) {
+      const html = renderToString(
+        <DuoProvider defaultState={{ posture }} defaultSystem={{ colorMode }}>
+          <DuoFrame>
+            <App />
+          </DuoFrame>
+        </DuoProvider>,
+      )
+      expect(html).toContain(`mode:${colorMode}`)
+      expect(html).toContain(`data-duo-color-mode="${colorMode}"`)
+      expect(html).toContain(`color-scheme:${colorMode}`)
+      expect(html).toContain(`data-duo-display="${posture === "closed" ? "outer" : "inner"}"`)
+    }
+  }
+})
+
 test("provider portrait lock reaches frame children on the first server render", () => {
   function App() {
     const screen = useDuoScreen()

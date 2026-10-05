@@ -7,6 +7,7 @@ export type DuoOrientation =
   | "landscape-right"
 export type DuoPosture = "open" | "closed" | "partially-open"
 export type DuoZoom = "fit" | number
+export type DuoColorMode = "light" | "dark"
 export type DuoIndicatorStyle = "auto" | "light" | "dark"
 
 export interface DuoIndicatorStyles {
@@ -59,6 +60,8 @@ export interface DuoScreenInfo {
 }
 
 export interface DuoSystem {
+  /** Simulated system appearance, independent of the host page's preference. */
+  readonly colorMode: DuoColorMode
   /** Displayed as provided. Use HH:mm for zero-padded hours. */
   readonly time: string
   readonly battery: number
