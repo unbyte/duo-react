@@ -102,15 +102,18 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   float inside = mix(coverage(sd), 1.0 - smoothstep(-1.6, 1.6, sd), selected * uGrowth);
   vec3 glass = blurBackground(p);
   float luma = dot(glass, vec3(.2126, .7152, .0722));
-  glass = mix(vec3(luma), glass, 1.12);
-  // Appearance comes only from the simulated system scheme. The scene still
-  // transmits through the material, but cannot switch its light/dark recipe.
-  vec3 lightGlass = mix(glass, vec3(.98), .26);
-  vec3 darkGlass = glass * .50 + vec3(.126 + .076 * uGrowth);
-  glass = mix(lightGlass, darkGlass, uDark);
+  vec3 chroma = glass - vec3(luma);
+  float restingSelection = selected * (1.0 - clamp(uGrowth, 0.0, 1.0));
+  // Approximate the captured color response: lift tone without washing away
+  // chroma, and give the resting selection its own contrast in each appearance.
+  float lightTone = mix(.52 + .48 * luma, .39 + .53 * luma, restingSelection);
+  float darkTone = .126 + luma * (1.0 - .40 * luma);
+  darkTone = mix(darkTone, .87 * darkTone - .07, restingSelection);
+  vec3 lightGlass = vec3(lightTone) + chroma * mix(.95, 1.10, restingSelection);
+  vec3 darkGlass = vec3(darkTone + .076 * uGrowth) + chroma * mix(1.20, 1.40, restingSelection);
+  glass = clamp(mix(lightGlass, darkGlass, uDark), 0.0, 1.0);
   glass += vec3((.5 - clamp(p.y / uBarHeight, 0.0, 1.0)) * .025 * uDark);
-  // One fixed surface recipe: a soft inner highlight, a shallow inner shadow,
-  // and a fine contour whose light/dark balance follows surface direction.
+  // Keep the contour geometry; adapt its contrast to the sampled backdrop.
   vec2 surfacePoint = outlinePoint - vec2(uBarWidth * .5, (uBarHeight * .5));
   vec2 surfaceGradient = surfacePoint - vec2(clamp(surfacePoint.x, -uBarWidth * .5 + (uBarHeight * .5), uBarWidth * .5 - (uBarHeight * .5)), 0.0);
   vec2 surfaceNormal = surfaceGradient / max(length(surfaceGradient), .001);
@@ -126,16 +129,13 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   glass *= 1.0 - mix(.010, .055, uDark) * exp(-pow((depth - 9.0) / 7.0, 2.0));
   float border = exp(-abs(sd) * 3.0);
   float wingContrast = 1.0 + .12 * uVertical * selected * uGrowth * insetWeight * pow(abs(surfaceNormal.y), 4.0);
-  glass *= 1.0 - border * .22 * (1.0 - verticalLight) * wingContrast;
-  glass = mix(glass, vec3(1.0), border * .28 * verticalLight);
-  // A fixed fine contour keeps the edge readable on white without requiring
-  // access to arbitrary DOM or iframe pixels behind an eventual host canvas.
+  float brightBackdrop = smoothstep(.20, .90, luma);
+  glass *= 1.0 - border * mix(.18, .26, brightBackdrop) * (1.0 - verticalLight) * wingContrast;
+  glass = mix(glass, vec3(1.0), border * mix(.38, .12, brightBackdrop) * verticalLight);
   float keyline = exp(-pow((sd + .45) / .45, 2.0));
-  glass *= 1.0 - keyline * .10 * wingContrast;
+  glass *= 1.0 - keyline * mix(.07, .12, brightBackdrop) * wingContrast;
   vec3 c = mix(bg, glass, inside);
-  // Apply the lens wash to the material before compositing artwork; otherwise
-  // the stronger resting wash makes the resting icon brighter than the held one.
-  c = mix(c, mix(vec3(.20), vec3(.9 * uGrowth), uDark), selected * mix(mix(.065, .74, uDark), mix(.008, .012, uDark), uGrowth));
+  c = mix(c, mix(vec3(.20), vec3(.9 * uGrowth), uDark), selected * uGrowth * mix(.008, .012, uDark));
   c *= 1.0 - lensShadow(outlinePoint);
   float ink = 0.0;
   // The sampled artwork owns its tint, even when a lens covers multiple items.
@@ -156,10 +156,14 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   } else if (artPoint.x >= 0.0 && artPoint.x <= uBarWidth && artPoint.y >= 0.0 && artPoint.y <= uBarHeight) {
     ink = texture(uArtwork, artPoint / vec2(uBarWidth, uBarHeight)).a;
   }
-  vec3 foreground = mix(vec3(.063, .098, .063), vec3(.957, .965, .937), uDark);
+  vec3 foreground = clamp(mix((glass - .76) * .25, vec3(.94) + glass * .28, uDark), 0.0, 1.0);
   vec4 accent = texelFetch(uAccents, ivec2(int(item), 0), 0);
-  vec3 tint = mix(accent.rgb * mix(vec3(1.0), c, .08), accent.rgb, uDark);
-  tint = min(vec3(1.0), tint * (1.0 + .12 * uGrowth * selected));
+  float tintTone = clamp(dot(c, vec3(.2126, .7152, .0722)), 0.0, 1.0);
+  vec3 lightTint = accent.rgb - (1.0 - tintTone) * mix(vec3(.18), vec3(.36), accent.rgb);
+  vec3 darkTint = accent.rgb - .126 * (1.0 - accent.rgb) + vec3(.59 * tintTone);
+  // Retain the tuned held-lens tint while the resting icon blends with its fill.
+  vec3 heldTint = mix(accent.rgb * mix(vec3(1.0), c, .08), accent.rgb, uDark) * 1.12;
+  vec3 tint = clamp(mix(mix(lightTint, darkTint, uDark), heldTint, clamp(uGrowth, 0.0, 1.0)), 0.0, 1.0);
   return mix(c, mix(foreground, tint, selected), ink * mix(1.0, accent.a, selected));
 }
 
