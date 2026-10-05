@@ -172,7 +172,8 @@ void main() {
   float surfaceAlpha = max(barMask, lensMask);
   float shadow = lensShadow(p);
   float alpha = surfaceAlpha + shadow * (1.0 - surfaceAlpha);
-  if (alpha < .001) { outColor = vec4(0.0); return; }
+  // Transparent neighbors must still evaluate the material: its edge coverage
+  // and texture mip levels rely on derivatives across adjacent fragments.
 
   float radius = lensRadius();
   vec2 straight = max(uLensSize * .5 - vec2(radius), vec2(0.0));
@@ -267,7 +268,7 @@ void main() {
   refracted = mix(refracted, vec3(1.0), reflection);
   refracted *= 1.0 - rim * (.20 - light * .08);
   vec3 surface = mix(material(p, p, p, 0.0, 0.0), refracted, lensMask);
-  outColor = vec4(surface * surfaceAlpha / alpha, alpha);
+  outColor = vec4(surface * surfaceAlpha / max(alpha, .001), alpha);
 }`
 
 const outerFragment = `#version 300 es

@@ -1,4 +1,5 @@
 import { canvasPadding, glassShaders, vertex } from "./shaders"
+import type { BackdropFrame } from "../../backdrop/store"
 import type { GlassFrame } from "./shared"
 
 export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
@@ -88,6 +89,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
   neutralContext.fillStyle = "#ffffff"
   neutralContext.fillRect(0, 0, 1, 1)
   let uploadedNeutral = false
+  let uploadedBackdrop: BackdropFrame | undefined
   let uploadedArtwork: HTMLCanvasElement | undefined
   function upload(unit: number, source: HTMLCanvasElement) {
     gl.activeTexture(gl.TEXTURE0 + unit)
@@ -128,7 +130,11 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
       gl.bindTexture(gl.TEXTURE_2D, null)
       gl.viewport(0, 0, width, height)
       gl.useProgram(program)
-      if (!uploadedNeutral) {
+      if (props.backdrop && props.backdrop !== uploadedBackdrop) {
+        upload(0, props.backdrop.canvas)
+        upload(2, props.backdrop.tabBlur)
+        uploadedBackdrop = props.backdrop
+      } else if (!props.backdrop && !uploadedNeutral) {
         upload(0, neutralCanvas)
         upload(2, neutralCanvas)
         uploadedNeutral = true
@@ -138,9 +144,9 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
         uploadedArtwork = artwork
       }
       gl.uniform2f(uniforms.uCanvasSize, canvasWidth, canvasHeight)
-      gl.uniform2f(uniforms.uSceneSize, 1, 1)
-      gl.uniform2f(uniforms.uBarOrigin, 0, 0)
-      gl.uniform1f(uniforms.uSceneScale, 0)
+      gl.uniform2f(uniforms.uSceneSize, props.backdrop?.width ?? 1, props.backdrop?.height ?? 1)
+      gl.uniform2f(uniforms.uBarOrigin, props.origin.x, props.origin.y)
+      gl.uniform1f(uniforms.uSceneScale, props.backdrop ? 1 : 0)
       gl.uniform1f(uniforms.uBarWidth, props.width)
       gl.uniform1f(uniforms.uBarHeight, crossSize)
       gl.uniform1f(uniforms.uFirstCenter, props.firstCenter ?? 4 + props.itemWidth / 2)

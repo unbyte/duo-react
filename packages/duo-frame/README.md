@@ -357,8 +357,8 @@ It renders its measured regions only in the browser and supports React 16.8–19
 The controls sit on a rounded, blurred backdrop: the inner capsule encloses the
 clock and combined indicator, and the outer capsule includes the camera as well.
 The capsule has no fill or tint: uniform backgrounds retain their color, while
-nearby color boundaries are blurred. Without backdrop-filter support it remains
-transparent. The foreground stays sharp. The material follows display rotation and preview
+nearby color boundaries are blurred. Its canvas uses the shared app capture with
+a 12px blur. The foreground stays sharp. The material follows display rotation and preview
 zoom, and hides with `showSystemUI={false}`; the outer camera remains visible.
 The [calibration note](docs/calibration/status-controls.md#capsule-material) records
 the simulator references and estimated material parameters.
@@ -397,35 +397,34 @@ other display and the other indicator's setting. Reset restores provider
 defaults. Changing appearance does not resize or remount app content. Iframe
 owners can forward an explicit preference through their own message bridge.
 
-**Auto samples each control separately.** An SVG backdrop filter averages the rendered
-background around each control with a Gaussian blur, takes a small sample near its
-center, and expands it across the control. The blur uses a minimum 16px standard
-deviation on each axis to reduce sensitivity to small background details.
-Linear luminance below 0.18 selects white; otherwise it selects
-black. An SVG alpha mask supplies the clock, 3-in-1, or home indicator artwork,
-including antialiased edges and subdued cellular dots. Moving a dark block under
-only the 3-in-1 can turn it white while the clock remains black.
+**Auto samples each control separately from one shared image.** The frame captures
+the app surface with SnapDOM and shares that image with the system capsule and
+`DuoTabBar`. The clock, combined status glyph, and home indicator each use the
+average linear luminance within their own bounds. Dark backgrounds select white
+artwork; light backgrounds select black. Hysteresis thresholds of 0.169/0.189
+prevent small changes near equal contrast from repeatedly flipping colors.
+Explicit `light` and `dark` preferences bypass that choice. Charging accents
+retain their colors independently of the black/white artwork.
 
-This happens in the browser's rendering pipeline, without DOM screenshots,
-JavaScript pixel reads, observers, or polling. It sees the rendered backdrop,
-including the capsule blur. No app color-scheme setting is required or consulted.
-Explicit `light` and `dark` styles bypass the filter. Hidden status controls and
-their capsule are not rendered; an enabled Auto home indicator remains independent.
+A frame-local external store owns the completed image and derived results.
+The canvas renderers subscribe directly; React indicator components subscribe
+only to their resolved color. Captures do not update provider state or rerender
+the app. Each completed image supplies both materials, with separate 12px system
+and 6px tab-bar blur recipes. Lens animation reuses the latest textures.
 
-The sample is a center-weighted neighborhood average, not a uniform average of
-the control's bounds or a calibration of Apple's algorithm. Automatic flips are
-instantaneous, without hysteresis; the CSS 120ms color transition applies only
-between explicit black/white styles and respects reduced motion.
+DOM mutations, scrolling, input, resource loads, and resizing schedule captures.
+Requests coalesce with at most one capture in flight and starts at least 100ms
+apart. A 500ms refresh also covers CSSOM changes, canvas drawing, and iframe
+contents. Hidden documents do not schedule new captures. Glass overlays are
+excluded from capture and mutation observation to avoid feedback. Sampling uses
+logical display coordinates, before frame zoom and rotation.
 
-This experimental filter-and-mask combination passes focused checks in Chrome
-154.0.8037.93 for light/dark adaptation, status visibility, portrait locking, and
-same-origin iframe backdrops in the React 16 and React 19 demos. Cross-version
-parity, particularly at fractional zoom and with thin home-indicator masks, is
-not established. Other browser engines are not validated.
-CSS syntax detection cannot establish full SVG backdrop-filter
-support; use explicit styles where Auto does not render correctly. Browsers
-without backdrop-filter syntax support fall back to black. Provider state stores
-only the requested modes.
+Same-origin iframe capture preserves the live document's viewport and scroll.
+SnapDOM reconstructs the DOM rather than reading the browser compositor; external
+resources and cross-origin iframe content remain subject to capture limitations.
+A failed capture retains the last completed image and colors. Before the first
+capture, Auto uses black artwork and the tab bar uses its neutral backdrop.
+Provider state stores only the requested appearance modes.
 
 ### Safe area and iframe content
 
@@ -551,7 +550,8 @@ or drag the lens to expand it; holding the vertical rail also reveals labels.
 The bar respects reduced motion and defaults to the prototype's light material.
 Set `style={{ colorScheme: "dark" }}` to select its dark material.
 
-The renderer uses a neutral backdrop for now; it does not sample app content.
+The renderer consumes the frame's shared app capture for backdrop refraction.
+Its neutral backdrop is used only before the first completed capture.
 Self-contained SVG icons are uploaded as artwork. Other React icons remain DOM
 artwork over the same WebGL material. If WebGL is unavailable, the buttons stay
 usable without a replacement material. Keyboard and pointer selection remain

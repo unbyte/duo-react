@@ -1,4 +1,6 @@
 import * as React from "react"
+import { useBackdropStore } from "../../context/backdrop-context"
+import { backdropOrigin } from "../../backdrop/store"
 import { useLensMotion } from "./motion"
 import { createRenderer } from "./renderer"
 import { canvasPadding } from "./shaders"
@@ -23,6 +25,9 @@ export function GlassTabs({
   variant,
   dark = false,
 }: VariantProps & { variant: GlassVariant }) {
+  const backdrop = useBackdropStore()
+  const repaint = React.useRef<() => void>()
+  React.useEffect(() => backdrop.subscribe(() => repaint.current?.()), [backdrop])
   const root = React.useRef<HTMLDivElement>(null)
   const canvas = React.useRef<HTMLCanvasElement>(null)
   const renderer = React.useRef<ReturnType<typeof createRenderer>>()
@@ -135,12 +140,14 @@ export function GlassTabs({
   }, [items, rest.length, variant.vertical, generation])
 
   React.useEffect(() => {
-    const request = requestAnimationFrame(() => {
+    const draw = () => {
       if (!renderer.current || !artwork.current) return
       try {
         const drawn = renderer.current.draw(
           {
             ...optics,
+            backdrop: backdrop.getSnapshot().frame,
+            origin: backdropOrigin(root.current!),
             width: geometry.length,
             crossSize: geometry.cross,
             firstCenter: geometry.first,
@@ -161,9 +168,15 @@ export function GlassTabs({
       } catch {
         setReady(false)
       }
-    })
-    return () => cancelAnimationFrame(request)
+    }
+    repaint.current = draw
+    const request = requestAnimationFrame(draw)
+    return () => {
+      cancelAnimationFrame(request)
+      repaint.current = undefined
+    }
   }, [
+    backdrop,
     geometry,
     items.length,
     position,

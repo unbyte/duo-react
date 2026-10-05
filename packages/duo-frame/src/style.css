@@ -120,8 +120,6 @@
 .duo-status-material {
   position: absolute;
   border-radius: 999px;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
 }
 .duo-status {
   position: absolute;
@@ -142,21 +140,9 @@
 .duo-indicator svg {
   display: block;
 }
-.duo-indicator-defs {
-  position: absolute;
-}
-.duo-indicator-auto {
-  position: absolute;
-  inset: 0;
-}
 .duo-indicator-foreground {
   position: absolute;
   inset: 0;
-}
-@supports (backdrop-filter: url("#filter")) {
-  .duo-indicator-fixed[data-auto] {
-    visibility: hidden;
-  }
 }
 [data-duo-resolved-style] {
   transition: color 120ms ease-out;

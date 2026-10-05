@@ -287,6 +287,9 @@ importers:
 
   packages/duo-frame:
     dependencies:
+      '@zumer/snapdom':
+        specifier: ^3.2.0
+        version: 3.2.0
       use-sync-external-store:
         specifier: ^1.6.0
         version: 1.7.0(react@16.8.6)
@@ -1113,6 +1116,9 @@ packages:
 
   '@yuku-toolchain/types@0.9.5':
     resolution: {integrity: sha512-KiuLNNgX9uNealaWAR+G3/cMXnRk9x4TY2EkYe/KIag+UPdwiA0RRf1hr1WAxzTP8KGzCTkqUdLPvqh32sEO3w==}
+
+  '@zumer/snapdom@3.2.0':
+    resolution: {integrity: sha512-FVYVoH3XXJdgFfZo6VxEX6DZ5XWNlYypMynOLKKFTa0XEZBMOVSQBVDHO66uIcK9q7yuYMyyAb5/KaMYsHIuxg==}
 
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
@@ -2006,6 +2012,8 @@ snapshots:
     optional: true
 
   '@yuku-toolchain/types@0.9.5': {}
+
+  '@zumer/snapdom@3.2.0': {}
 
   ansi-regex@5.0.1: {}
 

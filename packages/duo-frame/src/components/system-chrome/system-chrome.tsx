@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useBackdropStore } from "../../context/backdrop-context"
 import { useDuoState } from "../../context/hooks"
 import { getSystemLayout, systemMetrics } from "../../core/layout/system"
 import type { DuoRect, DuoScreenInfo } from "../../core/types"
@@ -10,19 +11,50 @@ function boundsStyle(bounds: DuoRect) {
 }
 
 export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
+  const store = useBackdropStore()
+  const canvas = React.useRef<HTMLCanvasElement>(null)
+  const area = React.useMemo(() => getSystemLayout(screen).material, [screen])
+  React.useEffect(() => {
+    const draw = () => {
+      const frame = store.getSnapshot().frame
+      const output = canvas.current
+      if (!frame || !output) return
+      const scale = frame.canvas.width / frame.width
+      output.width = Math.ceil(area.width * scale)
+      output.height = Math.ceil(area.height * scale)
+      const context = output.getContext("2d")!
+      context.drawImage(
+        frame.statusBlur,
+        area.x * scale,
+        area.y * scale,
+        area.width * scale,
+        area.height * scale,
+        0,
+        0,
+        output.width,
+        output.height,
+      )
+    }
+    const unsubscribe = store.subscribe(draw)
+    draw()
+    return unsubscribe
+  }, [area, store])
   return (
-    <div className="duo-status-material" style={boundsStyle(getSystemLayout(screen).material)} />
+    <canvas
+      ref={canvas}
+      className="duo-status-material"
+      style={boundsStyle(area)}
+      aria-hidden="true"
+    />
   )
 }
 
 export function SystemChrome({
   screen,
   showIndicators,
-  scale,
 }: {
   screen: DuoScreenInfo
   showIndicators: boolean
-  scale: number
 }) {
   const {
     time,
@@ -53,7 +85,7 @@ export function SystemChrome({
             >
               <SystemIndicator
                 className="duo-status-time"
-                scale={scale}
+                sample="time"
                 appearance={appearance.statusBar}
                 width={systemMetrics.timeWidth}
                 height={systemMetrics.lineHeight}
@@ -94,7 +126,7 @@ export function SystemChrome({
                     />
                   ) : undefined
                 }
-                scale={scale}
+                sample="glyph"
                 appearance={appearance.statusBar}
                 width={systemMetrics.glyphWidth}
                 height={systemMetrics.glyphHeight}
@@ -119,7 +151,7 @@ export function SystemChrome({
           {homeIndicatorVisible && (
             <SystemIndicator
               className="duo-home"
-              scale={scale}
+              sample="home"
               appearance={appearance.homeIndicator}
               width={layout.home.width}
               height={layout.home.height}

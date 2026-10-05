@@ -1,3 +1,4 @@
+import type { BackdropFrame } from "../../backdrop/store"
 import type { CSSProperties } from "react"
 import type { DuoTabBarProps } from "./tab-bar"
 
@@ -27,6 +28,8 @@ export interface GlassVariant {
 }
 
 export interface GlassFrame {
+  readonly backdrop?: BackdropFrame
+  readonly origin: { readonly x: number; readonly y: number }
   readonly width: number
   readonly crossSize: number
   readonly firstCenter: number
