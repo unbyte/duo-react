@@ -1,7 +1,8 @@
 import type { DuoScreenInfo } from "../core/types"
 import { createIframeCapture } from "./iframe-capture"
 import { createCaptureScheduler } from "./scheduler"
-import { prepareBackdrop, type BackdropStore } from "./store"
+import { prepareBackdrop, type BackdropRequest, type BackdropStore } from "./store"
+import { paddedRegion } from "./regions"
 
 const excluded = ".duo-accessory-window, .duo-status-material, .duo-system"
 
@@ -12,6 +13,16 @@ export function observeBackdrop(
 ) {
   const scheduler = createCaptureScheduler(async () => {
     const screen = getScreen()
+    if (document.hidden || !screen.visible) return store.getSnapshot()
+    const requests = new Map<symbol, BackdropRequest>()
+    for (const [key, request] of store.getRequests()) {
+      const area = paddedRegion(request.area, request.blur * 3, screen.size)
+      if (area) requests.set(key, { ...request, area })
+    }
+    if (!requests.size) {
+      const previous = store.getSnapshot()
+      return previous.regions.size ? { ...previous, regions: new Map() } : previous
+    }
     const { snapdom } = await import("@zumer/snapdom")
     const canvas = await snapdom.toCanvas(source, {
       scale: 1,
@@ -22,8 +33,9 @@ export function observeBackdrop(
       invalidate: true,
       plugins: [createIframeCapture(snapdom)],
     })
-    return prepareBackdrop(canvas, screen, store.getSnapshot())
+    return prepareBackdrop(canvas, requests, store.getSnapshot())
   }, store.publish)
+  const unsubscribeRequests = store.subscribeRequests(() => scheduler.invalidate(true))
   function schedule() {
     if (!document.hidden) scheduler.invalidate()
   }
@@ -59,6 +71,7 @@ export function observeBackdrop(
     invalidate: () => scheduler.invalidate(true),
     dispose() {
       scheduler.stop()
+      unsubscribeRequests()
       observer.disconnect()
       resize.disconnect()
       clearInterval(refresh)

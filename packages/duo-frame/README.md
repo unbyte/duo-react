@@ -410,18 +410,26 @@ prevent small changes near equal contrast from repeatedly flipping colors.
 Explicit `light` and `dark` preferences bypass that choice. Charging accents
 retain their colors independently of the black/white artwork.
 
-A frame-local external store owns the completed image and derived results.
-The canvas renderers subscribe directly; React indicator components subscribe
-only to their resolved color. Captures do not update provider state or rerender
-the app. Each completed image supplies both materials, with separate 12px system
-and 6px tab-bar blur recipes. Lens animation reuses the latest textures.
+A frame-local external store owns the completed regions and derived colors.
+Consumers register their logical bounds; material regions include blur padding,
+and the tab region reserves the expanded lens and refraction area. One shared
+screen capture supplies every region. Unchanged pixels retain their previous
+result, skipping blur, canvas redraws, and WebGL texture uploads. Changed regions
+use separate 12px system and 6px tab-bar blur recipes. Lens animation reuses the
+latest regional textures.
+
+The canvas renderers subscribe directly to their own regions; React indicators
+subscribe only to their resolved color. Captures do not update provider state or
+rerender the app.
 
 DOM mutations, scrolling, input, resource loads, and resizing schedule captures.
-Requests coalesce with at most one capture in flight and starts at least 100ms
-apart. A 500ms refresh also covers CSSOM changes, canvas drawing, and iframe
-contents. Hidden documents do not schedule new captures. Glass overlays are
-excluded from capture and mutation observation to avoid feedback. Sampling uses
-logical display coordinates, before frame zoom and rotation.
+Requests coalesce with at most one capture in flight and starts at least 50ms
+apart, allowing up to 20 updates per second when content changes. A 500ms refresh
+also covers CSSOM changes, canvas drawing, and iframe contents. Hidden documents
+and inactive displays do not capture. Glass overlays are excluded from capture
+and mutation observation to avoid feedback. Sampling uses logical display
+coordinates, before frame zoom and rotation. DOM capture still covers the full
+display; region selection reduces subsequent processing and rendering work.
 
 Same-origin iframe capture preserves the live document's viewport and scroll.
 SnapDOM reconstructs the DOM rather than reading the browser compositor; external

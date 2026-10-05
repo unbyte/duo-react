@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useBackdropStore } from "../../context/backdrop-context"
+import { useBackdropRegion } from "../../backdrop/use-region"
 import { backdropOrigin } from "../../backdrop/store"
 import { useLensMotion } from "./motion"
 import { createRenderer } from "./renderer"
@@ -27,8 +28,28 @@ export function GlassTabs({
 }: VariantProps & { variant: GlassVariant }) {
   const backdrop = useBackdropStore()
   const repaint = React.useRef<() => void>()
-  React.useEffect(() => backdrop.subscribe(() => repaint.current?.()), [backdrop])
   const root = React.useRef<HTMLDivElement>(null)
+  const region = useBackdropRegion(() => {
+    const origin = backdropOrigin(root.current!.parentElement!)
+    const expanded = variant.geometry(1, 1, 0)
+    // Reserve the expanded platter, canvas overscan, and refraction reach once.
+    const padding = canvasPadding + 12
+    const width = variant.vertical ? expanded.cross : expanded.length
+    const height = variant.vertical ? expanded.length : expanded.cross
+    return {
+      area: {
+        x: origin.x - (variant.vertical ? (expanded.cross - variant.rest.cross) / 2 : 0) - padding,
+        y: origin.y - (variant.vertical ? expanded.length - variant.rest.length : 0) - padding,
+        width: width + padding * 2,
+        height: height + padding * 2,
+      },
+      blur: 6,
+    }
+  })
+  React.useEffect(
+    () => backdrop.subscribeRegion(region, () => repaint.current?.()),
+    [backdrop, region],
+  )
   const canvas = React.useRef<HTMLCanvasElement>(null)
   const renderer = React.useRef<ReturnType<typeof createRenderer>>()
   const artwork = React.useRef<HTMLCanvasElement>()
@@ -147,7 +168,7 @@ export function GlassTabs({
         const drawn = renderer.current.draw(
           {
             ...optics,
-            backdrop: backdrop.getSnapshot().frame,
+            backdrop: backdrop.getSnapshot().regions.get(region),
             origin: backdropOrigin(root.current!),
             width: geometry.length,
             crossSize: geometry.cross,
@@ -181,6 +202,7 @@ export function GlassTabs({
     }
   }, [
     backdrop,
+    region,
     geometry,
     items,
     position,

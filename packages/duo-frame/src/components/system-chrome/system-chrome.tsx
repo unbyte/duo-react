@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useBackdropRegion } from "../../backdrop/use-region"
 import { useBackdropStore } from "../../context/backdrop-context"
 import { useDuoState } from "../../context/hooks"
 import { getSystemLayout, systemMetrics } from "../../core/layout/system"
@@ -14,9 +15,10 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
   const store = useBackdropStore()
   const canvas = React.useRef<HTMLCanvasElement>(null)
   const area = React.useMemo(() => getSystemLayout(screen).material, [screen])
+  const region = useBackdropRegion(() => ({ area, blur: 12 }))
   React.useEffect(() => {
     const draw = () => {
-      const frame = store.getSnapshot().frame
+      const frame = store.getSnapshot().regions.get(region)
       const output = canvas.current
       if (!frame || !output) return
       const scale = frame.canvas.width / frame.width
@@ -24,9 +26,9 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
       output.height = Math.ceil(area.height * scale)
       const context = output.getContext("2d")!
       context.drawImage(
-        frame.statusBlur,
-        area.x * scale,
-        area.y * scale,
+        frame.blurred,
+        (area.x - frame.x) * scale,
+        (area.y - frame.y) * scale,
         area.width * scale,
         area.height * scale,
         0,
@@ -35,10 +37,10 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
         output.height,
       )
     }
-    const unsubscribe = store.subscribe(draw)
+    const unsubscribe = store.subscribeRegion(region, draw)
     draw()
     return unsubscribe
-  }, [area, store])
+  }, [area, store, region])
   return (
     <canvas
       ref={canvas}
@@ -86,6 +88,7 @@ export function SystemChrome({
               <SystemIndicator
                 className="duo-status-time"
                 sample="time"
+                area={layout.time}
                 appearance={appearance.statusBar}
                 width={systemMetrics.timeWidth}
                 height={systemMetrics.lineHeight}
@@ -127,6 +130,7 @@ export function SystemChrome({
                   ) : undefined
                 }
                 sample="glyph"
+                area={layout.glyph}
                 appearance={appearance.statusBar}
                 width={systemMetrics.glyphWidth}
                 height={systemMetrics.glyphHeight}
@@ -152,6 +156,7 @@ export function SystemChrome({
             <SystemIndicator
               className="duo-home"
               sample="home"
+              area={layout.home}
               appearance={appearance.homeIndicator}
               width={layout.home.width}
               height={layout.home.height}

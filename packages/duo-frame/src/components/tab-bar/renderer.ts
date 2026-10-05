@@ -1,5 +1,5 @@
 import { canvasPadding, glassShaders, vertex } from "./shaders"
-import type { BackdropFrame } from "../../backdrop/store"
+import type { BackdropRegion } from "../../backdrop/store"
 import type { GlassFrame } from "./shared"
 
 export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
@@ -90,7 +90,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
   neutralContext.fillStyle = "#ffffff"
   neutralContext.fillRect(0, 0, 1, 1)
   let uploadedNeutral = false
-  let uploadedBackdrop: BackdropFrame | undefined
+  let uploadedBackdrop: BackdropRegion | undefined
   let uploadedArtwork: HTMLCanvasElement | undefined
   const colorCanvas = document.createElement("canvas")
   colorCanvas.width = colorCanvas.height = 1
@@ -137,7 +137,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
       gl.useProgram(program)
       if (props.backdrop && props.backdrop !== uploadedBackdrop) {
         upload(0, props.backdrop.canvas)
-        upload(2, props.backdrop.tabBlur)
+        upload(2, props.backdrop.blurred)
         uploadedBackdrop = props.backdrop
       } else if (!props.backdrop && !uploadedNeutral) {
         upload(0, neutralCanvas)
@@ -150,7 +150,11 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
       }
       gl.uniform2f(uniforms.uCanvasSize, canvasWidth, canvasHeight)
       gl.uniform2f(uniforms.uSceneSize, props.backdrop?.width ?? 1, props.backdrop?.height ?? 1)
-      gl.uniform2f(uniforms.uBarOrigin, props.origin.x, props.origin.y)
+      gl.uniform2f(
+        uniforms.uBarOrigin,
+        props.origin.x - (props.backdrop?.x ?? 0),
+        props.origin.y - (props.backdrop?.y ?? 0),
+      )
       gl.uniform1f(uniforms.uSceneScale, props.backdrop ? 1 : 0)
       gl.uniform1f(uniforms.uBarWidth, props.width)
       gl.uniform1f(uniforms.uBarHeight, crossSize)

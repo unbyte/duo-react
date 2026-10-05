@@ -15,7 +15,7 @@ export function createCaptureScheduler<T>(capture: () => Promise<T>, publish: (v
       () => {
         void run()
       },
-      Math.max(0, 100 - (performance.now() - lastStart)),
+      Math.max(0, Math.ceil(1000 / 20 - (performance.now() - lastStart))),
     )
   }
   async function run() {

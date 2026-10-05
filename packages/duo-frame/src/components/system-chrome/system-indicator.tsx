@@ -2,13 +2,15 @@ import * as React from "react"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector"
 import { useBackdropStore } from "../../context/backdrop-context"
 import type { IndicatorSample } from "../../backdrop/store"
-import type { DuoIndicatorStyle } from "../../core/types"
+import { useBackdropRegion } from "../../backdrop/use-region"
+import type { DuoRect, DuoIndicatorStyle } from "../../core/types"
 
 export function SystemIndicator({
   width,
   height,
   appearance,
   sample,
+  area,
   className,
   style,
   children,
@@ -18,12 +20,14 @@ export function SystemIndicator({
   height: number
   appearance: DuoIndicatorStyle
   sample: IndicatorSample
+  area: DuoRect
   className: string
   style?: React.CSSProperties
   children: React.ReactNode
   foreground?: React.ReactNode
 }) {
   const store = useBackdropStore()
+  useBackdropRegion(() => ({ area, blur: 0, indicator: sample }))
   const resolved = useSyncExternalStoreWithSelector(
     store.subscribe,
     store.getSnapshot,

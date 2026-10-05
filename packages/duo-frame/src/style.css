@@ -145,7 +145,7 @@
   inset: 0;
 }
 [data-duo-resolved-style] {
-  transition: color 120ms ease-out;
+  transition: color 120ms ease-in-out;
 }
 [data-duo-resolved-style="light"] {
   color: #fff;

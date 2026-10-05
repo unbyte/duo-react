@@ -1,63 +1,84 @@
-import type { DuoRect, DuoScreenInfo } from "../core/types"
-import { getSystemLayout } from "../core/layout/system"
+import type { DuoRect } from "../core/types"
 import { chooseIndicatorStyle, type ResolvedIndicatorStyle } from "./contrast"
+import { samePixels, sameRect } from "./regions"
 
 export type IndicatorSample = "time" | "glyph" | "home"
-export interface BackdropFrame {
+export interface BackdropRequest {
+  readonly area: DuoRect
+  readonly blur: number
+  readonly indicator?: IndicatorSample
+}
+export interface BackdropRegion extends DuoRect {
+  readonly indicator?: IndicatorSample
   readonly canvas: HTMLCanvasElement
-  readonly tabBlur: HTMLCanvasElement
-  readonly statusBlur: HTMLCanvasElement
-  readonly width: number
-  readonly height: number
+  readonly blurred: HTMLCanvasElement
+  readonly pixels: Uint8ClampedArray
+  readonly blur: number
 }
 export interface BackdropSnapshot {
-  readonly frame?: BackdropFrame
+  readonly regions: ReadonlyMap<symbol, BackdropRegion>
   readonly colors: Readonly<Record<IndicatorSample, ResolvedIndicatorStyle>>
 }
 
-const initial: BackdropSnapshot = { colors: { time: "dark", glyph: "dark", home: "dark" } }
+const initial: BackdropSnapshot = {
+  regions: new Map(),
+  colors: { time: "dark", glyph: "dark", home: "dark" },
+}
 
 export function createBackdropStore() {
   let snapshot = initial
+  const requests = new Map<symbol, BackdropRequest>()
   const listeners = new Set<() => void>()
+  const requestListeners = new Set<() => void>()
+  function subscribe(listener: () => void) {
+    listeners.add(listener)
+    return () => {
+      listeners.delete(listener)
+    }
+  }
   return {
     getSnapshot: () => snapshot,
     getServerSnapshot: () => initial,
-    subscribe: (listener: () => void) => {
-      listeners.add(listener)
+    getRequests: () => new Map(requests),
+    request: (key: symbol, request: BackdropRequest) => {
+      const previous = requests.get(key)
+      if (
+        previous &&
+        sameRect(previous.area, request.area) &&
+        previous.blur === request.blur &&
+        previous.indicator === request.indicator
+      )
+        return
+      requests.set(key, request)
+      requestListeners.forEach((listener) => listener())
+    },
+    release: (key: symbol) => {
+      if (requests.delete(key)) requestListeners.forEach((listener) => listener())
+    },
+    subscribeRequests: (listener: () => void) => {
+      requestListeners.add(listener)
       return () => {
-        listeners.delete(listener)
+        requestListeners.delete(listener)
       }
     },
+    subscribe,
+    subscribeRegion: (key: symbol, listener: () => void) => {
+      let region = snapshot.regions.get(key)
+      return subscribe(() => {
+        const next = snapshot.regions.get(key)
+        if (next === region) return
+        region = next
+        listener()
+      })
+    },
     publish: (next: BackdropSnapshot) => {
+      if (next === snapshot) return
       snapshot = next
       listeners.forEach((listener) => listener())
     },
   }
 }
 export type BackdropStore = ReturnType<typeof createBackdropStore>
-
-export function sampleRect(
-  canvas: HTMLCanvasElement,
-  area: DuoRect,
-  width: number,
-  height: number,
-) {
-  const x = Math.max(0, Math.floor((area.x * canvas.width) / width))
-  const y = Math.max(0, Math.floor((area.y * canvas.height) / height))
-  const right = Math.min(canvas.width, Math.ceil(((area.x + area.width) * canvas.width) / width))
-  const bottom = Math.min(
-    canvas.height,
-    Math.ceil(((area.y + area.height) * canvas.height) / height),
-  )
-  if (right <= x || bottom <= y) return
-  const sample = document.createElement("canvas")
-  sample.width = right - x
-  sample.height = bottom - y
-  const context = sample.getContext("2d", { willReadFrequently: true })!
-  context.drawImage(canvas, x, y, sample.width, sample.height, 0, 0, sample.width, sample.height)
-  return context.getImageData(0, 0, sample.width, sample.height).data
-}
 
 async function blur(canvas: HTMLCanvasElement, radius: number) {
   const output = document.createElement("canvas")
@@ -106,22 +127,57 @@ async function blur(canvas: HTMLCanvasElement, radius: number) {
 
 export async function prepareBackdrop(
   canvas: HTMLCanvasElement,
-  screen: DuoScreenInfo,
+  requests: ReadonlyMap<symbol, BackdropRequest>,
   previous: BackdropSnapshot,
 ) {
-  const { width, height } = screen.size
-  const [tabBlur, statusBlur] = await Promise.all([
-    blur(canvas, (6 * canvas.width) / width),
-    blur(canvas, (12 * canvas.width) / width),
-  ])
-  const frame: BackdropFrame = { canvas, width, height, tabBlur, statusBlur }
-  const layout = getSystemLayout(screen)
+  // Read the shared image once; reading separate GPU-backed crops repeats the
+  // readback cost for every consumer, even when all of them are unchanged.
+  const source = canvas.getContext("2d", { willReadFrequently: true })!
+  const image = source.getImageData(0, 0, canvas.width, canvas.height)
+  const regions = new Map<symbol, BackdropRegion>()
   const colors = { ...previous.colors }
-  for (const key of ["time", "glyph", "home"] as const) {
-    const pixels = sampleRect(canvas, layout[key], width, height)
-    if (pixels) colors[key] = chooseIndicatorStyle(pixels, colors[key])
-  }
-  return { frame, colors }
+  let changed = requests.size !== previous.regions.size
+  await Promise.all(
+    Array.from(requests, async ([key, request]) => {
+      const { area } = request
+      const pixels = new Uint8ClampedArray(area.width * area.height * 4)
+      for (let y = 0; y < area.height; y++) {
+        const offset = ((area.y + y) * image.width + area.x) * 4
+        pixels.set(image.data.subarray(offset, offset + area.width * 4), y * area.width * 4)
+      }
+      const old = previous.regions.get(key)
+      if (
+        old &&
+        sameRect(old, area) &&
+        old.blur === request.blur &&
+        old.indicator === request.indicator &&
+        samePixels(old.pixels, pixels)
+      ) {
+        regions.set(key, old)
+        return
+      }
+      changed = true
+      const raw = document.createElement("canvas")
+      raw.width = area.width
+      raw.height = area.height
+      const context = raw.getContext("2d")!
+      const crop = context.createImageData(raw.width, raw.height)
+      crop.data.set(pixels)
+      context.putImageData(crop, 0, 0)
+      const blurred = request.blur ? await blur(raw, request.blur) : raw
+      regions.set(key, {
+        ...area,
+        canvas: raw,
+        blurred,
+        pixels,
+        blur: request.blur,
+        indicator: request.indicator,
+      })
+      if (request.indicator)
+        colors[request.indicator] = chooseIndicatorStyle(pixels, colors[request.indicator])
+    }),
+  )
+  return changed ? { regions, colors } : previous
 }
 
 /** Offset-parent coordinates exclude the frame's presentation zoom and rotation. */
