@@ -2,7 +2,6 @@ import * as React from "react"
 import { AccessoryContext } from "../../context/accessory-context"
 import { useDuoState } from "../../context/hooks"
 import { ScreenContext } from "../../context/screen-context"
-import { getAccessoryLayout } from "../../core/layout/accessories"
 import { orientationRotation } from "../../core/rotation"
 import { safeAreaStyle } from "../../core/safe-area"
 import type { DuoDisplay } from "../../core/types"
@@ -21,21 +20,12 @@ export function DisplaySurface({
   showSystemUI: boolean
 }) {
   const screen = useDuoState((state) => state.screens[display])
-  const [tabBar, setTabBar] = React.useState<HTMLDivElement>()
-  const [toolbar, setToolbar] = React.useState<HTMLDivElement>()
-  const attachTabBar = React.useCallback(
-    (node: HTMLDivElement | null) => setTabBar(node ?? undefined),
+  const [barHost, setBarHost] = React.useState<HTMLDivElement>()
+  const attachBarHost = React.useCallback(
+    (node: HTMLDivElement | null) => setBarHost(node ?? undefined),
     [],
   )
-  const attachToolbar = React.useCallback(
-    (node: HTMLDivElement | null) => setToolbar(node ?? undefined),
-    [],
-  )
-  const { side, toolbarEndInset, ...accessoryBounds } = React.useMemo(
-    () => getAccessoryLayout(screen),
-    [screen],
-  )
-  const accessoryHosts = React.useMemo(() => ({ tabBar, toolbar, side }), [tabBar, toolbar, side])
+  const accessoryHost = React.useMemo(() => ({ node: barHost }), [barHost])
   const bounds = screen.window
   return (
     <div
@@ -72,11 +62,13 @@ export function DisplaySurface({
           }}
         >
           <ScreenContext.Provider value={display}>
-            <AccessoryContext.Provider value={accessoryHosts}>{children}</AccessoryContext.Provider>
+            <AccessoryContext.Provider value={accessoryHost}>{children}</AccessoryContext.Provider>
           </ScreenContext.Provider>
         </div>
         <div
           className="duo-accessory-window"
+          data-duo-accessory-host=""
+          ref={attachBarHost}
           style={{
             left: bounds.x,
             top: bounds.y,
@@ -85,21 +77,7 @@ export function DisplaySurface({
             borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
             ...safeAreaStyle(screen.safeArea),
           }}
-        >
-          <div
-            className="duo-accessory-layout"
-            data-duo-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
-            style={accessoryBounds}
-          >
-            <div
-              className="duo-accessory-host"
-              data-duo-accessory-host="toolbar"
-              ref={attachToolbar}
-              style={{ marginRight: toolbarEndInset }}
-            />
-            <div className="duo-accessory-host" data-duo-accessory-host="tab" ref={attachTabBar} />
-          </div>
-        </div>
+        />
         {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
       </div>
       <SystemChrome screen={screen} showIndicators={showSystemUI} scale={scale} />

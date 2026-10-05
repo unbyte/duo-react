@@ -615,16 +615,11 @@ select {
 .demo-bar-area {
   pointer-events: none;
 }
-.demo-bars-layer[data-show-bounds="true"] .demo-bar-area {
+.demo-bars-layer[data-show-bounds="true"] .demo-bar-area,
+.demo-bar-area[data-show-bounds="true"] {
   outline: 1px dashed #0879ed;
   outline-offset: -1px;
   background: #0879ed0d;
-}
-.demo-tab-area {
-  gap: 8px;
-}
-.demo-tab-area > .demo-app-bar:last-child {
-  flex-shrink: 0;
 }
 .demo-app-bar {
   display: flex;

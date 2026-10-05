@@ -1,7 +1,8 @@
 import * as React from "react"
-import { Layers2 } from "lucide-react"
+import { Home, Layers2, Library, Settings } from "lucide-react"
 import {
   DuoFrame,
+  DuoTabBar,
   DuoRegionMask,
   DuoProvider,
   DuoSafeArea,
@@ -197,14 +198,29 @@ function SystemControls() {
   )
 }
 
-function ExampleApp({ showBlock, blockColor }: { showBlock: boolean; blockColor: string }) {
+const tabItems = [
+  { id: "home", icon: <Home />, label: "Home" },
+  { id: "library", icon: <Library />, label: "Library" },
+  { id: "settings", icon: <Settings />, label: "Settings" },
+]
+
+function ExampleApp({
+  showBlock,
+  blockColor,
+  selectedTab,
+}: {
+  showBlock: boolean
+  blockColor: string
+  selectedTab: string
+}) {
   const { display } = useDuoScreen()
   const [count, setCount] = React.useState(0)
   const [text, setText] = React.useState("")
   return (
     <DuoSafeArea className="demo-app">
       <div className="demo-content">
-        <h2>{display === "inner" ? "Inner screen" : "Outer screen"}</h2>
+        <h2>{tabItems.find((item) => item.id === selectedTab)?.label}</h2>
+        <p>{display === "inner" ? "Inner screen" : "Outer screen"}</p>
         <button type="button" onClick={() => setCount((value) => value + 1)}>
           Count: {count}
         </button>
@@ -228,7 +244,7 @@ interface BarSettings {
 
 const initialBarSettings: BarSettings = {
   toolbarsEnabled: false,
-  tabbarEnabled: false,
+  tabbarEnabled: true,
   toolbarCount: 1,
   toolbars: [
     { id: "A", placement: "top-trailing", axis: "adaptive" },
@@ -373,15 +389,17 @@ function ExampleBars({
   request,
   showBounds,
   onLayout,
+  selectedId,
+  onSelect,
 }: {
   request: BarsLayoutRequest
   showBounds: boolean
   onLayout: (layout: BarsLayout) => void
+  selectedId: string
+  onSelect: (id: string) => void
 }) {
   const bars = useBars(request)
-  const [tab, setTab] = React.useState(1)
   const [counts, setCounts] = React.useState<Readonly<Record<string, number>>>({})
-  const [searchActive, setSearchActive] = React.useState(false)
   React.useEffect(() => onLayout(bars), [bars, onLayout])
 
   return (
@@ -404,47 +422,15 @@ function ExampleBars({
         </div>
       ))}
       {bars.tabbar && (
-        <nav
-          {...bars.tabbar.containerProps}
-          className="demo-bar-area demo-tab-area"
+        <DuoTabBar
+          layout={bars.tabbar}
+          items={tabItems}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          className="demo-bar-area"
+          data-show-bounds={showBounds}
           data-demo-bar="tabs"
-          aria-label="App destinations"
-        >
-          <div className="demo-app-bar">
-            {[1, 2].map((value) => (
-              <button
-                type="button"
-                key={value}
-                aria-label={`Destination ${value}`}
-                aria-pressed={tab === value}
-                onClick={() => setTab(value)}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-          <div className="demo-app-bar">
-            <button
-              type="button"
-              aria-label="Search"
-              aria-pressed={searchActive}
-              onClick={() => setSearchActive((active) => !active)}
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                aria-hidden="true"
-              >
-                <circle cx="10" cy="10" r="6" />
-                <path d="m15 15 5 5" />
-              </svg>
-            </button>
-          </div>
-        </nav>
+        />
       )}
     </div>
   )
@@ -480,6 +466,7 @@ function PreviewFrame({ background, children }: { background: string; children: 
 }
 
 export function Demo() {
+  const [selectedTab, setSelectedTab] = React.useState("home")
   const [background, setBackground] = React.useState("#ffffff")
   const [showRegions, setShowRegions] = React.useState(false)
   const [barSettings, setBarSettings] = React.useState(initialBarSettings)
@@ -582,11 +569,17 @@ export function Demo() {
                   style={{ width: "100%", height: "100%" }}
                   aria-label="Duo layout preview"
                 >
-                  <ExampleApp showBlock={showBlock} blockColor={blockColor} />
+                  <ExampleApp
+                    showBlock={showBlock}
+                    blockColor={blockColor}
+                    selectedTab={selectedTab}
+                  />
                   <ExampleBars
                     request={request}
                     showBounds={barSettings.showBounds}
                     onLayout={setBarsLayout}
+                    selectedId={selectedTab}
+                    onSelect={setSelectedTab}
                   />
                 </DuoFrame>
                 {showRegions && <DuoRegionMask frameRef={frame} theme="light" />}

@@ -47,8 +47,10 @@ export { DuoLayoutControls } from "./components/toolbar/layout-controls"
 export { DuoZoomControls } from "./components/toolbar/zoom-controls"
 export type { DuoToolbarProps, DuoControlGroupProps } from "./components/toolbar/types"
 
-export { DuoTabBar, DuoAppToolbar } from "./components/accessories/bars"
+export { DuoAppToolbar } from "./components/accessories/bars"
 export type { DuoBarProps } from "./components/accessories/bars"
+export { DuoTabBar } from "./components/tab-bar/tab-bar"
+export type { DuoTabBarItem, DuoTabBarProps } from "./components/tab-bar/tab-bar"
 
 export { DuoRegionMask } from "./components/region-mask/region-mask"
 export type { DuoRegionMaskProps } from "./components/region-mask/region-mask"

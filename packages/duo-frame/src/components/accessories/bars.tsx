@@ -1,43 +1,35 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { useAccessoryHosts } from "../../context/accessory-context"
+import { useAccessoryHost } from "../../context/accessory-context"
+import { useDuoScreen } from "../../context/hooks"
+import { getAccessoryLayout } from "../../core/layout/accessories"
 
 export type DuoBarProps = React.HTMLAttributes<HTMLDivElement>
 
-function Bar({
-  kind,
-  forwardedRef,
-  className,
-  ...props
-}: DuoBarProps & {
-  kind: "tabBar" | "toolbar"
-  forwardedRef: React.ForwardedRef<HTMLDivElement>
-}) {
-  const hosts = useAccessoryHosts()
-  const host = hosts[kind]
+export const DuoAppToolbar = React.forwardRef<HTMLDivElement, DuoBarProps>(function DuoAppToolbar(
+  { className, ...props },
+  ref,
+) {
+  const host = useAccessoryHost()
+  const screen = useDuoScreen()
+  const { side, toolbarEndInset, ...bounds } = getAccessoryLayout(screen)
   if (!host) return null
-  const placement =
-    hosts.side === "horizontal" ? (kind === "tabBar" ? "bottom" : "top") : hosts.side
   return createPortal(
     <div
-      {...props}
-      ref={forwardedRef}
-      className={["duo-app-bar", className].filter(Boolean).join(" ")}
-      data-duo-bar={kind === "tabBar" ? "tab" : "toolbar"}
-      data-duo-bar-placement={placement}
-    />,
+      className="duo-accessory-layout"
+      data-duo-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
+      style={bounds}
+    >
+      <div className="duo-accessory-toolbar" style={{ marginRight: toolbarEndInset }}>
+        <div
+          {...props}
+          ref={ref}
+          className={["duo-app-bar", className].filter(Boolean).join(" ")}
+          data-duo-bar="toolbar"
+          data-duo-bar-placement={side === "horizontal" ? "top" : side}
+        />
+      </div>
+    </div>,
     host,
   )
-}
-
-export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoBarProps>(
-  function DuoTabBar(props, ref) {
-    return <Bar {...props} kind="tabBar" forwardedRef={ref} />
-  },
-)
-
-export const DuoAppToolbar = React.forwardRef<HTMLDivElement, DuoBarProps>(
-  function DuoAppToolbar(props, ref) {
-    return <Bar {...props} kind="toolbar" forwardedRef={ref} />
-  },
-)
+})

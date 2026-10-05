@@ -194,21 +194,13 @@
   gap: 16px;
   min-height: 0;
 }
-.duo-accessory-host {
+.duo-accessory-toolbar {
   display: flex;
   flex: 0 1 auto;
   min-height: 0;
   max-width: 100%;
 }
-.duo-accessory-host:empty {
-  display: none;
-}
-.duo-accessory-host[data-duo-accessory-host="tab"] {
-  margin-top: auto;
-  justify-content: center;
-}
-.duo-accessory-layout[data-duo-bar-axis="horizontal"]
-  .duo-accessory-host[data-duo-accessory-host="toolbar"] {
+.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-accessory-toolbar {
   justify-content: flex-end;
 }
 :where(.duo-app-bar) {
@@ -229,6 +221,73 @@
 }
 :where(.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-app-bar) {
   flex-direction: row;
+}
+
+.duo-tab-bar {
+  pointer-events: none;
+}
+.duo-tab-bar-surface {
+  display: flex;
+  flex-direction: inherit;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: 2px;
+  border-radius: 28px;
+  background: #f0f3f8;
+  color: #25313e;
+  pointer-events: auto;
+}
+.duo-tab-bar-item {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 72px;
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 4px;
+  border: 0;
+  border-radius: 24px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.duo-tab-bar[data-duo-bar-axis="vertical"] .duo-tab-bar-item {
+  width: 44px;
+}
+.duo-tab-bar-item[aria-current="page"] {
+  color: #0879ed;
+  background: #dcecff;
+}
+.duo-tab-bar-item:focus-visible {
+  outline: 2px solid #0879ed;
+  outline-offset: -2px;
+}
+.duo-tab-bar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+.duo-tab-bar-icon > svg {
+  width: 100%;
+  height: 100%;
+}
+.duo-tab-bar-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  line-height: 12px;
 }
 
 .duo-region-mask {

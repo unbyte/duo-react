@@ -502,76 +502,78 @@ not coordinate. Content size, visuals, overflow, navigation, and menus remain
 the app's responsibility; bars do not change content safe areas.
 
 The demos' app bar controls use this hook. The [bars design](docs/bars.md) specifies
-allocation rules, numeric defaults, and geometric fallbacks. Native styled bar
-components remain separate work.
+allocation rules, numeric defaults, and geometric fallbacks. A definite `tabbar`
+request returns a definite tab-bar layout; conditional requests retain an optional
+result. Exhausted space throws rather than silently omitting a requested bar.
 
-### Portal bar helpers
+### Tab bar
 
-`DuoTabBar` and `DuoAppToolbar` position caller-provided content within a frame's
-children. `DuoAppToolbar` is the in-app action bar;
-`DuoToolbar` controls the device preview. The positioning helpers do not implement
-navigation, tab selection, menus, or iOS visual styling.
+`DuoTabBar` renders an array of destinations with icons, labels, and controlled
+selection. Declare it anywhere within `DuoFrame` children and pass the tab-bar
+layout from the same `useBars` request as your other bars.
 
 ```tsx
-import { DuoTabBar, DuoAppToolbar } from "duo-frame"
+import * as React from "react"
+import { DuoTabBar, useBars } from "duo-frame"
 
 function App() {
+  const [selectedId, setSelectedId] = React.useState("home")
+  const bars = useBars({ tabbar: { distribution: "packed" } })
+
   return (
     <>
-      <YourContent />
-      <DuoAppToolbar className="app-actions" aria-label="Document actions">
-        <button onClick={createDocument}>New</button>
-      </DuoAppToolbar>
-      <DuoTabBar className="app-tabs" aria-label="Destinations">
-        <YourNavigation />
-      </DuoTabBar>
+      <YourContent destination={selectedId} />
+      <DuoTabBar
+        layout={bars.tabbar}
+        items={[
+          { id: "home", icon: <HomeIcon />, label: "Home" },
+          { id: "library", icon: <LibraryIcon />, label: "Library" },
+        ]}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+      />
     </>
   )
 }
 ```
 
-Mount this app as the frame’s `children`. Use one of each helper, or omit either.
-They accept standard div attributes, `style`,
-`className`, and a forwarded div ref. Supply the appropriate navigation or tab
-semantics on your children; the helpers do not impose ARIA tab behavior.
+Items have unique, non-empty string IDs, string labels, and React-node icons.
+`onSelect(id)` runs on pointer or keyboard activation, including reactivation of
+the selected destination. The app owns navigation and updates `selectedId`.
+The bar provides native buttons, an accessible navigation region, and
+`aria-current="page"` on the selected destination.
 
-On the side, the toolbar grows downward below system controls and the tab bar
-grows upward from the bottom. Split-left uses the left edge, split-right uses
-the right, and full-display placement follows the measured side inset. Inner
-portrait, including upside-down portrait, places the toolbar horizontally at the
-top and the tab bar horizontally at the bottom. RTL text does not swap hardware
-edges. These rules follow [Apple's Duo guidance](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo#Vertical-controls).
+The component accepts standard div attributes except `children` and the DOM
+`onSelect` event, plus a forwarded div ref. Appearance styles can be supplied,
+but the resolved layout owns positioning styles. Its basic capsule follows the
+resolved axis and scrolls when items exceed the allocation. Split visuals,
+detached actions, minimization, and overflow menus are not implemented yet.
 
-The frame provides private, stable portal hosts, so app scrolling and nested
-positioned ancestors do not move the bars. Children keep their React context and
-state across display, orientation, placement, and zoom changes. CSS inheritance
-follows the frame host rather than the original DOM ancestry; put appearance styles on
-the helper or its children. Both bars scale in logical pixels with the app.
-Helpers cannot run inside an iframe's separate React tree; mount them beside the
-iframe in the frame's React content instead.
+The frame owns one stable portal host covering the app window. Tab bars and
+toolbar helpers mount into that shared div and position their own content.
+App scrolling and nested positioned ancestors do not move the bars. Portal
+children retain React context and state across display, orientation, placement,
+and zoom changes. CSS inheritance follows the frame host; place theme variables
+on the frame or styles on the bar. Bars overlay content without changing the
+calibrated safe area, so the app owns content clearance.
 
-Side bars use a 48px-wide column inset 24px from the display edge. Full-window
-outer portrait and inner landscape use a 24px bottom inset, measured on the
-iOS 27.1 Duo simulator. Their toolbars start at the status reservation boundary:
-170px on outer portrait and 120px on inner landscape. The 84px content safe inset
-remains unchanged. Split placement and outer-landscape bottom offsets retain
-their provisional defaults; the split-left toolbar starts at 24px from the top.
+### Toolbar portal helper
 
-Inner portrait places the toolbar at y = 24, aligned to the right of the top
-area available before the status reservation. That area runs from x = 20 to
-x = 535 in the 669px window. The tab bar is centered separately, 21px above the
-window bottom. These positioning offsets do not impose native group sizes or
-reproduce configurations that spread one toolbar across multiple screen edges.
-Group gaps retain their provisional 16px default. Reserved regions and
-the rendered status bounds constrain available space. Bars share that space and
-scroll when their content exceeds it; there is no automatic overflow menu or
-minimization. They overlay app content and do not change the provider's calibrated
-safe area. Keep your content clear of your chosen bar dimensions.
+`DuoAppToolbar` remains a positioning wrapper for caller-provided actions, with
+standard div attributes and a forwarded div ref. It uses the shared portal host
+and its existing automatic accessory placement. `DuoToolbar` is the separate
+preview-control container.
 
-Use `[data-duo-bar-placement="left" | "right" | "top" | "bottom"]` to adapt your
-styles. The helper uses a column on the side and a row in portrait; your own
-nested navigation container may also need to change its direction. These helpers
-use their own portal layout and do not participate in `useBars` allocations.
+```tsx
+<DuoAppToolbar className="app-actions" aria-label="Document actions">
+  <button onClick={createDocument}>New</button>
+</DuoAppToolbar>
+```
+
+This helper does not participate in `useBars` allocations. When toolbars must
+share space with `DuoTabBar`, resolve them together with `useBars` and render the
+custom toolbars in an app-window positioning layer, as shown above. The demo
+uses this coordinated approach.
 
 ### Zoom ownership
 

@@ -2,6 +2,7 @@ import * as React from "react"
 import { renderToString } from "react-dom/server"
 import { expect, test } from "vite-plus/test"
 import { getDuoGeometry } from "../src/core/geometry"
+import { getBarsLayout } from "../src/core/layout/bars"
 import { getAccessoryLayout } from "../src/core/layout/accessories"
 import { getSystemLayout } from "../src/core/layout/system"
 import { createDuoStore } from "../src/core/store"
@@ -74,10 +75,14 @@ test("outer bars leave room for status and the camera at either end", () => {
 })
 
 test("helpers require a frame surface and server rendering defers portals", () => {
+  const screen = createDuoStore().getSnapshot().screens.inner
+  const layout = getBarsLayout(screen, { tabbar: {} }).tabbar!
+  const items = [{ id: "home", label: "Home", icon: <span>H</span> }]
+  const onSelect = () => {}
   expect(() =>
     renderToString(
       <DuoProvider>
-        <DuoTabBar />
+        <DuoTabBar layout={layout} items={items} selectedId="home" onSelect={onSelect} />
       </DuoProvider>,
     ),
   ).toThrow("inside DuoFrame")
@@ -91,14 +96,12 @@ test("helpers require a frame surface and server rendering defers portals", () =
   const html = renderToString(
     <DuoProvider>
       <DuoFrame>
-        <DuoTabBar>
-          <button>Home</button>
-        </DuoTabBar>
+        <DuoTabBar layout={layout} items={items} selectedId="home" onSelect={onSelect} />
         <DuoAppToolbar />
       </DuoFrame>
     </DuoProvider>,
   )
-  expect(html).toContain('data-duo-accessory-host="tab"')
+  expect(html.match(/data-duo-accessory-host=""/g)).toHaveLength(1)
   expect(html).not.toContain("Home")
 })
 
@@ -123,4 +126,25 @@ test("inner landscape bars and status share the reference axis without doubling 
       }
     }
   }
+})
+
+test("tab items require stable unique IDs before mounting", () => {
+  const screen = createDuoStore().getSnapshot().screens.inner
+  const layout = getBarsLayout(screen, { tabbar: {} }).tabbar!
+  const render = (ids: string[]) =>
+    renderToString(
+      <DuoProvider>
+        <DuoFrame>
+          <DuoTabBar
+            layout={layout}
+            items={ids.map((id) => ({ id, label: "Home", icon: <span>H</span> }))}
+            selectedId="home"
+            onSelect={() => {}}
+          />
+        </DuoFrame>
+      </DuoProvider>,
+    )
+  expect(() => render(["home", "home"])).toThrow('duplicate item id "home"')
+  expect(() => render([" "])).toThrow("non-empty id")
+  expect(() => render([])).not.toThrow()
 })
