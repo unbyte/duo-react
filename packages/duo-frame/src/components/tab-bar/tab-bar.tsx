@@ -1,6 +1,8 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useAccessoryHost } from "../../context/accessory-context"
+import { HorizontalTabBar } from "./horizontal"
+import { VerticalTabBar } from "./vertical"
 import type { ResolvedBarLayout } from "../../core/bar-types"
 
 export interface DuoTabBarItem {
@@ -25,6 +27,7 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
   ref,
 ) {
   const host = useAccessoryHost()
+  const dark = style?.colorScheme === "dark"
   const ids = new Set<string>()
   for (const item of items) {
     if (!item.id.trim()) throw new Error("DuoTabBar: each item needs a non-empty id.")
@@ -44,24 +47,23 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
       className={["duo-tab-bar", className].filter(Boolean).join(" ")}
       style={{ ...style, ...layout.containerProps.style }}
     >
-      <div className="duo-tab-bar-surface">
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className="duo-tab-bar-item"
-            aria-current={item.id === selectedId ? "page" : undefined}
-            aria-label={item.label}
-            title={item.label}
-            onClick={() => onSelect(item.id)}
-          >
-            <span className="duo-tab-bar-icon" aria-hidden="true">
-              {item.icon}
-            </span>
-            <span className="duo-tab-bar-label">{item.label}</span>
-          </button>
-        ))}
-      </div>
+      {layout.axis === "vertical" ? (
+        <VerticalTabBar
+          dark={dark}
+          items={items}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          layout={layout}
+        />
+      ) : (
+        <HorizontalTabBar
+          dark={dark}
+          items={items}
+          selectedId={selectedId}
+          onSelect={onSelect}
+          layout={layout}
+        />
+      )}
     </div>,
     host,
   )

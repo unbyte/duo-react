@@ -193,7 +193,9 @@ export function getBarsLayout(screen: DuoScreenInfo, request: BarsLayoutRequest)
         ? profile.sectionGap
         : profile.groupGap
     })
-    const tabGap = request.tabbar && sideBars.length ? profile.sectionGap : 0
+    const tabGap = request.tabbar
+      ? profile.tabExpansion + (sideBars.length ? profile.sectionGap : 0)
+      : 0
     const count = sideBars.length + (request.tabbar ? 1 : 0)
     const height = (area.height - gaps.reduce<number>((sum, gap) => sum + gap, tabGap)) / count
     let y = area.y

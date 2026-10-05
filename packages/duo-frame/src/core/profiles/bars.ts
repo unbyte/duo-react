@@ -13,6 +13,8 @@ export const barProfile = {
   edgeTabBottom: 28,
   groupGap: 12,
   sectionGap: 16,
+  // Held tab clearance for the calibrated two-to-five-item presentations.
+  tabExpansion: 64,
   railWidth: sideControlMetrics.width,
   railInset: sideControlMetrics.edgeInset,
   railTop: sideControlMetrics.innerTop,

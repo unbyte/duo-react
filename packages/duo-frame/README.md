@@ -545,15 +545,33 @@ The bar provides native buttons, an accessible navigation region, and
 
 The component accepts standard div attributes except `children` and the DOM
 `onSelect` event, plus a forwarded div ref. Appearance styles can be supplied,
-but the resolved layout owns positioning styles. Its basic capsule follows the
-resolved axis and scrolls when items exceed the allocation. Split visuals,
-detached actions, minimization, and overflow menus are not implemented yet.
+but the resolved layout owns positioning styles. Private horizontal and vertical
+variants share a WebGL glass renderer, spring motion, and artwork loading. Hold
+or drag the lens to expand it; holding the vertical rail also reveals labels.
+The bar respects reduced motion and defaults to the prototype's light material.
+Set `style={{ colorScheme: "dark" }}` to select its dark material.
+
+The renderer uses a neutral backdrop for now; it does not sample app content.
+Self-contained SVG icons are uploaded as artwork. Other React icons remain DOM
+artwork over the same WebGL material. If WebGL is unavailable, the buttons stay
+usable without a replacement material. Keyboard and pointer selection remain
+available.
+
+Resting horizontal bars are 62px high, with measured widths of 188/274/400/400px
+for two through five items. Vertical bars are 48px wide, with lengths of
+112/162/212/262px. The component does not compress, scroll, or choose an overflow
+presentation. Developers own fitting their items into the available space. The expanded
+vertical rail keeps the same center axis and bottom edge; `useBars` reserves
+64px above its allocation for platter growth and lens travel, in addition to
+the normal 16px toolbar gap. This is an interaction clearance policy, not a new
+native resting inset. Detached actions, minimization, and overflow menus remain
+outside this implementation.
 
 The frame owns one stable portal host covering the app window. Tab bars and
 toolbar helpers mount into that shared div and position their own content.
 App scrolling and nested positioned ancestors do not move the bars. Portal
-children retain React context and state across display, orientation, placement,
-and zoom changes. CSS inheritance follows the frame host; place theme variables
+children retain React context; the controlled selection survives display,
+orientation, placement, and zoom changes. Switching axes resets the lens gesture. CSS inheritance follows the frame host; place theme variables
 on the frame or styles on the bar. Bars overlay content without changing the
 calibrated safe area, so the app owns content clearance.
 

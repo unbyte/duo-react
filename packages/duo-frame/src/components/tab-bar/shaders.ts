@@ -1,0 +1,325 @@
+const artworkMagnification = 1.22
+export const canvasPadding = 24
+const outerRefractionReach = 3
+const outerRefractionProfileWidth = 2
+
+export const vertex = `#version 300 es
+precision highp float;
+out vec2 uv;
+void main() {
+  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+  uv = vec2(p.x, 1.0 - p.y);
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+}`
+
+const lensGeometry = `
+float lensRadius() {
+  return min(uLensSize.x, uLensSize.y) * .5 * (1.0 - .16 * uVertical * uLabels);
+}
+float lensShape(vec2 p) {
+  float radius = lensRadius();
+  vec2 q = abs(p) - (uLensSize * .5 - vec2(radius));
+  return length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - radius;
+}
+vec2 screenPoint(vec2 p) { return uVertical > .5 ? p.yx : p; }
+`
+
+const fragment = `#version 300 es
+precision highp float;
+in vec2 uv;
+out vec4 outColor;
+uniform sampler2D uBackdrop;
+uniform sampler2D uArtwork;
+uniform sampler2D uBlurredBackdrop;
+uniform vec2 uCanvasSize;
+uniform vec2 uSceneSize;
+uniform vec2 uBarOrigin;
+uniform float uSceneScale;
+uniform float uBarWidth;
+uniform float uBarHeight;
+uniform float uVertical;
+uniform float uFirstCenter;
+uniform float uLabels;
+uniform float uPitch;
+uniform float uCount;
+uniform vec2 uLensSize;
+uniform float uLensX;
+uniform float uGrowth;
+uniform float uDispersion;
+uniform float uRimDistortion;
+uniform float uContainerInset;
+uniform float uEdgeCurlWidth;
+uniform float uEdgeCurlStrength;
+uniform float uDark;
+uniform vec3 uAccent;
+uniform float uPixel;
+
+float capsule(vec2 p, vec2 size) {
+  float radius = min(size.x, size.y) * 0.5;
+  vec2 q = abs(p) - max(size * .5 - vec2(radius), vec2(0.0));
+  return length(max(q, vec2(0.0))) - radius;
+}
+float railShape(vec2 p) {
+  float original = capsule(p, vec2(uBarWidth, uBarHeight));
+  float raised = uVertical * uLabels;
+  if (raised <= 0.0) return original;
+  float radius = uBarHeight * .5;
+  vec2 q = vec2(max(abs(p.x) - (uBarWidth * .5 - radius), 0.0), abs(p.y));
+  float norm = pow(pow(q.x, 2.5) + pow(q.y, 2.5), 1.0 / 2.5);
+  vec2 gradient = pow(q / max(norm, .001), vec2(1.5));
+  return mix(original, (norm - radius) / max(length(gradient), .8), raised);
+}
+${lensGeometry}
+float coverage(float distance) {
+  float aa = max(uPixel, fwidth(distance));
+  return 1.0 - smoothstep(-aa * .5, aa * .5, distance);
+}
+float lensShadow(vec2 p) {
+  // One lens-owned projection for every receiving surface, including the page
+  // beyond the platter. The clear center transmits more light than the bevel.
+  vec2 projected = p - vec2(uLensX, uBarHeight * .5) - screenPoint(vec2(0.0, 3.0 * uGrowth));
+  float distance = lensShape(projected) + 2.0 * uGrowth;
+  float upperWeight = mix(.30, 1.0, clamp(-screenPoint(projected).y / 35.0, 0.0, 1.0));
+  float innerShade = .065 * exp(-pow((distance + 7.0) / 4.5, 2.0)) * upperWeight;
+  float outerShade = .045 * exp(-.5 * pow(max(distance, 0.0) / 3.0, 2.0)) * smoothstep(-6.0, -1.0, distance);
+  return uGrowth * (innerShade + outerShade);
+}
+vec3 background(vec2 p) {
+  vec2 coord = (uBarOrigin + screenPoint(p) * uSceneScale) / uSceneSize;
+  return texture(uBackdrop, coord).rgb;
+}
+vec3 blurBackground(vec2 p) {
+  return texture(uBlurredBackdrop, (uBarOrigin + screenPoint(p) * uSceneScale) / uSceneSize).rgb;
+}
+vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float insetWeight) {
+  vec3 bg = background(p);
+  // Evaluate the rail contour independently of texture warping.
+  float lensDepth = -lensShape(outlinePoint - vec2(uLensX, (uBarHeight * .5)));
+  // Join the original edge at the rim, then keep a constant inset in the middle.
+  float contourJoin = smoothstep(0.0, 8.0, lensDepth);
+  float inset = uContainerInset * uGrowth * contourJoin * selected * insetWeight;
+  float sd = railShape(outlinePoint - vec2(uBarWidth * .5, uBarHeight * .5)) + inset;
+  float inside = mix(coverage(sd), 1.0 - smoothstep(-1.6, 1.6, sd), selected * uGrowth);
+  vec3 glass = blurBackground(p);
+  float luma = dot(glass, vec3(.2126, .7152, .0722));
+  glass = mix(vec3(luma), glass, 1.12);
+  // Appearance comes only from the simulated system scheme. The scene still
+  // transmits through the material, but cannot switch its light/dark recipe.
+  vec3 lightGlass = mix(glass, vec3(.98), .26);
+  vec3 darkGlass = glass * .50 + vec3(.126 + .076 * uGrowth);
+  glass = mix(lightGlass, darkGlass, uDark);
+  glass += vec3((.5 - clamp(p.y / uBarHeight, 0.0, 1.0)) * .025 * uDark);
+  // One fixed surface recipe: a soft inner highlight, a shallow inner shadow,
+  // and a fine contour whose light/dark balance follows surface direction.
+  vec2 surfacePoint = outlinePoint - vec2(uBarWidth * .5, (uBarHeight * .5));
+  vec2 surfaceGradient = surfacePoint - vec2(clamp(surfacePoint.x, -uBarWidth * .5 + (uBarHeight * .5), uBarWidth * .5 - (uBarHeight * .5)), 0.0);
+  vec2 surfaceNormal = surfaceGradient / max(length(surfaceGradient), .001);
+  if (uVertical * uLabels > 0.0) {
+    vec2 raisedGradient = sign(surfaceGradient) * pow(abs(surfaceGradient), vec2(1.5));
+    vec2 raisedNormal = raisedGradient / max(length(raisedGradient), .001);
+    surfaceNormal = normalize(mix(surfaceNormal, raisedNormal, uLabels) + vec2(.000001));
+  }
+  float depth = max(-sd, 0.0);
+  float verticalLight = pow(abs(screenPoint(surfaceNormal).y), 4.0);
+  float innerLight = exp(-depth / 7.0) * (.035 + .065 * verticalLight) * mix(.30, 1.0, uDark);
+  glass = mix(glass, vec3(1.0), innerLight);
+  glass *= 1.0 - mix(.010, .055, uDark) * exp(-pow((depth - 9.0) / 7.0, 2.0));
+  float border = exp(-abs(sd) * 3.0);
+  float wingContrast = 1.0 + .12 * uVertical * selected * uGrowth * insetWeight * pow(abs(surfaceNormal.y), 4.0);
+  glass *= 1.0 - border * .22 * (1.0 - verticalLight) * wingContrast;
+  glass = mix(glass, vec3(1.0), border * .28 * verticalLight);
+  // A fixed fine contour keeps the edge readable on white without requiring
+  // access to arbitrary DOM or iframe pixels behind an eventual host canvas.
+  float keyline = exp(-pow((sd + .45) / .45, 2.0));
+  glass *= 1.0 - keyline * .10 * wingContrast;
+  vec3 c = mix(bg, glass, inside);
+  // Apply the lens wash to the material before compositing artwork; otherwise
+  // the stronger resting wash makes the resting icon brighter than the held one.
+  c = mix(c, mix(vec3(.20), vec3(.9 * uGrowth), uDark), selected * mix(mix(.065, .74, uDark), mix(.008, .012, uDark), uGrowth));
+  c *= 1.0 - lensShadow(outlinePoint);
+  float ink = 0.0;
+  if (uVertical > .5) {
+    // Derive the filter footprint before clipping or jumping between atlas cells.
+    vec2 atlasSize = vec2(uCount * 80.0, 96.0);
+    vec2 atlasDx = dFdx(artPoint.yx) / atlasSize;
+    vec2 atlasDy = dFdy(artPoint.yx) / atlasSize;
+    float item = clamp(floor((artPoint.x - uFirstCenter) / uPitch + .5), 0.0, uCount - 1.0);
+    vec2 local = vec2(artPoint.y - uBarHeight * .5, artPoint.x - (uFirstCenter + item * uPitch));
+    float atlasX = item * 80.0 + 40.0 + local.x;
+    float iconY = 24.0 + local.y + 9.5 * uLabels;
+    float labelY = 72.0 + local.y - 14.0;
+    if (abs(local.x) < 40.0 && iconY >= 0.0 && iconY < 48.0)
+      ink = textureGrad(uArtwork, vec2(atlasX, iconY) / atlasSize, atlasDx, atlasDy).a;
+    if (abs(local.x) < 40.0 && labelY >= 48.0 && labelY < 96.0)
+      ink = max(ink, textureGrad(uArtwork, vec2(atlasX, labelY) / atlasSize, atlasDx, atlasDy).a * uLabels);
+  } else if (artPoint.x >= 0.0 && artPoint.x <= uBarWidth && artPoint.y >= 0.0 && artPoint.y <= uBarHeight) {
+    ink = texture(uArtwork, artPoint / vec2(uBarWidth, uBarHeight)).a;
+  }
+  vec3 foreground = mix(vec3(.063, .098, .063), vec3(.957, .965, .937), uDark);
+  vec3 tint = mix(uAccent * mix(vec3(1.0), c, .08), uAccent, uDark);
+  tint = min(vec3(1.0), tint * (1.0 + .12 * uGrowth * selected));
+  return mix(c, mix(foreground, tint, selected), ink);
+}
+
+void main() {
+  vec2 p = screenPoint(uv * uCanvasSize - vec2(${canvasPadding.toFixed(1)}));
+  vec2 center = vec2(uLensX, (uBarHeight * .5));
+  vec2 d = p - center;
+  float barDistance = railShape(p - vec2(uBarWidth * .5, uBarHeight * .5));
+  float lensDistance = lensShape(d);
+  float barMask = coverage(barDistance);
+  float lensMask = coverage(lensDistance);
+  float surfaceAlpha = max(barMask, lensMask);
+  float shadow = lensShadow(p);
+  float alpha = surfaceAlpha + shadow * (1.0 - surfaceAlpha);
+  if (alpha < .001) { outColor = vec4(0.0); return; }
+
+  float radius = lensRadius();
+  vec2 straight = max(uLensSize * .5 - vec2(radius), vec2(0.0));
+  vec2 radial = d - clamp(d, -straight, straight);
+  vec2 normal = radial / max(length(radial), .001);
+  float edge = smoothstep(-mix(20.0, 26.0, uVertical), 0.0, lensDistance);
+  // A smooth optical normal avoids a shoulder at the straight-to-round join
+  // of the capsule. The outline and reflection still use the capsule normal.
+  vec2 opticalGradient = d / (uLensSize * uLensSize);
+  vec2 opticalNormal = opticalGradient / max(length(opticalGradient), .000001);
+  // Keep artwork distortion local to the bevel.
+  float bevel = edge * edge * smoothstep(0.0, 8.0, -lensDistance);
+  // Sample inward through a wider bevel to stretch artwork outward into the
+  // rim. The interior retains uniform magnification instead of being squeezed.
+  float artworkBevel = smoothstep(0.0, 2.0, -lensDistance) * (1.0 - smoothstep(3.0, mix(14.0, 18.0, uVertical), -lensDistance));
+  artworkBevel *= smoothstep(mix(.35, .55, uVertical), mix(.80, .90, uVertical), abs(d.x) / (uLensSize.x * .5));
+  vec2 rimOffset = -opticalNormal * artworkBevel * mix(5.0, 6.0, uVertical) * uRimDistortion * uGrowth;
+  // Map each capsule cross-section monotonically onto itself. The center and
+  // silhouette stay fixed, while the upper/lower bands compress more strongly
+  // than the sides. A bounded coefficient prevents a folded-back bar contour.
+  float capX = max(abs(d.x) - (uLensSize.x * .5 - radius), 0.0);
+  float capY = max(abs(d.y) - (uLensSize.y * .5 - radius), 0.0);
+  float halfY = uLensSize.y * .5 - radius + sqrt(max(radius * radius - capX * capX, .0001));
+  float halfX = uLensSize.x * .5 - radius + sqrt(max(radius * radius - capY * capY, .0001));
+  vec2 extent = vec2(halfX, halfY);
+  vec2 section = clamp(abs(d) / extent, 0.0, 1.0);
+  float strength = min(.96, .25 + .70 * uRimDistortion) * uGrowth;
+  float sideTransition = 1.0 - smoothstep(.35, .90, abs(d.x) / (uLensSize.x * .5));
+  vec2 sectionWarp = sign(d) * extent * (1.0 - section) * vec2(pow(section.x, 4.0) * .45, section.y * section.y * sideTransition) * strength;
+  // In a vertical rail the wider optical band stays at the physical top/bottom;
+  // simply rotating the horizontal field puts its strongest bend on the sides.
+  float acrossTransition = 1.0 - smoothstep(.35, .90, abs(d.y) / (uLensSize.y * .5));
+  vec2 verticalWarp = sign(d) * extent * (1.0 - section) * vec2(section.x * section.x * acrossTransition, pow(section.y, 4.0) * .45) * strength;
+  sectionWarp = mix(sectionWarp, verticalWarp, uVertical);
+  vec2 samplePoint = p + sectionWarp;
+  // Uniform scaling about each rail end preserves its underlying contour.
+  // Anisotropic lens coordinates would flatten or pinch it.
+  float endDistance = min(p.x, uBarWidth - p.x);
+  float endWeight = (1.0 - smoothstep(uBarHeight * .5 - 2.0 * (1.0 - uVertical), uBarHeight * .5 + 18.0, endDistance)) * smoothstep(0.0, 7.0, -lensDistance);
+  vec2 endCenter = vec2(p.x < uBarWidth * .5 ? (uBarHeight * .5) : uBarWidth - (uBarHeight * .5), (uBarHeight * .5));
+  float endCompression = uContainerInset / (uBarHeight * .5 - uContainerInset);
+  vec2 circularSample = endCenter + (p - endCenter) * (1.0 + endCompression * uGrowth);
+  samplePoint = mix(samplePoint, circularSample, endWeight);
+  // The platter compresses, but the separate artwork copy magnifies uniformly.
+  float item = clamp(floor((p.x - uFirstCenter) / uPitch + .5), 0.0, uCount - 1.0);
+  vec2 itemCenter = vec2(uFirstCenter + item * uPitch, (uBarHeight * .5));
+  vec2 artPoint = itemCenter + (p - itemCenter) / (1.0 + uGrowth * mix(${(artworkMagnification - 1).toFixed(4)}, .16 + .06 * uLabels, uVertical)) + rimOffset;
+  float spread = uDispersion * uGrowth * (.1 + bevel * mix(3.0, 4.5, uVertical));
+  float artworkSpread = uDispersion * uGrowth * (.04 + artworkBevel * mix(2.4, 3.4, uVertical));
+  vec2 outlineNormal = opticalNormal;
+  float outlineSpread = spread;
+  if (uVertical > .5) {
+    vec2 capGradient = sign(p - endCenter) * pow(abs(p - endCenter), vec2(1.5));
+    vec2 capNormal = capGradient / max(length(capGradient), .001);
+    outlineNormal = mix(vec2(0.0, d.y < 0.0 ? -1.0 : 1.0), capNormal, endWeight);
+    float middle = (1.0 - smoothstep(uLensSize.x * .225, uLensSize.x * .39, abs(d.x))) * (1.0 - endWeight);
+    outlineSpread = mix(spread, uDispersion * uGrowth * .45, middle);
+    outlineSpread *= smoothstep(0.0, 7.0, -lensDistance);
+  }
+  // The droplet transition and its faint companion curve belong to the vertical rail.
+  // The displacement vanishes at the silhouette and inside the narrow bevel.
+  float curlDepth = clamp(-lensDistance / uEdgeCurlWidth, 0.0, 1.0);
+  float curlBand = 16.0 * curlDepth * curlDepth * (1.0 - curlDepth) * (1.0 - curlDepth);
+  float curlEnds = smoothstep(.25, .55, abs(d.x) / (uLensSize.x * .5));
+  float curlSides = uVertical * smoothstep(.35, .75, abs(normal.y));
+  vec2 curlOffset = vec2(0.0, -sign(d.y)) * curlBand * curlEnds * curlSides * uEdgeCurlStrength * uGrowth;
+  vec2 curlRed = curlOffset * (1.0 + .18 * uDispersion);
+  vec2 curlBlue = curlOffset * (1.0 - .18 * uDispersion);
+  vec3 curled;
+  curled.r = material(samplePoint + opticalNormal * spread + curlRed, artPoint + opticalNormal * artworkSpread + curlRed, p + outlineNormal * outlineSpread + curlRed, 1.0, 1.0).r;
+  curled.g = material(samplePoint + curlOffset, artPoint + curlOffset, p + curlOffset, 1.0, 1.0).g;
+  curled.b = material(samplePoint - opticalNormal * spread + curlBlue, artPoint - opticalNormal * artworkSpread + curlBlue, p - outlineNormal * outlineSpread + curlBlue, 1.0, 1.0).b;
+  vec3 refracted = curled;
+  // Uniform conditions keep texture derivatives valid and skip the unused image
+  // in horizontal mode, at rest, or with the curl disabled.
+  if (uVertical > .5 && uGrowth != 0.0 && uEdgeCurlStrength > 0.0) {
+    vec3 natural;
+    natural.r = material(samplePoint + opticalNormal * spread, artPoint + opticalNormal * artworkSpread, samplePoint + outlineNormal * outlineSpread, 1.0, 0.0).r;
+    natural.g = material(samplePoint, artPoint, samplePoint, 1.0, 0.0).g;
+    natural.b = material(samplePoint - opticalNormal * spread, artPoint - opticalNormal * artworkSpread, samplePoint - outlineNormal * outlineSpread, 1.0, 0.0).b;
+    // Keep the faint optical contour beside the inset curl, except at the rail ends.
+    float naturalWeight = .30 * uGrowth * smoothstep(0.0, .5, uEdgeCurlStrength) * curlSides * (1.0 - endWeight);
+    refracted = mix(curled, natural, naturalWeight);
+  }
+
+  // Almost clear when held: no opaque fill or continuous white rim.
+  float rim = exp(-abs(lensDistance + .2) * 2.0) * mix(.3 * uDark, 1.0, uGrowth);
+  float light = pow(max(0.0, dot(screenPoint(normal), normalize(vec2(-.65, -1.0)))), 5.0);
+  float separation = uDispersion * uGrowth * .75;
+  vec3 reflection = exp(-abs(vec3(lensDistance + .2) + vec3(separation, 0.0, -separation)) * 2.0);
+  reflection *= mix(.3 * uDark, 1.0, uGrowth) * (light * .24 + uDark * .14);
+  refracted = mix(refracted, vec3(1.0), reflection);
+  refracted *= 1.0 - rim * (.20 - light * .08);
+  vec3 surface = mix(material(p, p, p, 0.0, 0.0), refracted, lensMask);
+  outColor = vec4(surface * surfaceAlpha / alpha, alpha);
+}`
+
+const outerFragment = `#version 300 es
+precision highp float;
+in vec2 uv;
+out vec4 outColor;
+uniform sampler2D uSurface;
+uniform vec2 uCanvasSize;
+uniform vec2 uLensSize;
+uniform float uLensX;
+uniform float uBarHeight;
+uniform float uVertical;
+uniform float uLabels;
+uniform float uGrowth;
+uniform float uDispersion;
+uniform float uStrength;
+${lensGeometry}
+vec4 surface(vec2 point) {
+  // Framebuffer textures have the opposite Y direction to the canvas coordinates.
+  return texture(uSurface, vec2(point.x, 1.0 - point.y));
+}
+void main() {
+  vec4 original = surface(uv);
+  vec2 p = screenPoint(uv * uCanvasSize - vec2(${canvasPadding.toFixed(1)}));
+  vec2 d = p - vec2(uLensX, uBarHeight * .5);
+  float depth = -lensShape(d);
+  if (depth <= 0.0 || depth >= ${outerRefractionReach.toFixed(1)}) {
+    outColor = original;
+    return;
+  }
+  float t = depth / ${outerRefractionProfileWidth.toFixed(1)};
+  float band = 16.0 * t * t * (1.0 - t) * (1.0 - t);
+  vec2 straight = max(uLensSize * .5 - vec2(lensRadius()), vec2(0.0));
+  vec2 radial = d - clamp(d, -straight, straight);
+  vec2 normal = radial / max(length(radial), .001);
+  vec2 offset = screenPoint(normal) * band * uStrength * uGrowth / uCanvasSize;
+  float dispersion = .15 * uDispersion;
+  vec3 refracted = vec3(
+    surface(uv - offset * (1.0 + dispersion)).r,
+    surface(uv - offset).g,
+    surface(uv - offset * (1.0 - dispersion)).b
+  );
+  // Keep the incoming contour visible beside its displaced image.
+  outColor = vec4(mix(original.rgb, refracted, .60), original.a);
+}`
+
+// Specialize the common optical model once, rather than branching on orientation per frame.
+export function glassShaders(vertical: boolean) {
+  const specialize = (source: string) =>
+    source.replaceAll(
+      "uniform float uVertical;",
+      `const float uVertical = ${vertical ? "1.0" : "0.0"};`,
+    )
+  return { fragment: specialize(fragment), outerFragment: specialize(outerFragment) }
+}
