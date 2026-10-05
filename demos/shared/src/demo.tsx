@@ -200,8 +200,8 @@ function SystemControls() {
 
 const tabItems = [
   { id: "home", icon: <Home />, label: "Home" },
-  { id: "library", icon: <Library />, label: "Library" },
-  { id: "settings", icon: <Settings />, label: "Settings" },
+  { id: "library", icon: <Library />, label: "Library", selectedColor: "#af52de" },
+  { id: "settings", icon: <Settings />, label: "Settings", selectedColor: "#ff9500" },
 ]
 
 function ExampleApp({

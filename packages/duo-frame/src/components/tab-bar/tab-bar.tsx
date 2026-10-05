@@ -9,6 +9,8 @@ export interface DuoTabBarItem {
   readonly id: string
   readonly icon: React.ReactNode
   readonly label: string
+  /** CSS color for the selected icon and label; defaults to the material's blue. */
+  readonly selectedColor?: React.CSSProperties["color"]
 }
 
 export interface DuoTabBarProps extends Omit<

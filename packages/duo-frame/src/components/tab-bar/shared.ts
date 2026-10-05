@@ -42,7 +42,7 @@ export interface GlassFrame {
   readonly lensHeight: number
   readonly growth: number
   readonly dark: boolean
-  readonly accent: string
+  readonly accents: readonly string[]
   readonly dispersion: number
   readonly rimDistortion: number
   readonly containerInset: number

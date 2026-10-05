@@ -47,7 +47,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
     const vertexShader = compileShader(gl.VERTEX_SHADER, vertex)
     program = linkProgram(vertexShader, fragment)
     outerProgram = linkProgram(vertexShader, outerFragment)
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       const texture = gl.createTexture()!
       textures.push(texture)
       gl.activeTexture(gl.TEXTURE0 + i)
@@ -55,7 +55,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
       gl.texParameteri(
         gl.TEXTURE_2D,
         gl.TEXTURE_MIN_FILTER,
-        i === 3 ? gl.LINEAR : gl.LINEAR_MIPMAP_LINEAR,
+        i >= 3 ? gl.LINEAR : gl.LINEAR_MIPMAP_LINEAR,
       )
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -79,6 +79,7 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
   gl.uniform1i(uniforms.uBackdrop, 0)
   gl.uniform1i(uniforms.uArtwork, 1)
   gl.uniform1i(uniforms.uBlurredBackdrop, 2)
+  gl.uniform1i(uniforms.uAccents, 4)
   gl.useProgram(outerProgram)
   gl.uniform1i(outerUniforms.uSurface, 3)
   let surfaceWidth = 0
@@ -91,6 +92,10 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
   let uploadedNeutral = false
   let uploadedBackdrop: BackdropFrame | undefined
   let uploadedArtwork: HTMLCanvasElement | undefined
+  const colorCanvas = document.createElement("canvas")
+  colorCanvas.width = colorCanvas.height = 1
+  const colorContext = colorCanvas.getContext("2d")!
+  let accents: readonly string[] = []
   function upload(unit: number, source: HTMLCanvasElement) {
     gl.activeTexture(gl.TEXTURE0 + unit)
     gl.bindTexture(gl.TEXTURE_2D, textures[unit])
@@ -162,8 +167,18 @@ export function createRenderer(canvas: HTMLCanvasElement, vertical: boolean) {
       gl.uniform1f(uniforms.uEdgeCurlWidth, props.edgeCurlWidth)
       gl.uniform1f(uniforms.uEdgeCurlStrength, props.edgeCurlStrength)
       gl.uniform1f(uniforms.uDark, props.dark ? 1 : 0)
-      const hex = Number.parseInt(props.accent.slice(1), 16)
-      gl.uniform3f(uniforms.uAccent, (hex >> 16) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255)
+      if (
+        accents.length !== props.accents.length ||
+        props.accents.some((color, index) => color !== accents[index])
+      ) {
+        colorCanvas.width = props.accents.length
+        props.accents.forEach((color, index) => {
+          colorContext.fillStyle = color
+          colorContext.fillRect(index, 0, 1, 1)
+        })
+        upload(4, colorCanvas)
+        accents = props.accents
+      }
       gl.uniform1f(uniforms.uPixel, 1 / ratio)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
       if (outerEnabled) {

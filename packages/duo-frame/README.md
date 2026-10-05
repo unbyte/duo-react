@@ -526,7 +526,7 @@ function App() {
         layout={bars.tabbar}
         items={[
           { id: "home", icon: <HomeIcon />, label: "Home" },
-          { id: "library", icon: <LibraryIcon />, label: "Library" },
+          { id: "library", icon: <LibraryIcon />, label: "Library", selectedColor: "#af52de" },
         ]}
         selectedId={selectedId}
         onSelect={setSelectedId}
@@ -537,6 +537,13 @@ function App() {
 ```
 
 Items have unique, non-empty string IDs, string labels, and React-node icons.
+Each item accepts an optional `selectedColor` CSS color for its selected icon and
+label, including CSS variables inherited by the bar. Omitting it retains the
+material's default blue. The color applies to WebGL artwork and DOM rendering;
+icons rendered in the DOM should use `currentColor` to inherit it.
+As the lens moves across items, each item revealed through it uses its own
+`selectedColor`, independently of `selectedId`. A lens overlapping two items
+can reveal both colors at once; artwork outside the lens retains its normal color.
 `onSelect(id)` runs on pointer or keyboard activation, including reactivation of
 the selected destination. The app owns navigation and updates `selectedId`.
 The bar provides native buttons, an accessible navigation region, and

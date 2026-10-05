@@ -51,7 +51,7 @@ uniform float uContainerInset;
 uniform float uEdgeCurlWidth;
 uniform float uEdgeCurlStrength;
 uniform float uDark;
-uniform vec3 uAccent;
+uniform sampler2D uAccents;
 uniform float uPixel;
 
 float capsule(vec2 p, vec2 size) {
@@ -138,12 +138,13 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   c = mix(c, mix(vec3(.20), vec3(.9 * uGrowth), uDark), selected * mix(mix(.065, .74, uDark), mix(.008, .012, uDark), uGrowth));
   c *= 1.0 - lensShadow(outlinePoint);
   float ink = 0.0;
+  // The sampled artwork owns its tint, even when a lens covers multiple items.
+  float item = clamp(floor((artPoint.x - uFirstCenter) / uPitch + .5), 0.0, uCount - 1.0);
   if (uVertical > .5) {
     // Derive the filter footprint before clipping or jumping between atlas cells.
     vec2 atlasSize = vec2(uCount * 80.0, 96.0);
     vec2 atlasDx = dFdx(artPoint.yx) / atlasSize;
     vec2 atlasDy = dFdy(artPoint.yx) / atlasSize;
-    float item = clamp(floor((artPoint.x - uFirstCenter) / uPitch + .5), 0.0, uCount - 1.0);
     vec2 local = vec2(artPoint.y - uBarHeight * .5, artPoint.x - (uFirstCenter + item * uPitch));
     float atlasX = item * 80.0 + 40.0 + local.x;
     float iconY = 24.0 + local.y + 9.5 * uLabels;
@@ -156,9 +157,10 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
     ink = texture(uArtwork, artPoint / vec2(uBarWidth, uBarHeight)).a;
   }
   vec3 foreground = mix(vec3(.063, .098, .063), vec3(.957, .965, .937), uDark);
-  vec3 tint = mix(uAccent * mix(vec3(1.0), c, .08), uAccent, uDark);
+  vec4 accent = texelFetch(uAccents, ivec2(int(item), 0), 0);
+  vec3 tint = mix(accent.rgb * mix(vec3(1.0), c, .08), accent.rgb, uDark);
   tint = min(vec3(1.0), tint * (1.0 + .12 * uGrowth * selected));
-  return mix(c, mix(foreground, tint, selected), ink);
+  return mix(c, mix(foreground, tint, selected), ink * mix(1.0, accent.a, selected));
 }
 
 void main() {

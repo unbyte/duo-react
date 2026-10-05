@@ -51,6 +51,7 @@ export function GlassTabs({
     started: number
   }>()
   const selected = items.findIndex((item) => item.id === selectedId)
+  const defaultAccent = dark ? "#209bff" : "#0088ff"
   const { rest } = variant
   const selectedPosition = rest.first + Math.max(0, selected) * rest.pitch
   const motion = useLensMotion(target ?? selectedPosition, expanded, reducedMotion)
@@ -160,7 +161,10 @@ export function GlassTabs({
             lensHeight: geometry.lensCross,
             growth: clamp(motion.growth, 0, 1),
             dark,
-            accent: dark ? "#209bff" : "#0088ff",
+            accents: Array.from(
+              root.current!.querySelectorAll("button"),
+              (button) => getComputedStyle(button).color,
+            ),
           },
           artwork.current,
         )
@@ -178,13 +182,14 @@ export function GlassTabs({
   }, [
     backdrop,
     geometry,
-    items.length,
+    items,
     position,
     lensLength,
     selected,
     target,
     motion.growth,
     dark,
+    defaultAccent,
     generationArtwork,
   ])
 
@@ -300,7 +305,10 @@ export function GlassTabs({
             key={item.id}
             type="button"
             className="duo-tab-bar-item"
-            style={variant.itemStyle(geometry, index)}
+            style={{
+              ...variant.itemStyle(geometry, index),
+              color: item.selectedColor ?? defaultAccent,
+            }}
             aria-current={item.id === selectedId ? "page" : undefined}
             aria-label={item.label}
             title={item.label}
