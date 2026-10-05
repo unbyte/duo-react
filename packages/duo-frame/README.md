@@ -29,7 +29,8 @@ pnpm dev@16
 ```
 
 Open [React 19](http://127.0.0.1:5119) or [React 16](http://127.0.0.1:5116).
-Each demo consumes the built package with its own React runtime. The launch
+Both previews live in the private `packages/demo` package and select their React
+runtime through pnpm aliases and Vite modes. Each consumes the built library. The launch
 commands build the library first; run `pnpm watch` in another terminal to rebuild
 while editing. `pnpm dev` starts the React 19 demo.
 

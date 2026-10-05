@@ -1,11 +1,12 @@
 import * as React from "react"
-import { createRoot } from "react-dom/client"
-import { Demo } from "@duo-frame/demo-shared"
+import { render } from "react-dom"
+import { Demo } from "../src/demo"
 
 const root = document.getElementById("root")
 if (!root) throw new Error("Missing demo root")
-createRoot(root).render(
+render(
   <React.StrictMode>
     <Demo />
   </React.StrictMode>,
+  root,
 )

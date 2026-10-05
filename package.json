@@ -3,14 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vp run --filter \"./packages/*\" build",
+    "build": "vp run duo-frame#build",
     "dev": "vp run dev@19",
-    "dev@16": "vp run build && vp run @duo-frame/demo-react16#dev",
-    "dev@19": "vp run build && vp run @duo-frame/demo-react19#dev",
+    "dev@16": "vp run build && vp run @duo-frame/demo#dev@16",
+    "dev@19": "vp run build && vp run @duo-frame/demo#dev@19",
     "test": "vp test",
-    "check": "vp run build && vp check",
-    "build:demos": "vp run build && vp run --filter \"./demos/*\" build",
-    "watch": "vp run --parallel --filter \"./packages/*\" watch"
+    "check": "vp run build && vp check && vp run @duo-frame/demo#check:types",
+    "build:demos": "vp run build && vp run @duo-frame/demo#build",
+    "watch": "vp run duo-frame#watch"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

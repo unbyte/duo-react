@@ -1,0 +1,27 @@
+{
+  "name": "@duo-frame/demo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev --mode react19",
+    "dev@16": "vp dev --mode react16",
+    "dev@19": "vp dev --mode react19",
+    "build": "vp build --mode react16 && vp build --mode react19",
+    "check:types": "tsc -p react16/tsconfig.json && tsc -p react19/tsconfig.json"
+  },
+  "dependencies": {
+    "duo-frame": "workspace:*",
+    "lucide-react": "1.49.0",
+    "react-dom16": "npm:react-dom@16.14.0",
+    "react-dom19": "npm:react-dom@19.3.0",
+    "react16": "npm:react@16.14.0",
+    "react19": "npm:react@19.3.0"
+  },
+  "devDependencies": {
+    "@types/react-dom16": "npm:@types/react-dom@^16.9.0",
+    "@types/react-dom19": "npm:@types/react-dom@^19.3.0",
+    "@types/react16": "npm:@types/react@^16.14.0",
+    "@types/react19": "npm:@types/react@^19.3.0"
+  }
+}

@@ -14,14 +14,17 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
   const rangeX = width - blockWidth
   const rangeY = height - blockHeight
   const [position, setPosition] = React.useState(initialPosition)
-  const drag = React.useRef<{
-    pointerId: number
-    mode: "move" | "resize"
-    x: number
-    y: number
-    offsetX: number
-    offsetY: number
-  }>()
+  const drag = React.useRef<
+    | {
+        pointerId: number
+        mode: "move" | "resize"
+        x: number
+        y: number
+        offsetX: number
+        offsetY: number
+      }
+    | undefined
+  >(undefined)
   const svg = React.useRef<SVGSVGElement>(null)
   const x = position.x * rangeX
   const y = position.y * rangeY

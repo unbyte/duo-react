@@ -13,22 +13,28 @@ architecture, measurements, and remaining rendering decisions.
 ```text
 packages/
   duo-frame/          Library source, tests, documentation, and package build
-demos/
-  react16/            React 16.14 preview
-  react19/            React 19.3 preview
-  shared/             Private package for shared demo content and styles
+  demo/               Private demo package with shared source and Vite configuration
+    src/              Demo content, controls, and styles
+    react16/          React 16.14 entry point and type configuration
+    react19/          React 19.3 entry point and type configuration
 ```
 
-Add libraries under `packages/`, each with its own manifest and build config.
+Add packages under `packages/`, each with its own manifest and build config.
 The root owns the pnpm workspace and lockfile, shared development dependencies,
 TypeScript defaults, lint/format rules, and test project discovery. Packages own
 their runtime dependencies, peer contracts, and package-specific build inputs.
 `vp run` orchestrates workspace scripts; `vp check` handles formatting, lint,
 and type checks in one pass using each package's TypeScript configuration.
-The library pins React 16.8.6 for its test baseline; each demo keeps its own React
-runtime and matching types. Both demos depend on `@duo-frame/demo-shared`, which
-owns the `duo-frame` dependency and exposes its source directly to Vite. React is
-a peer of the shared package; each demo's resolver uses its own React runtime.
+The library pins React 16.8.6 for its test baseline. The private `@duo-frame/demo`
+package installs both React/React DOM pairs and matching types through pnpm
+aliases. Vite's `react16` and `react19` modes route all React imports, including
+library dependencies, to the chosen pair. Each mode has a separate dependency
+cache and output directory under `packages/demo/dist/`.
+
+The pnpm manifest hook gives the legacy React DOM renderer and its types their
+own matching React dependencies, so installation does not attach them to the
+React 19 peers. Separate TypeScript configurations check the shared source and
+each entry point against its corresponding React types.
 
 ## Development
 
@@ -39,7 +45,7 @@ pnpm install
 pnpm dev
 # Or use the React 16 preview:
 pnpm dev@16
-# In another terminal, rebuild packages while editing:
+# In another terminal, rebuild the library while editing:
 pnpm watch
 ```
 
@@ -48,14 +54,14 @@ pnpm watch
 [127.0.0.1:5116](http://127.0.0.1:5116). Both build `duo-frame` before starting;
 the demos consume its package exports from `packages/duo-frame/dist`.
 
-| Command            | Purpose                                                           |
-| ------------------ | ----------------------------------------------------------------- |
-| `pnpm build`       | Build all libraries under `packages/` in dependency order         |
-| `pnpm build:demos` | Build the libraries and both demos                                |
-| `pnpm test --run`  | Run all package test projects once                                |
-| `pnpm test`        | Run package tests in watch mode in an interactive terminal        |
-| `pnpm check`       | Build libraries, then check formatting, lint, and workspace types |
-| `pnpm watch`       | Watch library builds in parallel                                  |
+| Command            | Purpose                                                                                |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `pnpm build`       | Build the `duo-frame` library                                                          |
+| `pnpm build:demos` | Build the library and both demo modes                                                  |
+| `pnpm test --run`  | Run all package test projects once                                                     |
+| `pnpm test`        | Run package tests in watch mode in an interactive terminal                             |
+| `pnpm check`       | Build the library, check formatting and lint, and check both React type configurations |
+| `pnpm watch`       | Watch the library build                                                                |
 
 Use a package filter for focused work, such as `pnpm --filter duo-frame test --run`.
 The [package development guide](packages/duo-frame/README.md#preview-and-development)
