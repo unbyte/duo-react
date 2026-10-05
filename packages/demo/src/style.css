@@ -588,7 +588,7 @@ select {
 .demo-color-block:active {
   cursor: grabbing;
 }
-.demo-color-block:focus-visible {
+.demo-color-block:focus {
   outline: none;
 }
 .demo-block-resize {
@@ -606,7 +606,7 @@ select {
   stroke-linecap: round;
   pointer-events: none;
 }
-.demo-block-resize:focus-visible {
+.demo-block-resize:focus {
   outline: none;
 }
 .demo-block-resize:focus-visible rect {
