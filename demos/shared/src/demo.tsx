@@ -13,7 +13,6 @@ import {
   DuoZoomControls,
   useDuoActions,
   useDuoState,
-  useDuoScreen,
   useBars,
   type BarsLayout,
   type BarsLayoutRequest,
@@ -213,20 +212,10 @@ function ExampleApp({
   blockColor: string
   selectedTab: string
 }) {
-  const { display } = useDuoScreen()
-  const [count, setCount] = React.useState(0)
-  const [text, setText] = React.useState("")
   return (
     <DuoSafeArea className="demo-app">
       <div className="demo-content">
         <h2>{tabItems.find((item) => item.id === selectedTab)?.label}</h2>
-        <p>{display === "inner" ? "Inner screen" : "Outer screen"}</p>
-        <button type="button" onClick={() => setCount((value) => value + 1)}>
-          Count: {count}
-        </button>
-        <label>
-          Text <input value={text} onChange={(event) => setText(event.currentTarget.value)} />
-        </label>
       </div>
       <DraggableBlock visible={showBlock} color={blockColor} />
     </DuoSafeArea>

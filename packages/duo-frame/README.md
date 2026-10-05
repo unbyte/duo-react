@@ -33,9 +33,9 @@ Each demo consumes the built package with its own React runtime. The launch
 commands build the library first; run `pnpm watch` in another terminal to rebuild
 while editing. `pnpm dev` starts the React 19 demo.
 
-Both demos render one React app with a counter and a text input. Change either,
-switch the inner window between left, right, and full, then switch to the outer
-display and back. Content should keep its state.
+Both demos show the current tab's page name. Select a tab, switch the inner
+window between left, right, and full, then switch to the outer display and back.
+The selected tab should persist.
 
 The appearance controls share one row and wrap on smaller screens. **Background**
 previews light, dark, gray, and mixed content; **Icons** selects automatic, white,
@@ -50,7 +50,10 @@ Toolbar counters and tab selection persist while changing the configuration.
 Open **Inspector** on the right to switch between **Provider** state and the
 **Bars** request and resolved layouts, including `rect` and `containerProps`.
 
-Drag the blue block beneath the system controls to inspect the capsule's blur.
+Drag the blue block beneath the system controls or tab bar to inspect the glass.
+Drag its bottom-right handle to resize width and height independently. Focus the
+handle and use arrow keys to resize, with Shift for 1px adjustments. Home resets
+both size and position.
 Use the native **Color** picker to try black, white, or any other block color.
 Mouse, touch, and pen dragging follow preview zoom and rotation. Focus the block
 and use arrow keys to move it (Shift for finer movement), or Home to reset it.
