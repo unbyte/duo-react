@@ -1,5 +1,5 @@
 import * as React from "react"
-import { createDuoStore } from "../core/store"
+import { DuoStore } from "../core/store"
 import type { DuoDefaults, DuoSystemOptions } from "../core/types"
 import { useBrowserLayoutEffect } from "../hooks/use-browser-layout-effect"
 import { StoreContext } from "./store-context"
@@ -17,8 +17,8 @@ export function DuoProvider({
   defaultSystem,
   outerPortraitLocked = false,
 }: DuoProviderProps): React.ReactElement {
-  const [store] = React.useState(() =>
-    createDuoStore(defaultState, defaultSystem, outerPortraitLocked),
+  const [store] = React.useState(
+    () => new DuoStore(defaultState, defaultSystem, outerPortraitLocked),
   )
   useBrowserLayoutEffect(() => {
     store.configureOuterPortraitLock(outerPortraitLocked)

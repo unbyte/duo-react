@@ -1,8 +1,8 @@
 import { expect, test } from "vite-plus/test"
-import { createDuoStore } from "../src/core/store"
+import { DuoStore } from "../src/core/store"
 import { getMaskRegions } from "../src/core/layout/regions"
 
-function regions(store: ReturnType<typeof createDuoStore>) {
+function regions(store: DuoStore) {
   const state = store.getSnapshot()
   return getMaskRegions(
     state.screens[state.posture === "closed" ? "outer" : "inner"],
@@ -12,7 +12,7 @@ function regions(store: ReturnType<typeof createDuoStore>) {
 }
 
 test("mask uses source names, omits inactive regions and zero insets, and retains window bounds", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   expect(regions(store).map((r) => r.name)).toEqual([
     "Safe area",
     "Right inset",
@@ -39,7 +39,7 @@ test("mask uses source names, omits inactive regions and zero insets, and retain
 })
 
 test("split gap is distinct from the division and does not appear for full or outer windows", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   for (const orientation of ["landscape-left", "landscape-right"] as const) {
     store.actions.setOrientation(orientation)
     for (const placement of ["left", "right"] as const) {

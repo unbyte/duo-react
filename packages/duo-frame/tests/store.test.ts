@@ -1,9 +1,9 @@
 import { expect, test, vi } from "vite-plus/test"
-import { createDuoStore } from "../src/core/store"
+import { DuoStore } from "../src/core/store"
 
 test("independent stores keep stable snapshots and ignore no-op actions", () => {
-  const one = createDuoStore()
-  const two = createDuoStore()
+  const one = new DuoStore()
+  const two = new DuoStore()
   const initial = one.getSnapshot()
   const listener = vi.fn()
   const unsubscribe = one.subscribe(listener)
@@ -20,7 +20,7 @@ test("independent stores keep stable snapshots and ignore no-op actions", () => 
 })
 
 test("a rejected layout leaves all state and subscriptions unchanged", () => {
-  const store = createDuoStore({ innerPlacement: "left" })
+  const store = new DuoStore({ innerPlacement: "left" })
   const previous = store.getSnapshot()
   const listener = vi.fn()
   store.subscribe(listener)
@@ -33,7 +33,7 @@ test("a rejected layout leaves all state and subscriptions unchanged", () => {
 })
 
 test("visibility changes preserve window metrics and close/reopen preserves placement", () => {
-  const store = createDuoStore({ innerPlacement: "right" })
+  const store = new DuoStore({ innerPlacement: "right" })
   const initial = store.getSnapshot()
   store.actions.setPosture("closed")
   expect(store.getSnapshot().screens.inner.visible).toBe(false)
@@ -44,7 +44,7 @@ test("visibility changes preserve window metrics and close/reopen preserves plac
 })
 
 test("partial posture updates regions without changing display visibility and ignores repeated selection", () => {
-  const store = createDuoStore({ innerPlacement: "right" })
+  const store = new DuoStore({ innerPlacement: "right" })
   const initial = store.getSnapshot()
   const listener = vi.fn()
   store.subscribe(listener)
@@ -74,7 +74,7 @@ test("partial posture updates regions without changing display visibility and ig
 })
 
 test("partial defaults survive rotation and reset while unsupported postures are rejected", () => {
-  const store = createDuoStore({ posture: "partially-open", innerPlacement: "left" })
+  const store = new DuoStore({ posture: "partially-open", innerPlacement: "left" })
   const initial = store.getSnapshot()
   for (let i = 0; i < 4; i++) {
     store.actions.rotate("right")
@@ -93,7 +93,7 @@ test("partial defaults survive rotation and reset while unsupported postures are
 })
 
 test("controlled zoom requests changes without mutating its owner", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const disconnect = store.connectFrame()
   const requested = vi.fn()
   store.configureZoom(0.75, requested)
@@ -113,7 +113,7 @@ test("controlled zoom requests changes without mutating its owner", () => {
 })
 
 test("system changes only recompute geometry for camera activity", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const initial = store.getSnapshot()
   store.actions.setSystem({ battery: 25 })
   expect(store.getSnapshot().screens).toBe(initial.screens)
@@ -125,9 +125,9 @@ test("system changes only recompute geometry for camera activity", () => {
 })
 
 test("system color mode defaults to light and changes without disturbing app state or geometry", () => {
-  const independent = createDuoStore()
+  const independent = new DuoStore()
   expect(independent.getSnapshot().system.colorMode).toBe("light")
-  const store = createDuoStore({}, { colorMode: "dark", battery: 25 })
+  const store = new DuoStore({}, { colorMode: "dark", battery: 25 })
   const initial = store.getSnapshot()
   const listener = vi.fn()
   store.subscribe(listener)
@@ -149,8 +149,8 @@ test("system color mode defaults to light and changes without disturbing app sta
 test("invalid system color modes are rejected without publishing partial updates", () => {
   for (const colorMode of ["auto", "sepia", "", undefined]) {
     // @ts-expect-error Validate JavaScript callers too.
-    expect(() => createDuoStore({}, { colorMode })).toThrow(RangeError)
-    const store = createDuoStore()
+    expect(() => new DuoStore({}, { colorMode })).toThrow(RangeError)
+    const store = new DuoStore()
     const initial = store.getSnapshot()
     const listener = vi.fn()
     store.subscribe(listener)
@@ -162,7 +162,7 @@ test("invalid system color modes are rejected without publishing partial updates
 })
 
 test("signal updates preserve geometry, reject invalid levels, and reset to provider defaults", () => {
-  const store = createDuoStore({}, { wifiStrength: 2, cellularStrength: 3 })
+  const store = new DuoStore({}, { wifiStrength: 2, cellularStrength: 3 })
   const initial = store.getSnapshot()
   store.actions.setSystem({ wifiStrength: 0, cellularStrength: 4 })
   const changed = store.getSnapshot()
@@ -174,7 +174,7 @@ test("signal updates preserve geometry, reject invalid levels, and reset to prov
   expect(store.getSnapshot()).toBe(changed)
   for (const key of ["wifiStrength", "cellularStrength"] as const) {
     for (const value of [-1, 0.5, key === "wifiStrength" ? 4 : 5, NaN, Infinity]) {
-      expect(() => createDuoStore({}, { [key]: value })).toThrow(RangeError)
+      expect(() => new DuoStore({}, { [key]: value })).toThrow(RangeError)
       expect(() => store.actions.setSystem({ battery: 25, [key]: value })).toThrow(RangeError)
       expect(store.getSnapshot()).toBe(changed)
     }
@@ -185,7 +185,7 @@ test("signal updates preserve geometry, reject invalid levels, and reset to prov
 })
 
 test("reset restores provider defaults and separate providers can register their own frame", () => {
-  const store = createDuoStore({ zoom: 0.5, innerPlacement: "left" }, { battery: 50 })
+  const store = new DuoStore({ zoom: 0.5, innerPlacement: "left" }, { battery: 50 })
   store.actions.setInnerPlacement("right")
   store.actions.setSystem({ battery: 10 })
   store.actions.setZoom(2)
@@ -197,12 +197,12 @@ test("reset restores provider defaults and separate providers can register their
   })
   const disconnect = store.connectFrame()
   expect(() => store.connectFrame()).toThrow("one DuoFrame")
-  expect(createDuoStore().connectFrame()).toBeTypeOf("function")
+  expect(new DuoStore().connectFrame()).toBeTypeOf("function")
   disconnect()
 })
 
 test("indicator updates merge per display without changing geometry or mutating snapshots", () => {
-  const store = createDuoStore(
+  const store = new DuoStore(
     {},
     {
       indicatorStyles: { inner: { statusBar: "light" } },
@@ -226,7 +226,7 @@ test("indicator updates merge per display without changing geometry or mutating 
 })
 
 test("unsupported indicator styles reject the whole system update", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const initial = store.getSnapshot()
   expect(Object.isFrozen(initial.system)).toBe(true)
   expect(() =>
@@ -240,7 +240,7 @@ test("unsupported indicator styles reject the whole system update", () => {
 })
 
 test("rotation wraps in both directions and resets to the initial angle", () => {
-  const store = createDuoStore({ innerPlacement: "left" })
+  const store = new DuoStore({ innerPlacement: "left" })
   const listener = vi.fn()
   store.subscribe(listener)
   const initial = store.getSnapshot()
@@ -260,7 +260,7 @@ test("rotation wraps in both directions and resets to the initial angle", () => 
 })
 
 test("upside-down inner geometry is measured while outer content retains its supported layout", () => {
-  const store = createDuoStore({ innerPlacement: "right" })
+  const store = new DuoStore({ innerPlacement: "right" })
   const previousOuter = store.getSnapshot().screens.outer
   store.actions.rotate("right")
   expect(store.getSnapshot()).toMatchObject({
@@ -277,12 +277,12 @@ test("upside-down inner geometry is measured while outer content retains its sup
   store.actions.rotate("left")
   expect(store.getSnapshot().screens.outer).toBe(fromRight)
   expect(
-    createDuoStore({ orientation: "portrait-upside-down" }).getSnapshot().screens.outer.orientation,
+    new DuoStore({ orientation: "portrait-upside-down" }).getSnapshot().screens.outer.orientation,
   ).toBe("portrait")
 })
 
 test("explicit orientation uses a normalized angle after repeated turns", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   for (let i = 0; i < 8; i++) store.actions.rotate("right")
   store.actions.setOrientation("portrait")
   expect(store.getSnapshot()).toMatchObject({ rotation: 0, orientation: "portrait" })
@@ -291,7 +291,7 @@ test("explicit orientation uses a normalized angle after repeated turns", () => 
 })
 
 test("reset restores the initial outer fallback when starting upside down", () => {
-  const store = createDuoStore({ orientation: "portrait-upside-down" })
+  const store = new DuoStore({ orientation: "portrait-upside-down" })
   const initial = store.getSnapshot()
   store.actions.rotate("left")
   store.actions.rotate("right")
@@ -302,7 +302,7 @@ test("reset restores the initial outer fallback when starting upside down", () =
 })
 
 test("zoom steps start from measured fit and preserve logical screen geometry", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const disconnect = store.connectFrame()
   const initial = store.getSnapshot()
   store.actions.zoomIn()
@@ -326,7 +326,7 @@ test("zoom steps start from measured fit and preserve logical screen geometry", 
 })
 
 test("zoom steps respect controlled fit and fixed zoom", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const requested = vi.fn()
   store.configureZoom("fit", requested)
   store.reportRenderedZoom(0.4)
@@ -343,7 +343,7 @@ test("zoom steps respect controlled fit and fixed zoom", () => {
 })
 
 test("outer portrait lock preserves app geometry through physical rotations and display changes", () => {
-  const store = createDuoStore({ posture: "closed", orientation: "portrait" }, {}, true)
+  const store = new DuoStore({ posture: "closed", orientation: "portrait" }, {}, true)
   const outer = store.getSnapshot().screens.outer
   for (const orientation of [
     "landscape-left",
@@ -366,7 +366,7 @@ test("outer portrait lock preserves app geometry through physical rotations and 
 })
 
 test("provider lock changes update only outer layout and reset preserves the current policy", () => {
-  const store = createDuoStore({ posture: "closed", orientation: "landscape-left" })
+  const store = new DuoStore({ posture: "closed", orientation: "landscape-left" })
   const initial = store.getSnapshot()
   const listener = vi.fn()
   store.subscribe(listener)
@@ -387,7 +387,7 @@ test("provider lock changes update only outer layout and reset preserves the cur
 })
 
 test("unlocking upside down retains portrait until a supported orientation is reached", () => {
-  const store = createDuoStore({ orientation: "portrait-upside-down" }, {}, true)
+  const store = new DuoStore({ orientation: "portrait-upside-down" }, {}, true)
   store.configureOuterPortraitLock(false)
   expect(store.getSnapshot().screens.outer.orientation).toBe("portrait")
   store.actions.rotate("left")
@@ -397,7 +397,7 @@ test("unlocking upside down retains portrait until a supported orientation is re
 })
 
 test("outer status visibility follows effective layout, including retained and locked orientations", () => {
-  const store = createDuoStore({ posture: "closed", orientation: "portrait" })
+  const store = new DuoStore({ posture: "closed", orientation: "portrait" })
   expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true)
   for (const direction of ["left", "right"] as const) {
     store.actions.setOrientation("portrait")
@@ -420,7 +420,7 @@ test("outer status visibility follows effective layout, including retained and l
 })
 
 test("status preference overrides both displays without changing app geometry", () => {
-  const store = createDuoStore({ orientation: "landscape-left" })
+  const store = new DuoStore({ orientation: "landscape-left" })
   const initial = store.getSnapshot()
   store.actions.setSystem({ prefersStatusBarHidden: false })
   expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(true)
@@ -450,7 +450,7 @@ test("status preference overrides both displays without changing app geometry", 
 
 test("status preference initializes from provider defaults and reset restores it", () => {
   for (const prefersStatusBarHidden of [true, false]) {
-    const store = createDuoStore({}, { prefersStatusBarHidden })
+    const store = new DuoStore({}, { prefersStatusBarHidden })
     for (const screen of Object.values(store.getSnapshot().screens)) {
       expect(screen.statusBarVisible).toBe(!prefersStatusBarHidden)
     }

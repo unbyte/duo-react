@@ -1,6 +1,10 @@
-import { expect, test, vi } from "vite-plus/test"
-import type { CaptureContext, snapdom } from "@zumer/snapdom"
-import { createIframeCapture } from "../src/backdrop/iframe-capture"
+import { beforeEach, expect, test, vi } from "vite-plus/test"
+import { type CaptureContext, snapdom } from "@zumer/snapdom"
+import { iframeCapture } from "../src/backdrop/iframe-capture"
+
+vi.mock("@zumer/snapdom", () => ({ snapdom: { toPng: vi.fn() } }))
+
+beforeEach(() => vi.resetAllMocks())
 
 function fixture() {
   const image = { style: {} }
@@ -16,8 +20,9 @@ function fixture() {
     }),
     ownerDocument: { createElement: vi.fn(() => replacement) },
   }
-  const toPng = vi.fn().mockResolvedValue(image)
-  const plugin = createIframeCapture({ toPng } as unknown as typeof snapdom)
+  const toPng = vi.mocked(snapdom.toPng)
+  toPng.mockResolvedValue(image as HTMLImageElement)
+  const plugin = iframeCapture
   const context = {
     exclude: [".duo-system"],
     excludeMode: "remove",

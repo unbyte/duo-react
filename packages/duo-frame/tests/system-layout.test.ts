@@ -1,5 +1,5 @@
 import { expect, test } from "vite-plus/test"
-import { createDuoStore } from "../src/core/store"
+import { DuoStore } from "../src/core/store"
 import { getSystemLayout, systemMetrics } from "../src/core/layout/system"
 
 test("clock and glyph anchors match the three native full-window captures", () => {
@@ -24,7 +24,7 @@ test("clock and glyph anchors match the three native full-window captures", () =
     },
   ] as const
   for (const fixture of fixtures) {
-    const store = createDuoStore({ orientation: fixture.orientation })
+    const store = new DuoStore({ orientation: fixture.orientation })
     const { time, glyph, status } = getSystemLayout(store.getSnapshot().screens[fixture.display])
     // The clock uses a stable text box; ink width varies with the time string and font.
     expect(
@@ -43,7 +43,7 @@ test("clock and glyph anchors match the three native full-window captures", () =
 })
 
 test("status belongs to the display while the home indicator follows the app window", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   const full = getSystemLayout(store.getSnapshot().screens.inner)
   expect(full.home.x + full.home.width / 2).toBe(951 / 2)
   expect(full.divider).toBeUndefined()
@@ -58,7 +58,7 @@ test("status belongs to the display while the home indicator follows the app win
 })
 
 test("the outer cutout uses measured coordinates independently of status visibility", () => {
-  const store = createDuoStore({ orientation: "portrait" })
+  const store = new DuoStore({ orientation: "portrait" })
   const portrait = getSystemLayout(store.getSnapshot().screens.outer)
   expect(portrait.camera).toMatchObject({ x: 399.67, y: 29.33, width: 37, height: 37 })
   expect(portrait.status.y).toBeGreaterThan(portrait.camera!.y + portrait.camera!.height)
@@ -70,7 +70,7 @@ test("the outer cutout uses measured coordinates independently of status visibil
 })
 
 test("explicitly shown status stays in the reserved edge strip in all supported orientations", () => {
-  const store = createDuoStore({}, { prefersStatusBarHidden: false })
+  const store = new DuoStore({}, { prefersStatusBarHidden: false })
   for (const orientation of [
     "portrait",
     "portrait-upside-down",
@@ -94,7 +94,7 @@ test("explicitly shown status stays in the reserved edge strip in all supported 
 })
 
 test("capsule encloses the complete control group with consistent padding in every orientation", () => {
-  const store = createDuoStore({}, { prefersStatusBarHidden: false })
+  const store = new DuoStore({}, { prefersStatusBarHidden: false })
   for (const orientation of [
     "portrait",
     "portrait-upside-down",

@@ -1,141 +1,41 @@
-import { afterEach, expect, test, vi } from "vite-plus/test"
-import { createCaptureScheduler } from "../src/backdrop/scheduler"
-import { paddedRegion, samePixels } from "../src/backdrop/regions"
-import { createBackdropStore, type BackdropRegion } from "../src/backdrop/store"
+import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test"
+import { paddedRegion, samePixels } from "../src/backdrop/image"
+import { snapdom } from "@zumer/snapdom"
+import { BackdropStore } from "../src/backdrop/store"
+import { DuoStore } from "../src/core/store"
 
-afterEach(() => vi.useRealTimers())
+vi.mock("@zumer/snapdom", () => ({ snapdom: { toCanvas: vi.fn() } }))
 
-test("capture coalesces mutations and never starts another capture while busy", async () => {
+function canvas(value = 255) {
+  return {
+    width: 1,
+    height: 1,
+    getContext: () => ({
+      getImageData: () => ({ width: 1, data: new Uint8ClampedArray([value, value, value, 255]) }),
+      createImageData: () => ({ data: new Uint8ClampedArray(4) }),
+      putImageData: vi.fn(),
+    }),
+  } as unknown as HTMLCanvasElement
+}
+
+beforeEach(() => {
   vi.useFakeTimers()
-  let complete: ((value: number) => void) | undefined
-  const capture = vi.fn(
-    () =>
-      new Promise<number>((resolve) => {
-        complete = resolve
-      }),
+  vi.mocked(snapdom.toCanvas).mockReset().mockResolvedValue(canvas())
+  vi.stubGlobal(
+    "document",
+    Object.assign(new EventTarget(), { hidden: false, createElement: () => canvas() }),
   )
-  const publish = vi.fn()
-  const scheduler = createCaptureScheduler(capture, publish)
-  scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(0)
-  for (let i = 0; i < 20; i++) scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(500)
-  expect(capture).toHaveBeenCalledTimes(1)
-  complete!(1)
-  await vi.advanceTimersByTimeAsync(1)
-  expect(publish).toHaveBeenCalledWith(1)
-  expect(capture).toHaveBeenCalledTimes(2)
-  complete!(2)
-  await vi.advanceTimersByTimeAsync(1000)
-  expect(publish).toHaveBeenCalledTimes(2)
-  expect(capture).toHaveBeenCalledTimes(2)
-  scheduler.stop()
+  class Observer {
+    observe() {}
+    disconnect() {}
+  }
+  vi.stubGlobal("MutationObserver", Observer)
+  vi.stubGlobal("ResizeObserver", Observer)
 })
 
-test("geometry changes discard a pending image and disposal cannot publish late results", async () => {
-  vi.useFakeTimers()
-  let complete: ((value: number) => void) | undefined
-  const publish = vi.fn()
-  const scheduler = createCaptureScheduler(
-    () =>
-      new Promise<number>((resolve) => {
-        complete = resolve
-      }),
-    publish,
-  )
-  scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(0)
-  scheduler.invalidate(true)
-  complete!(1)
-  await vi.advanceTimersByTimeAsync(101)
-  scheduler.stop()
-  complete!(2)
-  await vi.advanceTimersByTimeAsync(500)
-  expect(publish).not.toHaveBeenCalled()
-})
-
-test("capture failure retains the current result and a later invalidation can retry", async () => {
-  vi.useFakeTimers()
-  const capture = vi
-    .fn()
-    .mockRejectedValueOnce(new Error("Unreadable image"))
-    .mockResolvedValueOnce(2)
-  const publish = vi.fn()
-  const scheduler = createCaptureScheduler(capture, publish)
-  scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(100)
-  expect(publish).not.toHaveBeenCalled()
-  scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(100)
-  expect(publish).toHaveBeenCalledWith(2)
-  scheduler.stop()
-})
-
-test("subscribers share one cached snapshot while indicator selections stay stable", () => {
-  const store = createBackdropStore()
-  const original = store.getSnapshot()
-  expect(store.getSnapshot()).toBe(original)
-  const snapshots: unknown[] = []
-  const unsubscribe = store.subscribe(() => snapshots.push(store.getSnapshot()))
-  const other = store.subscribe(() => snapshots.push(store.getSnapshot()))
-  const next = { regions: new Map(), colors: { ...original.colors } }
-  store.publish(next)
-  expect(snapshots).toEqual([next, next])
-  expect(snapshots[0]).toBe(snapshots[1])
-  expect(store.getSnapshot().colors.time).toBe(original.colors.time)
-  expect(store.getServerSnapshot()).toBe(original)
-  unsubscribe()
-  other()
-  store.publish(next)
-  expect(snapshots).toHaveLength(2)
-})
-
-test("region subscriptions ignore changes to other consumers and identical publications", () => {
-  const store = createBackdropStore()
-  const tab = Symbol("tab")
-  const status = Symbol("status")
-  const tabRegion = { x: 20, y: 40, width: 100, height: 200 } as BackdropRegion
-  const statusRegion = { x: 20, y: 0, width: 100, height: 40 } as BackdropRegion
-  const draw = vi.fn()
-  const unsubscribe = store.subscribeRegion(tab, draw)
-  store.publish({ ...store.getSnapshot(), regions: new Map([[tab, tabRegion]]) })
-  expect(draw).toHaveBeenCalledTimes(1)
-  store.publish({
-    ...store.getSnapshot(),
-    regions: new Map([
-      [tab, tabRegion],
-      [status, statusRegion],
-    ]),
-  })
-  store.publish(store.getSnapshot())
-  expect(draw).toHaveBeenCalledTimes(1)
-  store.publish({ ...store.getSnapshot(), regions: new Map([[tab, { ...tabRegion }]]) })
-  expect(draw).toHaveBeenCalledTimes(2)
-  unsubscribe()
-  store.publish({ ...store.getSnapshot(), regions: new Map() })
-  expect(draw).toHaveBeenCalledTimes(2)
-})
-
-test("only changed region requirements invalidate capture and released consumers disappear", () => {
-  const store = createBackdropStore()
-  const key = Symbol()
-  const invalidate = vi.fn()
-  const unsubscribe = store.subscribeRequests(invalidate)
-  const request = { area: { x: 40, y: 60, width: 80, height: 100 }, blur: 6 }
-  store.request(key, request)
-  const pending = store.getRequests()
-  store.request(key, { ...request, area: { ...request.area } })
-  expect(invalidate).toHaveBeenCalledTimes(1)
-  store.request(key, { ...request, area: { ...request.area, x: 50 } })
-  expect(invalidate).toHaveBeenCalledTimes(2)
-  expect(pending.get(key)).toBe(request)
-  store.release(key)
-  store.release(key)
-  expect(invalidate).toHaveBeenCalledTimes(3)
-  expect(store.getRequests().size).toBe(0)
-  unsubscribe()
-  store.request(key, request)
-  expect(invalidate).toHaveBeenCalledTimes(3)
+afterEach(() => {
+  vi.useRealTimers()
+  vi.unstubAllGlobals()
 })
 
 test("blur padding rounds outward and clips to the display", () => {
@@ -156,18 +56,85 @@ test("pixel comparison notices alpha changes and differences at the end of the r
   expect(samePixels(pixels, pixels.slice(0, 4))).toBe(false)
 })
 
-test("active invalidations can sample at 20 fps without turning idle time into a loop", async () => {
-  vi.useFakeTimers()
-  const capture = vi.fn().mockResolvedValue(1)
-  const scheduler = createCaptureScheduler(capture, vi.fn())
-  scheduler.invalidate()
+test("capture stays single-flight across disconnect and reconnect, discarding the old image", async () => {
+  const store = new BackdropStore()
+  const source = new EventTarget() as HTMLElement
+  const key = Symbol()
+  const changed = vi.fn()
+  store.subscribe(changed)
+  store.updateScreen(new DuoStore().getSnapshot().screens.inner)
+  store.request(key, { area: { x: 0, y: 0, width: 1, height: 1 }, blur: 0, indicator: "time" })
+  let finish!: (canvas: HTMLCanvasElement) => void
+  vi.mocked(snapdom.toCanvas).mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve
+      }),
+  )
+  store.connect(source)
   await vi.advanceTimersByTimeAsync(0)
-  scheduler.invalidate()
-  await vi.advanceTimersByTimeAsync(49)
-  expect(capture).toHaveBeenCalledTimes(1)
-  await vi.advanceTimersByTimeAsync(1)
-  expect(capture).toHaveBeenCalledTimes(2)
+  for (let i = 0; i < 20; i++) source.dispatchEvent(new Event("input"))
+  await vi.advanceTimersByTimeAsync(100)
+  expect(snapdom.toCanvas).toHaveBeenCalledTimes(1)
+  store.disconnect()
+  store.connect(source)
+  const initial = store.getSnapshot()
+  let finishNew!: (canvas: HTMLCanvasElement) => void
+  vi.mocked(snapdom.toCanvas).mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finishNew = resolve
+      }),
+  )
+  finish(canvas(0))
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot()).toBe(initial)
+  expect(changed).not.toHaveBeenCalled()
+  expect(snapdom.toCanvas).toHaveBeenCalledTimes(2)
+  finishNew(canvas(255))
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot().colors.time).toBe("dark")
+  expect(changed).toHaveBeenCalledTimes(1)
+  store.disconnect()
+  source.dispatchEvent(new Event("input"))
   await vi.advanceTimersByTimeAsync(1000)
-  expect(capture).toHaveBeenCalledTimes(2)
-  scheduler.stop()
+  expect(snapdom.toCanvas).toHaveBeenCalledTimes(2)
+})
+
+test("unchanged captures and failures retain snapshots; released regions disappear", async () => {
+  const store = new BackdropStore()
+  const source = new EventTarget() as HTMLElement
+  const key = Symbol()
+  const draw = vi.fn()
+  const request = { area: { x: 0, y: 0, width: 1, height: 1 }, blur: 0 } as const
+  store.updateScreen(new DuoStore().getSnapshot().screens.inner)
+  store.request(key, request)
+  const unsubscribe = store.subscribeRegion(key, draw)
+  store.connect(source)
+  await vi.advanceTimersByTimeAsync(50)
+  const snapshot = store.getSnapshot()
+  expect(snapshot.regions.size).toBe(1)
+  expect(draw).toHaveBeenCalledTimes(1)
+  store.request(key, { ...request, area: { ...request.area } })
+  await vi.advanceTimersByTimeAsync(50)
+  expect(snapdom.toCanvas).toHaveBeenCalledTimes(1)
+  source.dispatchEvent(new Event("input"))
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot()).toBe(snapshot)
+  expect(draw).toHaveBeenCalledTimes(1)
+  vi.mocked(snapdom.toCanvas).mockRejectedValueOnce(new Error("Unreadable image"))
+  source.dispatchEvent(new Event("input"))
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot()).toBe(snapshot)
+  vi.mocked(snapdom.toCanvas).mockResolvedValue(canvas(0))
+  source.dispatchEvent(new Event("input"))
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot()).not.toBe(snapshot)
+  expect(draw).toHaveBeenCalledTimes(2)
+  store.release(key)
+  await vi.advanceTimersByTimeAsync(50)
+  expect(store.getSnapshot().regions.size).toBe(0)
+  expect(draw).toHaveBeenCalledTimes(3)
+  unsubscribe()
+  store.disconnect()
 })

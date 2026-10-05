@@ -5,11 +5,11 @@ import { getDuoGeometry } from "../src/core/geometry"
 import { getBarsLayout } from "../src/core/layout/bars"
 import { getAccessoryLayout } from "../src/core/layout/accessories"
 import { getSystemLayout } from "../src/core/layout/system"
-import { createDuoStore } from "../src/core/store"
+import { DuoStore } from "../src/core/store"
 import { DuoAppToolbar, DuoFrame, DuoProvider, DuoTabBar } from "../src"
 
 test("full-window bars use measured glass-edge offsets without changing content safe areas", () => {
-  const store = createDuoStore({ orientation: "portrait" })
+  const store = new DuoStore({ orientation: "portrait" })
   const outer = store.getSnapshot().screens.outer
   expect(getAccessoryLayout(outer)).toMatchObject({ left: 394, right: 24, top: 170, bottom: 24 })
   expect(outer.safeArea).toEqual({ top: 0, right: 84, bottom: 34, left: 0 })
@@ -33,7 +33,7 @@ test("full-window bars use measured glass-edge offsets without changing content 
 })
 
 test("bar rails follow app placement and measured hardware edges", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   expect(getAccessoryLayout(store.getSnapshot().screens.inner).side).toBe("right")
   store.actions.setInnerPlacement("left")
   const left = getAccessoryLayout(store.getSnapshot().screens.inner)
@@ -75,7 +75,7 @@ test("outer bars leave room for status and the camera at either end", () => {
 })
 
 test("helpers require a frame surface and server rendering defers portals", () => {
-  const screen = createDuoStore().getSnapshot().screens.inner
+  const screen = new DuoStore().getSnapshot().screens.inner
   const layout = getBarsLayout(screen, { tabbar: {} }).tabbar!
   const items = [{ id: "home", label: "Home", icon: <span>H</span> }]
   const onSelect = () => {}
@@ -129,7 +129,7 @@ test("inner landscape bars and status share the reference axis without doubling 
 })
 
 test("tab items require stable unique IDs before mounting", () => {
-  const screen = createDuoStore().getSnapshot().screens.inner
+  const screen = new DuoStore().getSnapshot().screens.inner
   const layout = getBarsLayout(screen, { tabbar: {} }).tabbar!
   const render = (ids: string[]) =>
     renderToString(

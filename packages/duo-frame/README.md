@@ -596,8 +596,8 @@ The bar provides native buttons, an accessible navigation region, and
 The component accepts standard div attributes except `children` and the DOM
 `onSelect` event, plus a forwarded div ref. Appearance styles can be supplied,
 but the resolved layout owns positioning styles. Private horizontal and vertical
-variants share a WebGL glass renderer, spring motion, and artwork loading. Hold
-or drag the lens to expand it; holding the vertical rail also reveals labels.
+layouts use one glass component with a WebGL renderer, spring motion, and artwork
+loading. Hold or drag the lens to expand it; holding the vertical rail also reveals labels.
 The bar respects reduced motion and follows `system.colorMode` for its material.
 Set `style={{ colorScheme: "light" }}` or `style={{ colorScheme: "dark" }}` to
 override the material for an individual bar.

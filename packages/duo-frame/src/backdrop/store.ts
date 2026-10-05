@@ -1,6 +1,7 @@
-import type { DuoRect } from "../core/types"
+import type { DuoRect, DuoScreenInfo } from "../core/types"
 import { chooseIndicatorStyle, type ResolvedIndicatorStyle } from "./contrast"
-import { samePixels, sameRect } from "./regions"
+import { blur, paddedRegion, samePixels, sameRect } from "./image"
+import { iframeCapture } from "./iframe-capture"
 
 export type IndicatorSample = "time" | "glyph" | "home"
 export interface BackdropRequest {
@@ -25,170 +26,218 @@ const initial: BackdropSnapshot = {
   colors: { time: "dark", glyph: "dark", home: "dark" },
 }
 
-export function createBackdropStore() {
-  let snapshot = initial
-  const requests = new Map<symbol, BackdropRequest>()
-  const listeners = new Set<() => void>()
-  const requestListeners = new Set<() => void>()
-  function subscribe(listener: () => void) {
-    listeners.add(listener)
+const excluded = ".duo-accessory-window, .duo-status-material, .duo-system"
+
+export class BackdropStore {
+  private snapshot = initial
+  private readonly requests = new Map<symbol, BackdropRequest>()
+  private readonly listeners = new Set<() => void>()
+  private source?: HTMLElement
+  private screen?: DuoScreenInfo
+  private observer?: MutationObserver
+  private resize?: ResizeObserver
+  private refresh?: ReturnType<typeof setInterval>
+  private timer?: ReturnType<typeof setTimeout>
+  private busy = false
+  private dirty = false
+  private generation = 0
+  private lastStart = -Infinity
+
+  getSnapshot = () => this.snapshot
+  getServerSnapshot = () => initial
+
+  subscribe = (listener: () => void) => {
+    this.listeners.add(listener)
     return () => {
-      listeners.delete(listener)
+      this.listeners.delete(listener)
     }
   }
-  return {
-    getSnapshot: () => snapshot,
-    getServerSnapshot: () => initial,
-    getRequests: () => new Map(requests),
-    request: (key: symbol, request: BackdropRequest) => {
-      const previous = requests.get(key)
+
+  subscribeRegion(key: symbol, listener: () => void) {
+    let region = this.snapshot.regions.get(key)
+    return this.subscribe(() => {
+      const next = this.snapshot.regions.get(key)
+      if (next === region) return
+      region = next
+      listener()
+    })
+  }
+
+  request(key: symbol, request: BackdropRequest) {
+    const previous = this.requests.get(key)
+    if (
+      previous &&
+      sameRect(previous.area, request.area) &&
+      previous.blur === request.blur &&
+      previous.indicator === request.indicator
+    )
+      return
+    this.requests.set(key, request)
+    this.invalidate()
+  }
+
+  release(key: symbol) {
+    if (this.requests.delete(key)) this.invalidate()
+  }
+
+  updateScreen(screen: DuoScreenInfo) {
+    this.screen = screen
+    this.invalidate()
+  }
+
+  connect(source: HTMLElement) {
+    this.source = source
+    this.observer = new MutationObserver((records) => {
       if (
-        previous &&
-        sameRect(previous.area, request.area) &&
-        previous.blur === request.blur &&
-        previous.indicator === request.indicator
+        records.some((record) => {
+          const element =
+            record.target instanceof Element ? record.target : record.target.parentElement
+          return !element?.closest(excluded)
+        })
       )
-        return
-      requests.set(key, request)
-      requestListeners.forEach((listener) => listener())
-    },
-    release: (key: symbol) => {
-      if (requests.delete(key)) requestListeners.forEach((listener) => listener())
-    },
-    subscribeRequests: (listener: () => void) => {
-      requestListeners.add(listener)
-      return () => {
-        requestListeners.delete(listener)
-      }
-    },
-    subscribe,
-    subscribeRegion: (key: symbol, listener: () => void) => {
-      let region = snapshot.regions.get(key)
-      return subscribe(() => {
-        const next = snapshot.regions.get(key)
-        if (next === region) return
-        region = next
-        listener()
-      })
-    },
-    publish: (next: BackdropSnapshot) => {
-      if (next === snapshot) return
-      snapshot = next
-      listeners.forEach((listener) => listener())
-    },
+        this.schedule()
+    })
+    this.observer.observe(source, {
+      attributes: true,
+      childList: true,
+      characterData: true,
+      subtree: true,
+    })
+    // Frame CSS variables can alter the app without mutating its subtree.
+    for (let parent = source.parentElement; parent; parent = parent.parentElement)
+      this.observer.observe(parent, { attributes: true })
+    this.resize = new ResizeObserver(this.schedule)
+    this.resize.observe(source)
+    source.addEventListener("scroll", this.schedule, true)
+    source.addEventListener("input", this.schedule, true)
+    source.addEventListener("load", this.schedule, true)
+    document.addEventListener("visibilitychange", this.schedule)
+    // CSSOM, canvas drawing, and iframe interiors have no parent DOM mutation signal.
+    this.refresh = setInterval(this.schedule, 500)
+    this.invalidate()
   }
-}
-export type BackdropStore = ReturnType<typeof createBackdropStore>
 
-async function blur(canvas: HTMLCanvasElement, radius: number) {
-  const output = document.createElement("canvas")
-  output.width = canvas.width
-  output.height = canvas.height
-  const context = output.getContext("2d")!
-  // Extend the source edges so a blur near a display boundary stays opaque.
-  const padding = Math.ceil(radius * 3)
-  const padded = document.createElement("canvas")
-  padded.width = canvas.width + padding * 2
-  padded.height = canvas.height + padding * 2
-  const p = padded.getContext("2d")!
-  p.drawImage(canvas, padding, padding)
-  p.drawImage(canvas, 0, 0, canvas.width, 1, padding, 0, canvas.width, padding)
-  p.drawImage(
-    canvas,
-    0,
-    canvas.height - 1,
-    canvas.width,
-    1,
-    padding,
-    padding + canvas.height,
-    canvas.width,
-    padding,
-  )
-  p.drawImage(padded, padding, 0, 1, padded.height, 0, 0, padding, padded.height)
-  p.drawImage(
-    padded,
-    padding + canvas.width - 1,
-    0,
-    1,
-    padded.height,
-    padding + canvas.width,
-    0,
-    padding,
-    padded.height,
-  )
-  // SVG filters work in WebKit too, where CanvasRenderingContext2D.filter is absent.
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}" viewBox="${padding} ${padding} ${canvas.width} ${canvas.height}"><defs><filter id="blur" filterUnits="userSpaceOnUse" x="0" y="0" width="${padded.width}" height="${padded.height}" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${radius}" /></filter></defs><image width="${padded.width}" height="${padded.height}" href="${padded.toDataURL()}" filter="url(#blur)" /></svg>`
-  const image = new Image()
-  image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
-  await image.decode()
-  context.drawImage(image, 0, 0)
-  return output
-}
-
-export async function prepareBackdrop(
-  canvas: HTMLCanvasElement,
-  requests: ReadonlyMap<symbol, BackdropRequest>,
-  previous: BackdropSnapshot,
-) {
-  // Read the shared image once; reading separate GPU-backed crops repeats the
-  // readback cost for every consumer, even when all of them are unchanged.
-  const source = canvas.getContext("2d", { willReadFrequently: true })!
-  const image = source.getImageData(0, 0, canvas.width, canvas.height)
-  const regions = new Map<symbol, BackdropRegion>()
-  const colors = { ...previous.colors }
-  let changed = requests.size !== previous.regions.size
-  await Promise.all(
-    Array.from(requests, async ([key, request]) => {
-      const { area } = request
-      const pixels = new Uint8ClampedArray(area.width * area.height * 4)
-      for (let y = 0; y < area.height; y++) {
-        const offset = ((area.y + y) * image.width + area.x) * 4
-        pixels.set(image.data.subarray(offset, offset + area.width * 4), y * area.width * 4)
-      }
-      const old = previous.regions.get(key)
-      if (
-        old &&
-        sameRect(old, area) &&
-        old.blur === request.blur &&
-        old.indicator === request.indicator &&
-        samePixels(old.pixels, pixels)
-      ) {
-        regions.set(key, old)
-        return
-      }
-      changed = true
-      const raw = document.createElement("canvas")
-      raw.width = area.width
-      raw.height = area.height
-      const context = raw.getContext("2d")!
-      const crop = context.createImageData(raw.width, raw.height)
-      crop.data.set(pixels)
-      context.putImageData(crop, 0, 0)
-      const blurred = request.blur ? await blur(raw, request.blur) : raw
-      regions.set(key, {
-        ...area,
-        canvas: raw,
-        blurred,
-        pixels,
-        blur: request.blur,
-        indicator: request.indicator,
-      })
-      if (request.indicator)
-        colors[request.indicator] = chooseIndicatorStyle(pixels, colors[request.indicator])
-    }),
-  )
-  return changed ? { regions, colors } : previous
-}
-
-/** Offset-parent coordinates exclude the frame's presentation zoom and rotation. */
-export function backdropOrigin(element: HTMLElement) {
-  let x = 0
-  let y = 0
-  let current: HTMLElement | null = element
-  while (current && !current.classList.contains("duo-screen")) {
-    x += current.offsetLeft
-    y += current.offsetTop
-    current = current.offsetParent as HTMLElement | null
+  disconnect() {
+    this.generation++
+    clearTimeout(this.timer)
+    this.timer = undefined
+    clearInterval(this.refresh)
+    this.observer?.disconnect()
+    this.resize?.disconnect()
+    this.source?.removeEventListener("scroll", this.schedule, true)
+    this.source?.removeEventListener("input", this.schedule, true)
+    this.source?.removeEventListener("load", this.schedule, true)
+    document.removeEventListener("visibilitychange", this.schedule)
+    this.source = undefined
   }
-  return { x, y }
+
+  private invalidate() {
+    this.generation++
+    this.schedule()
+  }
+
+  private schedule = () => {
+    if (!this.source || document.hidden || !this.screen?.visible) return
+    this.dirty = true
+    if (this.busy || this.timer !== undefined) return
+    this.timer = setTimeout(
+      () => {
+        void this.capture()
+      },
+      Math.max(0, Math.ceil(50 - (performance.now() - this.lastStart))),
+    )
+  }
+
+  private async capture() {
+    this.timer = undefined
+    const { source, screen } = this
+    if (!source || !screen?.visible || document.hidden) return
+    this.busy = true
+    this.dirty = false
+    this.lastStart = performance.now()
+    const generation = this.generation
+    try {
+      const requests = new Map<symbol, BackdropRequest>()
+      for (const [key, request] of this.requests) {
+        const area = paddedRegion(request.area, request.blur * 3, screen.size)
+        if (area) requests.set(key, { ...request, area })
+      }
+      let next = this.snapshot
+      if (requests.size) {
+        const { snapdom } = await import("@zumer/snapdom")
+        const canvas = await snapdom.toCanvas(source, {
+          scale: 1,
+          dpr: 1,
+          exclude: excluded,
+          excludeMode: "remove",
+          fast: false,
+          invalidate: true,
+          plugins: [iframeCapture],
+        })
+        next = await this.prepare(canvas, requests)
+      } else if (next.regions.size) {
+        next = { ...next, regions: new Map() }
+      }
+      if (generation !== this.generation || next === this.snapshot) return
+      this.snapshot = next
+      this.listeners.forEach((listener) => listener())
+    } catch {
+      // Keep the last completed image if a resource cannot be captured.
+    } finally {
+      this.busy = false
+      if (this.dirty) this.schedule()
+    }
+  }
+
+  private async prepare(canvas: HTMLCanvasElement, requests: ReadonlyMap<symbol, BackdropRequest>) {
+    const previous = this.snapshot
+    // Read the shared image once; reading separate GPU-backed crops repeats the
+    // readback cost for every consumer, even when all of them are unchanged.
+    const source = canvas.getContext("2d", { willReadFrequently: true })!
+    const image = source.getImageData(0, 0, canvas.width, canvas.height)
+    const regions = new Map<symbol, BackdropRegion>()
+    const colors = { ...previous.colors }
+    let changed = requests.size !== previous.regions.size
+    await Promise.all(
+      Array.from(requests, async ([key, request]) => {
+        const { area } = request
+        const pixels = new Uint8ClampedArray(area.width * area.height * 4)
+        for (let y = 0; y < area.height; y++) {
+          const offset = ((area.y + y) * image.width + area.x) * 4
+          pixels.set(image.data.subarray(offset, offset + area.width * 4), y * area.width * 4)
+        }
+        const old = previous.regions.get(key)
+        if (
+          old &&
+          sameRect(old, area) &&
+          old.blur === request.blur &&
+          old.indicator === request.indicator &&
+          samePixels(old.pixels, pixels)
+        ) {
+          regions.set(key, old)
+          return
+        }
+        changed = true
+        const raw = document.createElement("canvas")
+        raw.width = area.width
+        raw.height = area.height
+        const context = raw.getContext("2d")!
+        const crop = context.createImageData(raw.width, raw.height)
+        crop.data.set(pixels)
+        context.putImageData(crop, 0, 0)
+        const blurred = request.blur ? await blur(raw, request.blur) : raw
+        regions.set(key, {
+          ...area,
+          canvas: raw,
+          blurred,
+          pixels,
+          blur: request.blur,
+          indicator: request.indicator,
+        })
+        if (request.indicator)
+          colors[request.indicator] = chooseIndicatorStyle(pixels, colors[request.indicator])
+      }),
+    )
+    return changed ? { regions, colors } : previous
+  }
 }

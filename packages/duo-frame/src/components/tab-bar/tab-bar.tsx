@@ -2,8 +2,7 @@ import * as React from "react"
 import { createPortal } from "react-dom"
 import { useAccessoryHost } from "../../context/accessory-context"
 import { useDuoState } from "../../context/hooks"
-import { HorizontalTabBar } from "./horizontal"
-import { VerticalTabBar } from "./vertical"
+import { GlassTabs } from "./glass-tabs"
 import type { ResolvedBarLayout } from "../../core/bar-types"
 
 export interface DuoTabBarItem {
@@ -51,23 +50,14 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
       className={["duo-tab-bar", className].filter(Boolean).join(" ")}
       style={{ ...style, ...layout.containerProps.style }}
     >
-      {layout.axis === "vertical" ? (
-        <VerticalTabBar
-          dark={dark}
-          items={items}
-          selectedId={selectedId}
-          onSelect={onSelect}
-          layout={layout}
-        />
-      ) : (
-        <HorizontalTabBar
-          dark={dark}
-          items={items}
-          selectedId={selectedId}
-          onSelect={onSelect}
-          layout={layout}
-        />
-      )}
+      <GlassTabs
+        key={layout.axis}
+        dark={dark}
+        items={items}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        vertical={layout.axis === "vertical"}
+      />
     </div>,
     host,
   )

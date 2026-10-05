@@ -1,6 +1,5 @@
 import * as React from "react"
-import { createBackdropStore } from "../../backdrop/store"
-import { observeBackdrop } from "../../backdrop/capture"
+import { BackdropStore } from "../../backdrop/store"
 import { BackdropContext } from "../../context/backdrop-context"
 import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
 import { AccessoryContext } from "../../context/accessory-context"
@@ -25,21 +24,14 @@ export function DisplaySurface({
 }) {
   const screen = useDuoState((state) => state.screens[display])
   const colorMode = useDuoState((state) => state.system.colorMode)
-  const [backdrop] = React.useState(createBackdropStore)
+  const [backdrop] = React.useState(() => new BackdropStore())
   const source = React.useRef<HTMLDivElement>(null)
-  const screenRef = React.useRef(screen)
-  const capture = React.useRef<ReturnType<typeof observeBackdrop>>()
   useBrowserLayoutEffect(() => {
-    screenRef.current = screen
-    capture.current?.invalidate()
-  }, [screen, colorMode])
+    backdrop.updateScreen(screen)
+  }, [backdrop, screen, colorMode])
   React.useEffect(() => {
-    const observer = observeBackdrop(source.current!, () => screenRef.current, backdrop)
-    capture.current = observer
-    return () => {
-      observer.dispose()
-      capture.current = undefined
-    }
+    backdrop.connect(source.current!)
+    return () => backdrop.disconnect()
   }, [backdrop])
   const [barHost, setBarHost] = React.useState<HTMLDivElement>()
   const attachBarHost = React.useCallback(

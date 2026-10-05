@@ -11,7 +11,7 @@ import {
   type ResolvedBarLayout,
 } from "../src"
 import { getBarsLayout } from "../src/core/layout/bars"
-import { createDuoStore } from "../src/core/store"
+import { DuoStore } from "../src/core/store"
 
 function overlaps(a: DuoRect, b: DuoRect) {
   const epsilon = 0.000001
@@ -48,7 +48,7 @@ function checkLayout(screen: DuoScreenInfo, bars: readonly ResolvedBarLayout[]) 
 }
 
 test("portrait allocations retain native edge offsets and distinct tab distributions", () => {
-  const screen = createDuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
+  const screen = new DuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
   const layout = getBarsLayout(screen, {
     toolbars: [{ id: "navigation", placement: "top-trailing" }],
     tabbar: {},
@@ -66,7 +66,7 @@ test("portrait allocations retain native edge offsets and distinct tab distribut
 })
 
 test("toolbars share areas in logical order while results retain request order", () => {
-  const screen = createDuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
+  const screen = new DuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
   const request = {
     toolbars: [
       { id: "trailing", placement: "top-trailing" },
@@ -85,7 +85,7 @@ test("toolbars share areas in logical order while results retain request order",
 })
 
 test("portrait bottom toolbars sit above the tab composition", () => {
-  const screen = createDuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
+  const screen = new DuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
   expect(
     getBarsLayout(screen, { toolbars: [{ id: "actions", placement: "bottom" }] }).toolbars[0].rect,
   ).toEqual({ x: 20, y: 879, width: 629, height: 48 })
@@ -99,7 +99,7 @@ test("portrait bottom toolbars sit above the tab composition", () => {
 })
 
 test("adaptive bars share a rail while horizontal navigation stays at the top", () => {
-  const screen = createDuoStore({ orientation: "portrait" }).getSnapshot().screens.outer
+  const screen = new DuoStore({ orientation: "portrait" }).getSnapshot().screens.outer
   const result = getBarsLayout(screen, {
     toolbars: [
       { id: "text", placement: "top-leading", axis: "horizontal" },
@@ -120,7 +120,7 @@ test("adaptive bars share a rail while horizontal navigation stays at the top", 
 })
 
 test("allocated rails are window-local and follow split placement", () => {
-  const store = createDuoStore()
+  const store = new DuoStore()
   for (const placement of ["full", "left", "right"] as const) {
     store.actions.setInnerPlacement(placement)
     const screen = store.getSnapshot().screens.inner
@@ -154,10 +154,7 @@ test("all frame configurations avoid reservations and mutual overlap", () => {
     for (const posture of ["open", "closed", "partially-open"] as const) {
       for (const innerPlacement of ["full", "left", "right"] as const) {
         if (orientation.startsWith("portrait") && innerPlacement !== "full") continue
-        const store = createDuoStore(
-          { orientation, posture, innerPlacement },
-          { cameraActive: true },
-        )
+        const store = new DuoStore({ orientation, posture, innerPlacement }, { cameraActive: true })
         for (const screen of Object.values(store.getSnapshot().screens)) {
           for (const distribution of ["packed", "edges"] as const) {
             const result = getBarsLayout(screen, { ...request, tabbar: { distribution } })
@@ -170,7 +167,7 @@ test("all frame configurations avoid reservations and mutual overlap", () => {
 })
 
 test("invalid declarations and exhausted space fail explicitly", () => {
-  const screen = createDuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
+  const screen = new DuoStore({ orientation: "portrait" }).getSnapshot().screens.inner
   expect(() =>
     getBarsLayout(screen, {
       toolbars: [

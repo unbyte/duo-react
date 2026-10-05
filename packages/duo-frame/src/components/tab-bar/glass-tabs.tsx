@@ -1,11 +1,13 @@
 import * as React from "react"
 import { useBackdropStore } from "../../context/backdrop-context"
 import { useBackdropRegion } from "../../backdrop/use-region"
-import { backdropOrigin } from "../../backdrop/store"
+import { backdropOrigin } from "../../backdrop/image"
 import { useLensMotion } from "./motion"
-import { createRenderer } from "./renderer"
+import { GlassRenderer } from "./renderer"
 import { canvasPadding } from "./shaders"
-import { clamp, makeArtwork, optics, type GlassVariant, type VariantProps } from "./shared"
+import { clamp, TabLayout } from "./layout"
+import { makeArtwork } from "./artwork"
+import type { DuoTabBarProps } from "./tab-bar"
 
 function useMedia(query: string) {
   const [matches, setMatches] = React.useState(false)
@@ -23,35 +25,37 @@ export function GlassTabs({
   items,
   selectedId,
   onSelect,
-  variant,
+  vertical,
   dark = false,
-}: VariantProps & { variant: GlassVariant }) {
+}: Pick<DuoTabBarProps, "items" | "selectedId" | "onSelect"> & {
+  vertical: boolean
+  dark?: boolean
+}) {
+  const layout = React.useMemo(
+    () => new TabLayout(vertical, items.length),
+    [vertical, items.length],
+  )
   const backdrop = useBackdropStore()
-  const repaint = React.useRef<() => void>()
   const root = React.useRef<HTMLDivElement>(null)
   const region = useBackdropRegion(() => {
     const origin = backdropOrigin(root.current!.parentElement!)
-    const expanded = variant.geometry(1, 1, 0)
+    const expanded = layout.geometry(1, 1, 0)
     // Reserve the expanded platter, canvas overscan, and refraction reach once.
     const padding = canvasPadding + 12
-    const width = variant.vertical ? expanded.cross : expanded.length
-    const height = variant.vertical ? expanded.length : expanded.cross
+    const width = vertical ? expanded.cross : expanded.length
+    const height = vertical ? expanded.length : expanded.cross
     return {
       area: {
-        x: origin.x - (variant.vertical ? (expanded.cross - variant.rest.cross) / 2 : 0) - padding,
-        y: origin.y - (variant.vertical ? expanded.length - variant.rest.length : 0) - padding,
+        x: origin.x - (vertical ? (expanded.cross - layout.rest.cross) / 2 : 0) - padding,
+        y: origin.y - (vertical ? expanded.length - layout.rest.length : 0) - padding,
         width: width + padding * 2,
         height: height + padding * 2,
       },
       blur: 6,
     }
   })
-  React.useEffect(
-    () => backdrop.subscribeRegion(region, () => repaint.current?.()),
-    [backdrop, region],
-  )
   const canvas = React.useRef<HTMLCanvasElement>(null)
-  const renderer = React.useRef<ReturnType<typeof createRenderer>>()
+  const renderer = React.useRef<GlassRenderer>()
   const artwork = React.useRef<HTMLCanvasElement>()
   const [ready, setReady] = React.useState(false)
   const [artworkReady, setArtworkReady] = React.useState(false)
@@ -73,22 +77,16 @@ export function GlassTabs({
   }>()
   const selected = items.findIndex((item) => item.id === selectedId)
   const defaultAccent = dark ? "#209bff" : "#0088ff"
-  const { rest } = variant
+  const { rest } = layout
   const selectedPosition = rest.first + Math.max(0, selected) * rest.pitch
   const motion = useLensMotion(target ?? selectedPosition, expanded, reducedMotion)
   const detail = useLensMotion(0, detailed, reducedMotion)
-  const geometry = variant.geometry(
+  const geometry = layout.geometry(
     clamp(detail.growth, 0, 1),
     clamp(motion.growth, 0, 1),
     motion.deformation,
   )
-  const rawPosition = geometry.first + ((motion.x - rest.first) / rest.pitch) * geometry.pitch
-  const lensLength = geometry.lensLength
-  const position = rawPosition
-  const latest = React.useRef({ items, variant })
-  React.useEffect(() => {
-    latest.current = { items, variant }
-  }, [items, variant])
+  const position = geometry.first + ((motion.x - rest.first) / rest.pitch) * geometry.pitch
 
   React.useEffect(() => {
     const element = canvas.current!
@@ -102,7 +100,7 @@ export function GlassTabs({
     element.addEventListener("webglcontextlost", lost)
     element.addEventListener("webglcontextrestored", restored)
     try {
-      renderer.current = createRenderer(element, variant.vertical)
+      renderer.current = new GlassRenderer(element, vertical)
     } catch {
       renderer.current = undefined
     }
@@ -112,7 +110,7 @@ export function GlassTabs({
       renderer.current?.dispose()
       renderer.current = undefined
     }
-  }, [variant.vertical, generation])
+  }, [vertical, generation])
 
   React.useEffect(() => {
     let disposed = false
@@ -123,11 +121,10 @@ export function GlassTabs({
       artwork.current = undefined
       setReady(false)
       const requested = ++revision
-      const current = latest.current
       void makeArtwork(
         source,
-        current.variant,
-        current.items.map((item) => item.label),
+        layout,
+        items.map((item) => item.label),
       )
         .then((image) => {
           if (disposed || requested !== revision) return
@@ -159,7 +156,7 @@ export function GlassTabs({
       observer.disconnect()
       cancelAnimationFrame(request)
     }
-  }, [items, rest.length, variant.vertical, generation])
+  }, [items, layout, generation])
 
   React.useEffect(() => {
     const draw = () => {
@@ -167,19 +164,11 @@ export function GlassTabs({
       try {
         const drawn = renderer.current.draw(
           {
-            ...optics,
             backdrop: backdrop.getSnapshot().regions.get(region),
             origin: backdropOrigin(root.current!),
-            width: geometry.length,
-            crossSize: geometry.cross,
-            firstCenter: geometry.first,
-            pitch: geometry.pitch,
+            geometry,
             count: items.length,
-            itemWidth: geometry.itemLength,
-            labels: geometry.labels,
             x: selected < 0 && target === undefined ? -1000 : position,
-            lensWidth: lensLength,
-            lensHeight: geometry.lensCross,
             growth: clamp(motion.growth, 0, 1),
             dark,
             accents: Array.from(
@@ -194,11 +183,11 @@ export function GlassTabs({
         setReady(false)
       }
     }
-    repaint.current = draw
+    const unsubscribe = backdrop.subscribeRegion(region, draw)
     const request = requestAnimationFrame(draw)
     return () => {
       cancelAnimationFrame(request)
-      repaint.current = undefined
+      unsubscribe()
     }
   }, [
     backdrop,
@@ -206,12 +195,10 @@ export function GlassTabs({
     geometry,
     items,
     position,
-    lensLength,
     selected,
     target,
     motion.growth,
     dark,
-    defaultAccent,
     generationArtwork,
   ])
 
@@ -224,7 +211,7 @@ export function GlassTabs({
   )
 
   function local(event: React.PointerEvent<HTMLDivElement>) {
-    return variant.point(
+    return layout.point(
       event.currentTarget.getBoundingClientRect(),
       event.clientX,
       event.clientY,
@@ -255,7 +242,7 @@ export function GlassTabs({
     event.currentTarget.setPointerCapture(event.pointerId)
     setTarget(rest.first + index * rest.pitch)
     setExpanded(true)
-    if (variant.vertical) holdTimer.current = setTimeout(() => setDetailed(true), 320)
+    if (vertical) holdTimer.current = setTimeout(() => setDetailed(true), 320)
   }
   function move(event: React.PointerEvent<HTMLDivElement>) {
     const active = gesture.current
@@ -264,7 +251,7 @@ export function GlassTabs({
     if (!active.dragged && Math.abs(delta) <= 3) return
     active.dragged = true
     clearTimeout(holdTimer.current)
-    setDetailed(variant.vertical)
+    setDetailed(vertical)
     const value = active.anchor + delta
     const excess = value - bounded(value)
     setTarget(bounded(value) + (excess * 0.35) / (1 + (Math.abs(excess) * 0.35) / 12))
@@ -294,13 +281,19 @@ export function GlassTabs({
     if (event.currentTarget.hasPointerCapture(event.pointerId))
       event.currentTarget.releasePointerCapture(event.pointerId)
   }
-  const canvasSize = variant.size({
+  const canvasSize = layout.size({
     ...geometry,
     length: geometry.length + canvasPadding * 2,
     cross: geometry.cross + canvasPadding * 2,
   })
   return (
-    <div className="duo-tab-bar-slot" style={variant.style}>
+    <div
+      className="duo-tab-bar-slot"
+      style={{
+        width: vertical ? rest.cross : rest.length,
+        height: vertical ? rest.length : rest.cross,
+      }}
+    >
       <div
         ref={root}
         className="duo-tab-bar-surface"
@@ -309,7 +302,7 @@ export function GlassTabs({
         data-expanded={expanded}
         data-label-reveal={geometry.labels}
         data-material-dark={dark}
-        style={variant.size(geometry)}
+        style={layout.size(geometry)}
         onPointerDown={start}
         onPointerMove={move}
         onPointerUp={end}
@@ -328,7 +321,7 @@ export function GlassTabs({
             type="button"
             className="duo-tab-bar-item"
             style={{
-              ...variant.itemStyle(geometry, index),
+              ...layout.itemStyle(geometry, index),
               color: item.selectedColor ?? defaultAccent,
             }}
             aria-current={item.id === selectedId ? "page" : undefined}
@@ -344,9 +337,9 @@ export function GlassTabs({
             }}
             onKeyDown={(event) => {
               let next = index
-              if (event.key === (variant.vertical ? "ArrowDown" : "ArrowRight"))
+              if (event.key === (vertical ? "ArrowDown" : "ArrowRight"))
                 next = (index + 1) % items.length
-              else if (event.key === (variant.vertical ? "ArrowUp" : "ArrowLeft"))
+              else if (event.key === (vertical ? "ArrowUp" : "ArrowLeft"))
                 next = (index + items.length - 1) % items.length
               else if (event.key === "Home") next = 0
               else if (event.key === "End") next = items.length - 1
