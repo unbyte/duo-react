@@ -8,6 +8,6 @@ export const AccessoryContext = React.createContext<AccessoryHost | undefined>(u
 
 export function useAccessoryHost() {
   const host = React.useContext(AccessoryContext)
-  if (!host) throw new Error("DuoTabBar and DuoAppToolbar must be inside DuoFrame's children.")
+  if (!host) throw new Error("DuoTabBar and DuoToolbar must be inside DuoFrame's children.")
   return host.node
 }

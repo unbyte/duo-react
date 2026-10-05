@@ -258,7 +258,7 @@ select {
   border: 0;
   border-radius: 3px;
 }
-.demo-toolbar {
+.demo-preview-controls {
   flex-shrink: 0;
   padding: 4px 8px max(20px, env(safe-area-inset-bottom));
   display: flex;
@@ -266,7 +266,7 @@ select {
   flex-wrap: wrap;
   gap: 6px;
 }
-.demo-toolbar-group {
+.demo-control-group {
   display: flex;
   gap: 2px;
   padding: 4px;
@@ -278,7 +278,7 @@ select {
     0 3px 12px #18283b0a,
     0 12px 28px #18283b0a;
 }
-.demo-toolbar button {
+.demo-preview-controls button {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -295,34 +295,34 @@ select {
     background-color 120ms ease,
     color 120ms ease;
 }
-.demo-toolbar button:hover:not(:disabled) {
+.demo-preview-controls button:hover:not(:disabled) {
   background: #edf1f6;
 }
-.demo-toolbar button[aria-pressed="true"] {
+.demo-preview-controls button[aria-pressed="true"] {
   background: #e7f1ff;
   color: #0879ed;
 }
-.demo-toolbar button[aria-pressed="true"]:hover {
+.demo-preview-controls button[aria-pressed="true"]:hover {
   background: #dcecff;
 }
-.demo-toolbar button:active:not(:disabled) {
+.demo-preview-controls button:active:not(:disabled) {
   background: #dce4ef;
 }
-.demo-toolbar button:focus-visible {
+.demo-preview-controls button:focus-visible {
   outline: 2px solid #0879ed;
   outline-offset: 2px;
 }
-.demo-toolbar button:disabled {
+.demo-preview-controls button:disabled {
   color: #9da6b2;
   cursor: default;
 }
-.demo-toolbar svg {
+.demo-preview-controls svg {
   display: block;
   width: 20px;
   height: 20px;
 }
 @media (prefers-reduced-motion: reduce) {
-  .demo-toolbar button {
+  .demo-preview-controls button {
     transition: none;
   }
 }

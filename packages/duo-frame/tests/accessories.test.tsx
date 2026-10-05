@@ -6,7 +6,7 @@ import { getBarsLayout } from "../src/core/layout/bars"
 import { getAccessoryLayout } from "../src/core/layout/accessories"
 import { getSystemLayout } from "../src/core/layout/system"
 import { DuoStore } from "../src/core/store"
-import { DuoAppToolbar, DuoFrame, DuoProvider, DuoTabBar } from "../src"
+import { DuoToolbar, DuoFrame, DuoProvider, DuoTabBar } from "../src"
 
 test("full-window bars use measured glass-edge offsets without changing content safe areas", () => {
   const store = new DuoStore({ orientation: "portrait" })
@@ -89,7 +89,7 @@ test("helpers require a frame surface and server rendering defers portals", () =
   expect(() =>
     renderToString(
       <DuoProvider>
-        <DuoAppToolbar />
+        <DuoToolbar />
       </DuoProvider>,
     ),
   ).toThrow("inside DuoFrame")
@@ -97,7 +97,7 @@ test("helpers require a frame surface and server rendering defers portals", () =
     <DuoProvider>
       <DuoFrame>
         <DuoTabBar layout={layout} items={items} selectedId="home" onSelect={onSelect} />
-        <DuoAppToolbar />
+        <DuoToolbar />
       </DuoFrame>
     </DuoProvider>,
   )

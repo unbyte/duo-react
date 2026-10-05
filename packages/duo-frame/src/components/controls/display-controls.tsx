@@ -9,7 +9,7 @@ export const DuoDisplayControls = React.forwardRef<HTMLDivElement, DuoControlGro
     const posture = useDuoState((state) => state.posture)
     const { setPosture } = useDuoActions()
     return (
-      <div role="group" aria-label="Posture" data-duo-toolbar-group="display" {...props} ref={ref}>
+      <div role="group" aria-label="Posture" data-duo-control-group="display" {...props} ref={ref}>
         <IconButton
           label="Closed"
           action="outer"

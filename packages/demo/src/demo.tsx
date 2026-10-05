@@ -6,7 +6,7 @@ import {
   DuoRegionMask,
   DuoProvider,
   DuoSafeArea,
-  DuoToolbar,
+  DuoControls,
   DuoDisplayControls,
   DuoRotationControls,
   DuoLayoutControls,
@@ -614,12 +614,12 @@ export function Demo() {
                 {showRegions && <DuoRegionMask frameRef={frame} theme="light" />}
               </PreviewFrame>
             </div>
-            <DuoToolbar className="demo-toolbar">
-              <DuoDisplayControls className="demo-toolbar-group" />
-              <DuoRotationControls className="demo-toolbar-group" />
-              <DuoLayoutControls className="demo-toolbar-group" />
-              <DuoZoomControls className="demo-toolbar-group" />
-            </DuoToolbar>
+            <DuoControls className="demo-preview-controls">
+              <DuoDisplayControls className="demo-control-group" />
+              <DuoRotationControls className="demo-control-group" />
+              <DuoLayoutControls className="demo-control-group" />
+              <DuoZoomControls className="demo-control-group" />
+            </DuoControls>
           </main>
           <StateInspector
             open={inspectorOpen}

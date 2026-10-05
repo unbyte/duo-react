@@ -193,7 +193,7 @@
 .duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-accessory-toolbar {
   justify-content: flex-end;
 }
-:where(.duo-app-bar) {
+:where(.duo-toolbar) {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -203,13 +203,13 @@
   overflow: auto;
   pointer-events: auto;
 }
-:where(.duo-app-bar > *) {
+:where(.duo-toolbar > *) {
   flex-shrink: 0;
 }
-:where(.duo-accessory-layout[data-duo-bar-axis="vertical"] .duo-app-bar) {
+:where(.duo-accessory-layout[data-duo-bar-axis="vertical"] .duo-toolbar) {
   width: 100%;
 }
-:where(.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-app-bar) {
+:where(.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-toolbar) {
   flex-direction: row;
 }
 

@@ -5,7 +5,7 @@ import {
   DuoFrame,
   DuoRegionMask,
   DuoProvider,
-  DuoToolbar,
+  DuoControls,
   DuoDisplayControls,
   DuoLayoutControls,
   DuoRotationControls,
@@ -226,20 +226,20 @@ test("headless control groups compose independently with the React 16.8 baseline
   )
   expect(standalone).toContain('class="my-rotation"')
   expect(standalone).toContain('aria-label="Rotate left"')
-  expect(standalone).not.toContain('data-duo-toolbar-group="zoom"')
+  expect(standalone).not.toContain('data-duo-control-group="zoom"')
   const composed = renderToString(
     <DuoProvider defaultState={{ posture: "closed" }}>
-      <DuoToolbar className="my-toolbar">
+      <DuoControls className="my-controls">
         <DuoZoomControls />
         <DuoDisplayControls />
         <DuoLayoutControls />
-      </DuoToolbar>
+      </DuoControls>
     </DuoProvider>,
   )
-  expect(composed).toContain('class="duo-toolbar my-toolbar"')
+  expect(composed).toContain('class="duo-controls my-controls"')
   expect(composed).toContain('aria-label="Zoom in"')
   expect(composed).toContain('aria-label="Closed"')
-  expect(composed).not.toContain('data-duo-toolbar-group="layout"')
+  expect(composed).not.toContain('data-duo-control-group="layout"')
 })
 
 test("partial posture selects its own control and keeps landscape layout controls available", () => {
@@ -252,6 +252,6 @@ test("partial posture selects its own control and keeps landscape layout control
   expect(html).toMatch(/data-duo-action="partially-open" aria-pressed="true"/)
   expect(html).toMatch(/data-duo-action="inner" aria-pressed="false"/)
   expect(html).toMatch(/data-duo-action="outer" aria-pressed="false"/)
-  expect(html).toContain('data-duo-toolbar-group="layout"')
+  expect(html).toContain('data-duo-control-group="layout"')
   expect(html).not.toContain("disabled")
 })

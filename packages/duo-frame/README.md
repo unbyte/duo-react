@@ -47,16 +47,16 @@ import {
   DuoDisplayControls,
   DuoLayoutControls,
   DuoRotationControls,
-  DuoToolbar,
+  DuoControls,
   DuoZoomControls,
 } from "duo-frame"
 
-<DuoToolbar className="preview-controls">
+<DuoControls className="preview-controls">
   <DuoDisplayControls />
   <DuoRotationControls />
   <DuoLayoutControls />
   <DuoZoomControls />
-</DuoToolbar>
+</DuoControls>
 ```
 
 Choose **Closed** for the outer display, or **Partially open** or **Fully open**
@@ -65,7 +65,7 @@ controls select the left, full, or right app window on the inner display; split
 windows are available in landscape. Rotating into portrait selects the full
 window. Zoom controls enlarge, reduce, or fit the preview.
 
-The groups can be omitted, reordered, or used without `DuoToolbar`. Supply your
+The groups can be omitted, reordered, or used without `DuoControls`. Supply your
 own control layout and button styling. Buttons have accessible names and expose
 selection through `aria-pressed`; style them with `[data-duo-action]`,
 `[aria-pressed="true"]`, and `:disabled`. Icons inherit `currentColor`.
@@ -257,15 +257,15 @@ Bars overlay content without adding safe-area padding. Leave room for them in
 your content layout, and keep the number of destinations small enough to fit;
 the tab bar does not scroll or provide an overflow menu.
 
-For a simple group of app actions, render your buttons in `DuoAppToolbar` inside
+For a simple group of app actions, render your buttons in `DuoToolbar` inside
 the frame. It places them at an edge appropriate to the current layout:
 
 ```tsx
-import { DuoAppToolbar } from "duo-frame"
+import { DuoToolbar } from "duo-frame"
 
-<DuoAppToolbar aria-label="Document actions">
+<DuoToolbar aria-label="Document actions">
   <button onClick={createDocument}>New</button>
-</DuoAppToolbar>
+</DuoToolbar>
 ```
 
 When custom toolbars need to share space with a tab bar, declare them together
@@ -292,7 +292,7 @@ return (
 
 Keep custom toolbar wrappers beside scrolling content in a positioned container
 covering the app window. Use the returned axis to arrange your actions within
-their allocated space. Separate `useBars` calls and `DuoAppToolbar` do not
+their allocated space. Separate `useBars` calls and `DuoToolbar` do not
 coordinate with this request.
 
 ## Zoom

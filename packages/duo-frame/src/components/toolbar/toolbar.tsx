@@ -1,17 +1,35 @@
 import * as React from "react"
-import type { DuoToolbarProps } from "./types"
+import { createPortal } from "react-dom"
+import { useAccessoryHost } from "../../context/accessory-context"
+import { useDuoScreen } from "../../context/hooks"
+import { getAccessoryLayout } from "../../core/layout/accessories"
+
+export type DuoToolbarProps = React.HTMLAttributes<HTMLDivElement>
 
 export const DuoToolbar = React.forwardRef<HTMLDivElement, DuoToolbarProps>(function DuoToolbar(
   { className, ...props },
   ref,
 ) {
-  return (
+  const host = useAccessoryHost()
+  const screen = useDuoScreen()
+  const { side, toolbarEndInset, ...bounds } = getAccessoryLayout(screen)
+  if (!host) return null
+  return createPortal(
     <div
-      role="group"
-      aria-label="Device preview controls"
-      {...props}
-      ref={ref}
-      className={["duo-toolbar", className].filter(Boolean).join(" ")}
-    />
+      className="duo-accessory-layout"
+      data-duo-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
+      style={bounds}
+    >
+      <div className="duo-accessory-toolbar" style={{ marginRight: toolbarEndInset }}>
+        <div
+          {...props}
+          ref={ref}
+          className={["duo-toolbar", className].filter(Boolean).join(" ")}
+          data-duo-bar="toolbar"
+          data-duo-bar-placement={side === "horizontal" ? "top" : side}
+        />
+      </div>
+    </div>,
+    host,
   )
 })
