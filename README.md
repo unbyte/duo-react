@@ -64,8 +64,8 @@ the demos consume its package exports from `packages/duo-frame/dist`.
 | `pnpm watch`       | Watch the library build                                                                |
 
 Use a package filter for focused work, such as `pnpm --filter duo-frame test --run`.
-The [package development guide](packages/duo-frame/README.md#preview-and-development)
-describes manual preview checks and React compatibility.
+The [package usage guide](packages/duo-frame/README.md)
+describes how to integrate the frame into an application.
 
 ## Code style and diagnostics
 
