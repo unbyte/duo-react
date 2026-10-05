@@ -38,11 +38,14 @@ Both demos show the current tab's page name. Select a tab, switch the inner
 window between left, right, and full, then switch to the outer display and back.
 The selected tab should persist.
 
-The appearance controls share one row and wrap on smaller screens. **Background**
-previews light, dark, gray, and mixed content; **Icons** selects automatic, white,
-or black indicators. **Camera** simulates inner-camera activity through
-`cameraActive`; enable **Regions** to see its reserved area. **Regions** toggles
-the layout overlay. Independent **Toolbars** and **Tab bar** toggles exercise all
+The sidebar starts with **System**: **Appearance** selects the simulated light or
+dark appearance, followed by time, battery, charging, Wi-Fi, and cellular controls.
+**App** is the second section. Its **Background** picker remembers a separate color
+for each mode; **Icons** selects automatic, white, or black indicators. It also
+contains status-bar visibility, the outer portrait lock, and **Block** controls. Inner-camera activity
+is enabled through `cameraActive`; **Regions** toggles the layout overlay.
+**App bars** starts with **Bar bounds**, then **Tab bar** and its distribution,
+followed by **Toolbars** and their per-toolbar options. Independent toggles exercise all
 four bar-presence combinations. Choose one to three toolbars, edit each
 placement and axis, and switch tabs between **Packed** and **Edges**.
 **Bar bounds** outlines the allocated rectangles independently of the content.
@@ -55,7 +58,7 @@ Drag the blue block beneath the system controls or tab bar to inspect the glass.
 Drag its bottom-right handle to resize width and height independently. Focus the
 handle and use arrow keys to resize, with Shift for 1px adjustments. Home resets
 both size and position.
-Use the native **Color** picker to try black, white, or any other block color.
+Use **App → Block color** to try black, white, or any other block color.
 Mouse, touch, and pen dragging follow preview zoom and rotation. Focus the block
 and use arrow keys to move it (Shift for finer movement), or Home to reset it.
 The block has no focus border or ring.
@@ -349,7 +352,7 @@ const frame = React.useRef<HTMLDivElement>(null)
 ```
 
 `theme` accepts `"auto"` (system color preference), `"light"`, or `"dark"`.
-The demo follows its Background selector. Normal div attributes, `className`, and
+The demo uses light labels against its preview canvas. Normal div attributes, `className`, and
 `style` are supported. Each mask has independent hover/focus state and clipping
 IDs, so multiple providers can show masks on the same page. Only active reserved
 regions and nonzero rectangles are rendered. The mask intercepts pointer events

@@ -132,6 +132,7 @@ select {
 .demo-select,
 .demo-time,
 .demo-toggle,
+.demo-range,
 .demo-color {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 132px;
@@ -219,22 +220,19 @@ select {
 .demo-toggle input:checked::before {
   transform: translateX(12px);
 }
-.demo-range {
+.demo-range-control {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 6px 12px;
+  gap: 8px;
 }
 .demo-range input {
-  grid-column: 1 / -1;
-  grid-row: 2;
+  min-width: 0;
   width: 100%;
-  margin: 4px 0;
+  margin: 0;
   accent-color: #2873df;
 }
 .demo-range-value {
-  grid-column: 2;
-  grid-row: 1;
   min-width: 4ch;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -665,6 +663,10 @@ select {
   background: transparent;
   color: inherit;
   cursor: pointer;
+}
+.duo-display[data-duo-color-mode="dark"] .demo-app-bar {
+  background: #2c2c2e;
+  color: #f4f4f4;
 }
 .demo-app-bar button[aria-pressed="true"] {
   color: #0879ed;

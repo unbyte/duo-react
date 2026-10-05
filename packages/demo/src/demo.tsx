@@ -19,6 +19,7 @@ import {
   type TabBarLayoutRequest,
   type ToolbarLayoutRequest,
   type DuoIndicatorStyle,
+  type DuoColorMode,
 } from "duo-frame"
 import { DraggableBlock } from "./draggable-block"
 import { StateInspector } from "./state-inspector"
@@ -139,24 +140,38 @@ function TimeControls() {
 }
 
 function SystemControls() {
-  const { battery, charging, wifiStrength, cellularStrength } = useDuoState((state) => state.system)
+  const { colorMode, battery, charging, wifiStrength, cellularStrength } = useDuoState(
+    (state) => state.system,
+  )
   const { setSystem } = useDuoActions()
   return (
-    <div className="demo-controls" role="group" aria-label="System indicators">
+    <div className="demo-controls" role="group" aria-label="System settings">
+      <label className="demo-select">
+        <span>Appearance</span>
+        <select
+          value={colorMode}
+          onChange={(event) => setSystem({ colorMode: event.currentTarget.value as DuoColorMode })}
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
       <TimeControls />
       <label className="demo-range">
         <span id="demo-battery-label">Battery</span>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          step={1}
-          value={battery}
-          aria-labelledby="demo-battery-label"
-          aria-valuetext={`${battery}%`}
-          onChange={(event) => setSystem({ battery: Number(event.currentTarget.value) })}
-        />
-        <span className="demo-range-value">{battery}%</span>
+        <span className="demo-range-control">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={battery}
+            aria-labelledby="demo-battery-label"
+            aria-valuetext={`${battery}%`}
+            onChange={(event) => setSystem({ battery: Number(event.currentTarget.value) })}
+          />
+          <span className="demo-range-value">{battery}%</span>
+        </span>
       </label>
       <label className="demo-toggle">
         <input
@@ -270,6 +285,41 @@ function BarControls({
         <label className="demo-toggle">
           <input
             type="checkbox"
+            checked={settings.showBounds}
+            onChange={(event) => onChange({ ...settings, showBounds: event.currentTarget.checked })}
+          />
+          <span>Bar bounds</span>
+        </label>
+        <label className="demo-toggle">
+          <input
+            type="checkbox"
+            checked={settings.tabbarEnabled}
+            onChange={(event) =>
+              onChange({ ...settings, tabbarEnabled: event.currentTarget.checked })
+            }
+          />
+          <span>Tab bar</span>
+        </label>
+        {settings.tabbarEnabled && (
+          <label className="demo-select">
+            <span>Tab distribution</span>
+            <select
+              value={settings.distribution}
+              onChange={(event) =>
+                onChange({
+                  ...settings,
+                  distribution: event.currentTarget.value as BarSettings["distribution"],
+                })
+              }
+            >
+              <option value="packed">Packed</option>
+              <option value="edges">Edges</option>
+            </select>
+          </label>
+        )}
+        <label className="demo-toggle">
+          <input
+            type="checkbox"
             checked={settings.toolbarsEnabled}
             onChange={(event) =>
               onChange({ ...settings, toolbarsEnabled: event.currentTarget.checked })
@@ -334,41 +384,6 @@ function BarControls({
             ))}
           </div>
         )}
-        <label className="demo-toggle">
-          <input
-            type="checkbox"
-            checked={settings.tabbarEnabled}
-            onChange={(event) =>
-              onChange({ ...settings, tabbarEnabled: event.currentTarget.checked })
-            }
-          />
-          <span>Tab bar</span>
-        </label>
-        {settings.tabbarEnabled && (
-          <label className="demo-select">
-            <span>Tab distribution</span>
-            <select
-              value={settings.distribution}
-              onChange={(event) =>
-                onChange({
-                  ...settings,
-                  distribution: event.currentTarget.value as BarSettings["distribution"],
-                })
-              }
-            >
-              <option value="packed">Packed</option>
-              <option value="edges">Edges</option>
-            </select>
-          </label>
-        )}
-        <label className="demo-toggle">
-          <input
-            type="checkbox"
-            checked={settings.showBounds}
-            onChange={(event) => onChange({ ...settings, showBounds: event.currentTarget.checked })}
-          />
-          <span>Bar bounds</span>
-        </label>
       </div>
     </section>
   )
@@ -434,7 +449,36 @@ function ControlSection({ title, children }: { title: string; children: React.Re
   )
 }
 
-function PreviewFrame({ background, children }: { background: string; children: React.ReactNode }) {
+function BackgroundPicker({
+  backgrounds,
+  onChange,
+}: {
+  backgrounds: Record<DuoColorMode, string>
+  onChange: (mode: DuoColorMode, color: string) => void
+}) {
+  const colorMode = useDuoState((state) => state.system.colorMode)
+  return (
+    <label className="demo-color">
+      <span>Background</span>
+      <input
+        type="color"
+        aria-label="Background color"
+        value={backgrounds[colorMode]}
+        onChange={(event) => onChange(colorMode, event.currentTarget.value)}
+      />
+    </label>
+  )
+}
+
+function PreviewFrame({
+  backgrounds,
+  children,
+}: {
+  backgrounds: Record<DuoColorMode, string>
+  children: React.ReactNode
+}) {
+  const colorMode = useDuoState((state) => state.system.colorMode)
+  const background = backgrounds[colorMode]
   const size = useDuoState(
     (state) => state.screens[state.posture === "closed" ? "outer" : "inner"].size,
   )
@@ -456,7 +500,7 @@ function PreviewFrame({ background, children }: { background: string; children: 
 
 export function Demo() {
   const [selectedTab, setSelectedTab] = React.useState("home")
-  const [background, setBackground] = React.useState("#ffffff")
+  const [backgrounds, setBackgrounds] = React.useState({ light: "#ffffff", dark: "#111111" })
   const [showRegions, setShowRegions] = React.useState(false)
   const [barSettings, setBarSettings] = React.useState(initialBarSettings)
   const [barsLayout, setBarsLayout] = React.useState<BarsLayout>()
@@ -468,7 +512,10 @@ export function Demo() {
   const frame = React.useRef<HTMLDivElement>(null)
   const inspectorToggle = React.useRef<HTMLButtonElement>(null)
   return (
-    <DuoProvider defaultSystem={{ cameraActive: true }} outerPortraitLocked={outerPortraitLocked}>
+    <DuoProvider
+      defaultSystem={{ colorMode: "light", cameraActive: true }}
+      outerPortraitLocked={outerPortraitLocked}
+    >
       <div className="demo" data-inspector-open={inspectorOpen}>
         <button
           ref={inspectorToggle}
@@ -485,17 +532,17 @@ export function Demo() {
         <div className="demo-workspace">
           <aside className="demo-sidebar" aria-label="Demo settings">
             <div className="demo-sidebar-scroll">
-              <ControlSection title="Appearance">
-                <div className="demo-controls" role="group" aria-label="Preview appearance">
-                  <label className="demo-color">
-                    <span>Background</span>
-                    <input
-                      type="color"
-                      aria-label="Background color"
-                      value={background}
-                      onChange={(event) => setBackground(event.currentTarget.value)}
-                    />
-                  </label>
+              <ControlSection title="System">
+                <SystemControls />
+              </ControlSection>
+              <ControlSection title="App">
+                <div className="demo-controls" role="group" aria-label="App settings">
+                  <BackgroundPicker
+                    backgrounds={backgrounds}
+                    onChange={(mode, color) =>
+                      setBackgrounds((current) => ({ ...current, [mode]: color }))
+                    }
+                  />
                   <IndicatorStylePicker />
                   <StatusBarPicker />
                   <label
@@ -509,16 +556,6 @@ export function Demo() {
                     />
                     <span>Outer portrait lock</span>
                   </label>
-                </div>
-              </ControlSection>
-              <ControlSection title="System indicators">
-                <SystemControls />
-              </ControlSection>
-              <ControlSection title="App bars">
-                <BarControls settings={barSettings} onChange={setBarSettings} />
-              </ControlSection>
-              <ControlSection title="Draggable block">
-                <div className="demo-controls">
                   <label className="demo-toggle" title="Show draggable color block">
                     <input
                       type="checkbox"
@@ -528,7 +565,7 @@ export function Demo() {
                     <span>Block</span>
                   </label>
                   <label className="demo-color">
-                    <span>Color</span>
+                    <span>Block color</span>
                     <input
                       type="color"
                       aria-label="Block color"
@@ -537,6 +574,9 @@ export function Demo() {
                     />
                   </label>
                 </div>
+              </ControlSection>
+              <ControlSection title="App bars">
+                <BarControls settings={barSettings} onChange={setBarSettings} />
               </ControlSection>
             </div>
           </aside>
@@ -552,7 +592,7 @@ export function Demo() {
               >
                 <Layers2 size={18} strokeWidth={1.5} aria-hidden="true" />
               </button>
-              <PreviewFrame background={background}>
+              <PreviewFrame backgrounds={backgrounds}>
                 <DuoFrame
                   ref={frame}
                   style={{ width: "100%", height: "100%" }}
