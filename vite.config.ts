@@ -29,7 +29,6 @@ export default defineConfig({
         options: { embeddedLanguageFormatting: "off" },
       },
     ],
-    // Preserve reference snapshots byte for byte so their provenance hashes stay valid.
-    ignorePatterns: ["packages/duo-react/docs/calibration/sources/**"],
+    ignorePatterns: ["/docs/"],
   },
 })

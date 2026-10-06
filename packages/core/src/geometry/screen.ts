@@ -23,7 +23,7 @@ export function getDuoGeometry({
   )
   if (!profile)
     throw new RangeError(`No measured Duo profile for ${display}/${orientation}/${placement}.`)
-  // The source repeats outer radii in native portrait order even in landscape.
+  // Outer profiles store radii in portrait order even in landscape.
   // Rotate them into the same oriented coordinates as the screen and camera.
   const [topLeft, topRight, bottomRight, bottomLeft] = profile.cornerRadii
   const cornerRadii: DuoScreenInfo["cornerRadii"] =

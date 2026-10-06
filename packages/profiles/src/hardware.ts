@@ -4,16 +4,15 @@ export const frameBezel = { inner: 18, outer: 12 } as const
 // Clearance includes the projected buttons and folded body beyond the bezel.
 export const frameOutset = { inner: frameBezel.inner + 3, outer: frameBezel.outer + 12 } as const
 
-// Projected silhouettes from packages/duo-react/docs/calibration/sources/inner-hardware.png,
-// measured against its 951 × 669 display; physical thickness is unknown.
+// Projected button silhouettes measured against a 951 × 669 display;
+// physical thickness is unknown.
 const innerButtons = [
   { name: "volume-left", x: 698, y: -21, width: 64, height: 4 },
   { name: "volume-right", x: 778, y: -21, width: 64, height: 4 },
   { name: "side", x: 968, y: 186, width: 4, height: 108 },
 ] as const
 
-// Folded positions follow the projected meshes recorded in
-// packages/duo-react/docs/calibration/hardware-measurements.json; protrusion follows our CSS rim.
+// Folded positions use measured mesh projections; protrusion follows the CSS rim.
 const outerButtons = [
   { name: "volume-left", x: 210, y: -15, width: 64, height: 4 },
   { name: "volume-right", x: 291, y: -15, width: 64, height: 4 },

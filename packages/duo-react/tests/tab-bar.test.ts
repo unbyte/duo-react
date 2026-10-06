@@ -26,7 +26,7 @@ test("vertical expansion retains the resting axis and fits its reserved clearanc
       const style = layout.size(geometry)
       expect(Number(style.left) + geometry.cross / 2).toBe(24)
       expect(style.bottom).toBe(0)
-      // Include the prototype's maximum 12px resisted pointer travel.
+      // Include the maximum 12px resisted pointer travel.
       const protrusion = Math.max(0, geometry.lensLength / 2 - geometry.first + 12)
       expect(geometry.length - layout.rest.length + protrusion).toBeLessThan(
         barProfile.tabExpansion + barProfile.sectionGap,

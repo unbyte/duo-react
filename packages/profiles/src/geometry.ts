@@ -19,7 +19,7 @@ export const foldingRegions: Readonly<Record<DuoOrientation, DuoFoldingRegion>> 
   "landscape-right": landscapeFold,
 }
 
-// Split windows are edge-aligned; the 13px central gap is inferred from reported widths.
+// Split windows are edge-aligned; the 13px central gap is inferred from profile widths.
 export const geometryProfiles: readonly GeometryProfile[] = [
   {
     display: "outer",
@@ -617,5 +617,5 @@ export const geometryProfiles: readonly GeometryProfile[] = [
   },
 ]
 
-// Divider-facing corners are estimated from the Split View illustration, not simulator data.
+// Divider-facing corners are estimated from imagery, not simulator measurements.
 export const splitWindowRadius = 32

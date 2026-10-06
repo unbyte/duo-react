@@ -10,9 +10,5 @@ dist
 .env.*
 !.env.example
 
-# Local exploration notes; retain the durable design document
-/docs/*
-!/docs/design.md
-/packages/duo-react/docs/*
-!/packages/duo-react/docs/design.md
-!/packages/duo-react/docs/architecture.md
+# Local design documents and exploration notes
+/docs/

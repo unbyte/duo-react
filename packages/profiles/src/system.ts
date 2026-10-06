@@ -1,5 +1,5 @@
-// Reference-image pixels mapped to app CSS pixels using the provisional camera cutout.
-// This matches the supplied crop's proportions, not a confirmed physical-hole measurement.
+// Measured image proportions mapped to app CSS pixels using the provisional camera cutout.
+// These proportions do not establish the physical camera-hole size.
 const referenceScale = 37 / 94
 export const systemMetrics = {
   glyphWidth: 104 * referenceScale,

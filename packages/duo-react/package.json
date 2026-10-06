@@ -4,7 +4,8 @@
   "private": true,
   "description": "React components for iPhone Duo device previews and system UI.",
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "type": "module",
   "sideEffects": [
