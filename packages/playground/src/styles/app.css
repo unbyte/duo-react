@@ -101,7 +101,8 @@ body {
   height: 18px;
 }
 .playground-frame .duo-react-display[data-duo-react-placement="full"] {
-  background: var(--playground-background);
+  /* The app paints the background; extra backing shows through antialiased edges. */
+  background: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
