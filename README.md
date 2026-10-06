@@ -17,10 +17,22 @@ packages/
     index.html        Playground entry page and page metadata
     wrangler.jsonc    Playground-only Cloudflare Workers deployment
     public/           Static playground assets
-    src/              React entry point, playground content, controls, and styles
+    src/
+      main.tsx        React entry point and stylesheet loading
+      app.tsx         Shared state and composition of the three playground areas
+      settings/       Sidebar, setting groups, option labels, and bar settings
+      preview/        Device canvas, preview controls, and example content
+      inspector/      State inspection and inspector controls
+      components/     Shared fields, copyable values, scrolling, and UI primitives
+      styles/         UI theme and playground styles
+      lib/            Utilities used by generated UI components
 ```
 
 Add packages under `packages/`, each with its own manifest and build config.
+In the playground, keep area-specific components and their props together.
+`app.tsx` owns state shared between settings, preview, and inspector; the area
+components receive that state and callbacks. Components used across areas belong
+in `components/`, with the generated primitives under `components/ui/`.
 The root owns the pnpm workspace and lockfile, shared development dependencies,
 TypeScript defaults, lint/format rules, and test project discovery. Packages own
 their runtime dependencies, peer contracts, and package-specific build inputs.

@@ -19,8 +19,11 @@ import {
   type DuoRegion,
   type DuoScreenInfo,
 } from "duo-frame"
-import { InspectorTabs, ToggleSetting, IconHint, PinOverlay, ScrollSurface } from "./playground-ui"
-import { CopyableNumber } from "./components/copyable-number"
+import { InspectorTabs } from "./inspector-tabs"
+import { IconHint, PinOverlay } from "./inspector-controls"
+import { ToggleSetting } from "../components/setting-fields"
+import { ScrollSurface } from "../components/scroll-surface"
+import { CopyableNumber } from "../components/copyable-number"
 
 const headingRow =
   "flex items-center justify-between gap-2 @max-[280px]:flex-wrap @max-[280px]:gap-y-0"
