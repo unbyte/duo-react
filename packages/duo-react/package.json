@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "vp pack",
+    "test": "vp test",
     "watch": "vp pack --watch"
   },
   "dependencies": {

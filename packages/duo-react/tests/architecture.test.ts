@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync } from "node:fs"
-import { dirname, relative, resolve } from "node:path"
+import { dirname, relative, resolve, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 import { expect, test } from "vite-plus/test"
 
@@ -22,7 +22,7 @@ const allowedPackages = {
 const sourcePaths = new Set(
   owners.flatMap((owner) =>
     readdirSync(resolve(packageRoot, owner, "src"), { recursive: true, encoding: "utf8" }).map(
-      (path) => `${owner}/src/${path}`,
+      (path) => `${owner}/src/${path.split(sep).join("/")}`,
     ),
   ),
 )
@@ -57,6 +57,8 @@ for (const [path, source] of modules) {
         return specifier
       }
       const target = relative(packageRoot, resolve(packageRoot, dirname(path), specifier))
+        .split(sep)
+        .join("/")
       expect(
         target.startsWith(`${owner}/src/`),
         `${path} bypasses a package boundary with ${specifier}`,
