@@ -1,14 +1,13 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": false,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
-      "react": ["./node_modules/@types/react"],
-      "react/*": ["./node_modules/@types/react/*"],
-      "react-dom": ["./node_modules/@types/react-dom"],
-      "react-dom/*": ["./node_modules/@types/react-dom/*"]
+      // The linked library has React 16 development types.
+      // Check its declarations with the playground's React 19 types.
+      // Published consumers resolve their own React types without this mapping.
+      "react": ["./node_modules/@types/react"]
     }
   },
   "include": ["src", "vite.config.ts"]
