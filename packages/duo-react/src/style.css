@@ -277,8 +277,7 @@
   visibility: hidden;
 }
 .duo-react-tab-bar-item:focus-visible {
-  outline: 2px solid #0088ff;
-  outline-offset: -2px;
+  outline: none;
 }
 .duo-react-tab-bar-item:not([aria-current="page"]) > span {
   color: var(--duo-react-tab-foreground);
