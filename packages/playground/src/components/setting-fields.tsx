@@ -188,7 +188,10 @@ export function TimeInput({ value, onValueChange }: TimeInputProps) {
   return (
     <Field className={cn("playground-time", fieldRow)}>
       <Input
-        className={cn(fieldControl, "col-start-2 select-text")}
+        className={cn(
+          fieldControl,
+          "col-start-2 cursor-text appearance-none select-text tabular-nums md:text-xs [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+        )}
         type="time"
         aria-label="Specified time"
         step={60}
