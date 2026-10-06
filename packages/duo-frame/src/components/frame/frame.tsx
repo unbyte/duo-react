@@ -1,8 +1,8 @@
 import * as React from "react"
 import { useDuoState, useDuoStore } from "../../context/hooks"
 import { orientationRotation, rotatedSize } from "../../core/rotation"
-import type { DuoZoom } from "../../core/types"
-import { resolveZoom, validateZoom } from "../../core/zoom"
+import type { DuoFitPadding, DuoZoom } from "../../core/types"
+import { resolveFitPadding, resolveZoom } from "../../core/zoom"
 import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
 import { useRotation } from "../../hooks/use-rotation"
 import { DisplaySurface } from "./display-surface"
@@ -13,7 +13,7 @@ export interface DuoFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   zoom?: DuoZoom
   onZoomChange?: (zoom: DuoZoom) => void
-  fitPadding?: number
+  fitPadding?: DuoFitPadding
   showSystemUI?: boolean
 }
 
@@ -66,9 +66,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
     return () => observer.disconnect()
   }, [])
   const effectiveZoom = zoom ?? state.zoom
-  validateZoom(effectiveZoom)
-  if (!Number.isFinite(fitPadding) || fitPadding < 0)
-    throw new RangeError("fitPadding must be a nonnegative finite number.")
+  const padding = resolveFitPadding(fitPadding)
   const active = state.screens[state.posture === "closed" ? "outer" : "inner"]
   const rotation = useRotation(state.rotation)
   const outset = frameOutset(active.display)
@@ -79,7 +77,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
       { width: active.size.width + outset * 2, height: active.size.height + outset * 2 },
       rotation - orientationRotation[active.orientation],
     ),
-    fitPadding,
+    padding,
   )
   useBrowserLayoutEffect(() => {
     if (size) store.reportRenderedZoom(scale)
@@ -91,7 +89,20 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
       className={["duo-frame", className].filter(Boolean).join(" ")}
       style={style}
     >
-      <div className="duo-rotation" style={{ transform: `rotate(${rotation}deg)` }}>
+      <div
+        className="duo-rotation"
+        style={{
+          transform: `rotate(${rotation}deg)`,
+          left:
+            effectiveZoom === "fit"
+              ? `calc(50% + ${(padding.left - padding.right) / 2}px)`
+              : undefined,
+          top:
+            effectiveZoom === "fit"
+              ? `calc(50% + ${(padding.top - padding.bottom) / 2}px)`
+              : undefined,
+        }}
+      >
         <DisplaySurface display={active.display} scale={scale} showSystemUI={showSystemUI}>
           {children}
         </DisplaySurface>

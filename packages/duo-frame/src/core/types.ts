@@ -29,6 +29,8 @@ export interface DuoInsets {
   readonly left: number
 }
 
+export type DuoFitPadding = number | Partial<DuoInsets>
+
 export interface DuoReservedRegion extends DuoRect {
   readonly type: "occlusion" | "division"
 }

@@ -94,6 +94,21 @@ test("frame can be server-rendered without browser globals", () => {
   expect(html).not.toContain('class="duo-divider"')
 })
 
+test("asymmetric fit padding shifts the frame center and leaves numeric zoom centered", () => {
+  const render = (zoom: "fit" | number) =>
+    renderToString(
+      <DuoProvider>
+        <DuoFrame zoom={zoom} fitPadding={{ top: 24, bottom: 104, left: 84 }}>
+          <span>App content</span>
+        </DuoFrame>
+      </DuoProvider>,
+    ).match(/class="duo-rotation" style="([^"]+)"/)?.[1]
+  expect(render("fit")).toContain("left:calc(50% + 30px)")
+  expect(render("fit")).toContain("top:calc(50% + -40px)")
+  expect(render(2)).not.toContain("left:")
+  expect(render(2)).not.toContain("top:")
+})
+
 test("both displays preserve the supplied time including leading zeros", () => {
   for (const posture of ["open", "closed"] as const) {
     for (const time of ["00:00", "00:05", "01:09", "09:41", "9:41", "10:05", "12:00", "23:59"]) {

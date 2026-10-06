@@ -298,9 +298,18 @@ coordinate with this request.
 ## Zoom
 
 By default, provider actions and zoom controls manage the preview scale.
-`"fit"` fits the device within the frame, leaving `fitPadding` of 24px on each
-side. A positive number sets a fixed scale: `1` displays one app CSS pixel as
-one preview CSS pixel. Larger scales can crop the device.
+`"fit"` scales and centers the device within the frame's padded area.
+`fitPadding` accepts a nonnegative finite number for all sides, or an object with
+optional `top`, `right`, `bottom`, and `left` values. The default and each omitted
+side are 24px. Padding is measured in preview CSS pixels before device scaling.
+
+For example, `fitPadding={{ bottom: 104 }}` leaves extra space for controls below
+the device and moves the fitted center 40px upward. The full frame remains
+available for rendering and interaction.
+
+A positive numeric zoom sets a fixed scale: `1` displays one app CSS pixel as
+one preview CSS pixel. Numeric zoom uses the frame's center and ignores fit
+padding; larger scales can crop the device.
 
 For controlled zoom, pass both `zoom` and `onZoomChange`:
 

@@ -22,6 +22,7 @@ export type {
   DuoColorMode,
   DuoDefaults,
   DuoDisplay,
+  DuoFitPadding,
   DuoFoldingRegion,
   DuoInsets,
   DuoIndicatorStyle,

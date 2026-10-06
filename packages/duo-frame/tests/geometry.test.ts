@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test"
 import { rotatedSize } from "../src/core/rotation"
 import { getDuoGeometry } from "../src/core/geometry"
-import { resolveZoom } from "../src/core/zoom"
+import { resolveFitPadding, resolveZoom } from "../src/core/zoom"
 import { safeAreaStyle } from "../src/core/safe-area"
 
 test("split windows preserve a common pixel density and local reserved-region coordinates", () => {
@@ -98,6 +98,35 @@ test("fit responds to container bounds while numeric zoom preserves app scale", 
   expect(resolveZoom(1, { width: 0, height: 200 }, device)).toBe(0)
   for (const zoom of [0, -1, Infinity, NaN])
     expect(() => resolveZoom(zoom, device, device)).toThrow(RangeError)
+})
+
+test("fit accepts uniform or optional per-side padding with 24px defaults", () => {
+  expect(resolveFitPadding()).toEqual({ top: 24, right: 24, bottom: 24, left: 24 })
+  expect(resolveFitPadding({})).toEqual(resolveFitPadding())
+  expect(resolveFitPadding(0)).toEqual({ top: 0, right: 0, bottom: 0, left: 0 })
+  expect(resolveFitPadding({ bottom: 104, left: 0 })).toEqual({
+    top: 24,
+    right: 24,
+    bottom: 104,
+    left: 0,
+  })
+  const device = { width: 100, height: 100 }
+  const container = { width: 300, height: 300 }
+  expect(resolveZoom("fit", container, device, { bottom: 104 })).toBe(1.72)
+  expect(resolveZoom("fit", container, device, { left: 104 })).toBe(1.72)
+  expect(resolveZoom("fit", container, device, { top: 200, bottom: 200 })).toBe(0)
+  expect(resolveZoom(2, container, device, { bottom: 104 })).toBe(2)
+  expect(resolveZoom("fit", container, device, 12)).toBe(
+    resolveZoom("fit", container, device, { top: 12, right: 12, bottom: 12, left: 12 }),
+  )
+})
+
+test("fit rejects negative and nonfinite padding on every side", () => {
+  for (const value of [-1, NaN, Infinity, -Infinity]) {
+    expect(() => resolveFitPadding(value)).toThrow(RangeError)
+    for (const side of ["top", "right", "bottom", "left"] as const)
+      expect(() => resolveFitPadding({ [side]: value })).toThrow(RangeError)
+  }
 })
 
 test("partial folding clips the active division to each window without changing measured layout", () => {
