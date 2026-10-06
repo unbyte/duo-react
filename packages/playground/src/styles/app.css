@@ -13,7 +13,7 @@ body {
   select {
     font: inherit;
   }
-  .playground :is(button, input, select, summary):focus-visible {
+  .playground :is(a, button, input, select, summary):focus-visible {
     outline: 2px solid #2873df;
     outline-offset: 2px;
   }

@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import { ScrollSurface } from '../components/scroll-surface'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip'
 import { InspectorToggle } from '../inspector/inspector-controls'
 import { AppSettings, type AppSettingsProps } from './app-settings'
 import { TabBarControls, ToolbarControls } from './bar-controls'
@@ -27,10 +28,63 @@ export function SettingsPanel({
       aria-label="Playground settings"
     >
       <div className="playground-sidebar-heading box-border flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border px-3 max-sm:group-data-[inspector-open=true]/playground:bg-white/90 max-sm:group-data-[inspector-open=true]/playground:backdrop-blur-[20px] max-sm:group-data-[inspector-open=true]/playground:backdrop-saturate-[125%]">
-        <h1 className="playground-title m-0 flex items-center gap-2 text-[13px] font-semibold">
-          <img src="/favicon.svg" alt="" width={16} height={16} className="size-4 shrink-0" />
-          Duo React
-        </h1>
+        <div className="flex items-center gap-2.5">
+          <h1 className="playground-title m-0 flex items-center gap-2 whitespace-nowrap text-[13px] font-semibold">
+            Duo React
+          </h1>
+          <TooltipProvider delay={200}>
+            <div className="flex items-center gap-2.5">
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <a
+                      href="https://github.com/unbyte/duo-react"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open GitHub"
+                      className="inline-flex shrink-0 transition-opacity opacity-80 hover:opacity-100 focus-visible:opacity-100"
+                    />
+                  }
+                >
+                  <img
+                    src="https://github.githubassets.com/favicons/favicon.svg"
+                    alt=""
+                    width={12}
+                    height={12}
+                    className="size-3"
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={8}>
+                  Open GitHub
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <a
+                      href="https://www.npmjs.com/package/duo-react"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Open NPM"
+                      className="inline-flex shrink-0 transition-opacity opacity-80 hover:opacity-100 focus-visible:opacity-100"
+                    />
+                  }
+                >
+                  <img
+                    src="https://static-production.npmjs.com/1996fcfdf7ca81ea795f67f093d7f449.png"
+                    alt=""
+                    width={12}
+                    height={12}
+                    className="size-3"
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={8}>
+                  Open NPM
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
+        </div>
         <InspectorToggle
           buttonRef={inspectorToggleRef}
           open={inspectorOpen}
