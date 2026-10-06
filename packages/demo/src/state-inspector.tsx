@@ -20,6 +20,7 @@ import {
   type DuoScreenInfo,
 } from "duo-frame"
 import { InspectorTabs, ToggleSetting, IconHint, PinOverlay, ScrollSurface } from "./demo-ui"
+import { CopyableNumber } from "./components/copyable-number"
 
 const headingRow =
   "flex items-center justify-between gap-2 @max-[280px]:flex-wrap @max-[280px]:gap-y-0"
@@ -48,8 +49,6 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
   )
 }
 
-const format = (value: number) => Number(value.toFixed(2))
-
 function JsonData({
   data,
   label,
@@ -75,7 +74,8 @@ function JsonData({
 function Size({ rect }: { rect: Pick<DuoRect, "width" | "height"> }) {
   return (
     <span className="demo-inspector-size m-0 shrink-0 text-[11px] font-normal tabular-nums text-muted-foreground">
-      {format(rect.width)} × {format(rect.height)}{" "}
+      <CopyableNumber value={rect.width} label="Width" /> ×{" "}
+      <CopyableNumber value={rect.height} label="Height" />{" "}
       <small className="demo-inspector-unit text-[#9ba6b5] font-normal [font-size:inherit]">
         pt
       </small>
@@ -98,7 +98,7 @@ function GeometryDetails({ rect }: { rect: DuoRect }) {
             <Icon size={14} stroke={1.5} aria-hidden="true" />
             {label}
           </small>
-          <span className={metricValue}>{format(value)}</span>
+          <CopyableNumber value={value} label={label} className={metricValue} />
         </span>
       ))}
     </span>
@@ -146,7 +146,7 @@ function CornerRadii({ values, label }: { values: DuoScreenInfo["cornerRadii"]; 
                 </IconHint>
               </dt>
               <dd className="m-0 text-[11px] font-normal tabular-nums text-[#526174]">
-                {format(values[index])}
+                <CopyableNumber value={values[index]} label={`${corner} radius`} />
               </dd>
             </div>
           ))}
@@ -209,7 +209,6 @@ export function StateInspector({
   onShowBarBoundsChange,
   highlightedRegionId,
   onHoveredRegionChange,
-  onFocusedRegionChange,
   onClose,
 }: {
   open: boolean
@@ -221,7 +220,6 @@ export function StateInspector({
   onShowBarBoundsChange: (show: boolean) => void
   highlightedRegionId?: string
   onHoveredRegionChange: (regionId: string | undefined) => void
-  onFocusedRegionChange: (regionId: string | undefined) => void
   onClose: () => void
 }) {
   const state = useDuoState((value) => value)
@@ -231,8 +229,7 @@ export function StateInspector({
 
   React.useEffect(() => {
     onHoveredRegionChange(undefined)
-    onFocusedRegionChange(undefined)
-  }, [regions, open, tab, onHoveredRegionChange, onFocusedRegionChange])
+  }, [regions, open, tab, onHoveredRegionChange])
 
   React.useLayoutEffect(() => {
     panel.current?.toggleAttribute("inert", !open)
@@ -291,10 +288,11 @@ export function StateInspector({
                     {[...regions]
                       .sort((a, b) => a.y + a.height / 2 - b.y - b.height / 2)
                       .map((region) => (
-                        <button
+                        <div
                           key={region.id}
-                          type="button"
-                          className="demo-region-label flex min-w-0 cursor-pointer flex-col gap-2 border-0 bg-transparent px-0 py-[11px] text-left text-xs/normal text-[#526174] [&>span]:transition-opacity [&>span]:duration-160 [&>span]:ease-[ease] motion-reduce:[&>span]:transition-none group-data-[inspecting=true]/regions:data-[highlighted=false]:[&>span]:opacity-40"
+                          role="group"
+                          aria-label={region.name}
+                          className="demo-region-label flex min-w-0 flex-col gap-2 border-0 bg-transparent px-0 py-[11px] text-left text-xs/normal text-[#526174] [&>span]:transition-opacity [&>span]:duration-160 [&>span]:ease-[ease] motion-reduce:[&>span]:transition-none group-data-[inspecting=true]/regions:data-[highlighted=false]:[&>span]:opacity-40"
                           data-region={region.id}
                           data-kind={region.kind}
                           data-highlighted={highlightedRegionId === region.id}
@@ -303,13 +301,11 @@ export function StateInspector({
                               "--demo-region-color": regionColors[region.kind],
                             } as React.CSSProperties
                           }
-                          onMouseEnter={() => onHoveredRegionChange(region.id)}
-                          onMouseLeave={() => onHoveredRegionChange(undefined)}
-                          onFocus={() => onFocusedRegionChange(region.id)}
-                          onBlur={() => onFocusedRegionChange(undefined)}
+                          onPointerEnter={() => onHoveredRegionChange(region.id)}
+                          onPointerLeave={() => onHoveredRegionChange(undefined)}
                         >
                           <RegionDetails region={region} />
-                        </button>
+                        </div>
                       ))}
                   </div>
                 </>

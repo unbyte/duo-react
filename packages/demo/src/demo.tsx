@@ -549,9 +549,7 @@ export function Demo() {
   const [selectedTab, setSelectedTab] = React.useState("home")
   const [backgrounds, setBackgrounds] = React.useState({ light: "#ffffff", dark: "#111111" })
   const [regionsPinned, setRegionsPinned] = React.useState(false)
-  const [hoveredRegionId, setHoveredRegionId] = React.useState<string>()
-  const [focusedRegionId, setFocusedRegionId] = React.useState<string>()
-  const highlightedRegionId = hoveredRegionId ?? focusedRegionId
+  const [highlightedRegionId, setHighlightedRegionId] = React.useState<string>()
   const [showBarBounds, setShowBarBounds] = React.useState(false)
   const [barSettings, setBarSettings] = React.useState(initialBarSettings)
   const updateBarSettings = (next: BarSettings) => {
@@ -686,7 +684,7 @@ export function Demo() {
                   frameRef={frame}
                   theme="light"
                   highlightedRegionId={highlightedRegionId}
-                  onHighlightedRegionChange={setHoveredRegionId}
+                  onHighlightedRegionChange={setHighlightedRegionId}
                   data-overlay-pinned={regionsPinned}
                 />
               </PreviewFrame>
@@ -702,8 +700,7 @@ export function Demo() {
             showBarBounds={showBarBounds}
             onShowBarBoundsChange={setShowBarBounds}
             highlightedRegionId={highlightedRegionId}
-            onHoveredRegionChange={setHoveredRegionId}
-            onFocusedRegionChange={setFocusedRegionId}
+            onHoveredRegionChange={setHighlightedRegionId}
             onClose={closeInspector}
           />
         </div>
