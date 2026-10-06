@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "cn"
-import { Home, Heart, Library, Settings, Search } from "lucide-react"
+import { Home, Library, Settings, Search } from "lucide-react"
 import {
   DuoSafeArea,
   DuoTabBar,
@@ -16,7 +16,12 @@ export const tabItems = [
   { id: "library", icon: <Library />, label: "Library", selectedColor: "#af52de" },
   { id: "settings", icon: <Settings />, label: "Settings", selectedColor: "#ff9500" },
   { id: "search", icon: <Search />, label: "Search" },
-  { id: "favorites", icon: <Heart />, label: "Favorites", selectedColor: "#ff2d55" },
+  {
+    id: "favorites",
+    icon: <img src="/icons/heart.png" width={27} height={27} alt="" draggable={false} />,
+    label: "Favorites",
+    selectedColor: "#ff2d55",
+  },
 ]
 
 export function ExampleApp({

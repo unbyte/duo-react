@@ -16,15 +16,16 @@ export async function makeArtwork(
   const icons = element.querySelectorAll<HTMLElement>(".duo-react-tab-bar-icon")
   await Promise.all(
     Array.from(icons).map(async (icon, index) => {
-      // Arbitrary React icons remain usable through the DOM presentation. Only
-      // self-contained SVG artwork can be safely uploaded to a WebGL texture.
-      const svg = icon.firstElementChild
-      if (!(svg instanceof SVGSVGElement) || icon.childElementCount !== 1)
-        throw new Error("Icon requires DOM rendering")
-      const copy = svg.cloneNode(true) as SVGSVGElement
-      copy.setAttribute("xmlns", "http://www.w3.org/2000/svg")
-      const image = new Image()
-      image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy).replaceAll("currentColor", "#ffffff"))}`
+      const source = icon.firstElementChild
+      if (icon.childElementCount !== 1) throw new Error("Icon requires DOM rendering")
+      let image: HTMLImageElement
+      if (source instanceof HTMLImageElement) image = source
+      else if (source instanceof SVGSVGElement) {
+        const copy = source.cloneNode(true) as SVGSVGElement
+        copy.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+        image = new Image()
+        image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy).replaceAll("currentColor", "#ffffff"))}`
+      } else throw new Error("Icon requires DOM rendering")
       await image.decode()
       const center = vertical ? index * 80 + 40 : rest.first + index * rest.pitch
       context.drawImage(image, center - 13.5, 10.5, 27, 27)
