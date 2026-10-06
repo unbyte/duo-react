@@ -37,7 +37,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 import * as React from "react"
-import type { DuoPlacement } from "../../core/types"
+import type { DuoPlacement } from "@duo-react/profiles"
 
 function ControlGlyph({ children }: { children: React.ReactNode }) {
   return (

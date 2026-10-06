@@ -1,13 +1,25 @@
 import * as React from "react"
-import { useBackdropStore } from "../../context/backdrop-context"
-import { useBackdropRegion } from "../../backdrop/use-region"
-import { backdropOrigin } from "../../backdrop/image"
+import { useBackdropStore } from "../../backdrop/backdrop-context"
+import { useBackdropRegion } from "../../backdrop/use-backdrop-region"
 import { useLensMotion } from "./motion"
 import { GlassRenderer } from "./renderer"
 import { canvasPadding } from "./shaders"
 import { clamp, TabLayout } from "./layout"
 import { makeArtwork } from "./artwork"
-import type { DuoTabBarProps } from "./tab-bar"
+import type { TabContent } from "./types"
+
+/** Offset-parent coordinates exclude the frame's presentation zoom and rotation. */
+function backdropOrigin(element: HTMLElement) {
+  let x = 0
+  let y = 0
+  let current: HTMLElement | null = element
+  while (current && !current.classList.contains("duo-react-screen")) {
+    x += current.offsetLeft
+    y += current.offsetTop
+    current = current.offsetParent as HTMLElement | null
+  }
+  return { x, y }
+}
 
 function useMedia(query: string) {
   const [matches, setMatches] = React.useState(false)
@@ -27,7 +39,7 @@ export function GlassTabs({
   onSelect,
   vertical,
   dark = false,
-}: Pick<DuoTabBarProps, "items" | "selectedId" | "onSelect"> & {
+}: TabContent & {
   vertical: boolean
   dark?: boolean
 }) {

@@ -1,5 +1,5 @@
 import { canvasPadding, glassShaders, vertex } from "./shaders"
-import type { BackdropRegion } from "../../backdrop/store"
+import type { BackdropRegion } from "@duo-react/browser"
 import type { GlassGeometry } from "./layout"
 
 interface GlassFrame {

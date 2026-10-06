@@ -226,6 +226,21 @@ importers:
         specifier: 'catalog:'
         version: 1.0.0(@types/node@26.6.3)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
 
+  packages/browser:
+    dependencies:
+      '@duo-react/profiles':
+        specifier: workspace:*
+        version: link:../profiles
+      '@zumer/snapdom':
+        specifier: ^3.2.0
+        version: 3.2.0
+
+  packages/core:
+    dependencies:
+      '@duo-react/profiles':
+        specifier: workspace:*
+        version: link:../profiles
+
   packages/duo-react:
     dependencies:
       '@zumer/snapdom':
@@ -235,6 +250,15 @@ importers:
         specifier: ^1.6.0
         version: 1.7.0(react@16.8.6)
     devDependencies:
+      '@duo-react/browser':
+        specifier: workspace:*
+        version: link:../browser
+      '@duo-react/core':
+        specifier: workspace:*
+        version: link:../core
+      '@duo-react/profiles':
+        specifier: workspace:*
+        version: link:../profiles
       '@types/react':
         specifier: ^16.14.0
         version: 16.14.70
@@ -308,6 +332,8 @@ importers:
       wrangler:
         specifier: ^4.147.0
         version: 4.147.0(@types/node@26.6.3)
+
+  packages/profiles: {}
 
 packages:
 

@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react"
+import { barProfile, tabProfile } from "@duo-react/profiles"
 
 export interface GlassGeometry {
   readonly length: number
@@ -22,16 +23,24 @@ export class TabLayout {
     readonly vertical: boolean,
     private readonly count: number,
   ) {
-    const length = vertical ? count * 50 + 12 : count < 4 ? count * 86 + 16 : 400
-    const pitch = vertical ? 50 : (length - 16) / count
+    const length = vertical
+      ? count * tabProfile.verticalPitch + tabProfile.verticalPadding
+      : count < 4
+        ? count * tabProfile.horizontalPitch + tabProfile.horizontalPadding
+        : barProfile.packedTabWidth
+    const pitch = vertical
+      ? tabProfile.verticalPitch
+      : (length - tabProfile.horizontalPadding) / count
     this.rest = {
       length,
-      cross: vertical ? 48 : 62,
+      cross: vertical ? barProfile.railWidth : barProfile.tabThickness,
       pitch,
-      first: vertical ? (length - (count - 1) * pitch) / 2 : 4 + (pitch + 8) / 2,
-      itemLength: pitch + 8,
-      lensLength: pitch + 8,
-      lensCross: vertical ? 44 : 54,
+      first: vertical
+        ? (length - (count - 1) * pitch) / 2
+        : tabProfile.horizontalInset + (pitch + tabProfile.itemOverlap) / 2,
+      itemLength: pitch + tabProfile.itemOverlap,
+      lensLength: pitch + tabProfile.itemOverlap,
+      lensCross: vertical ? tabProfile.verticalLensCross : tabProfile.horizontalLensCross,
       labels: vertical ? 0 : 1,
     }
   }
@@ -43,7 +52,7 @@ export class TabLayout {
       return {
         ...rest,
         lensLength: rest.itemLength + growth * 16 + stretch,
-        lensCross: 54 + growth * 16 - stretch * 0.45,
+        lensCross: rest.lensCross + growth * 16 - stretch * 0.45,
       }
     }
     // Expansion keeps the calibrated control axis centered.
@@ -53,12 +62,12 @@ export class TabLayout {
     const stretch = clamp(deformation, -24, 30) * growth
     return {
       length,
-      cross: 48 + 28 * reveal,
+      cross: rest.cross + 28 * reveal,
       pitch,
       first: (length - (count - 1) * pitch) / 2,
       itemLength: rest.itemLength,
       lensLength: rest.itemLength + 20 * growth + 6 * reveal + stretch,
-      lensCross: 44 + 20 * growth + 20 * reveal - stretch * 0.45,
+      lensCross: rest.lensCross + 20 * growth + 20 * reveal - stretch * 0.45,
       labels: reveal,
     }
   }
@@ -84,11 +93,16 @@ export class TabLayout {
   itemStyle(geometry: GlassGeometry, index: number): CSSProperties {
     return this.vertical
       ? {
-          left: 2,
+          left: tabProfile.verticalInset,
           top: geometry.first + index * geometry.pitch - geometry.pitch / 2,
-          width: geometry.cross - 4,
+          width: geometry.cross - tabProfile.verticalInset * 2,
           height: geometry.pitch,
         }
-      : { left: 4 + index * this.rest.pitch, top: 4, width: this.rest.itemLength, height: 54 }
+      : {
+          left: tabProfile.horizontalInset + index * this.rest.pitch,
+          top: tabProfile.horizontalInset,
+          width: this.rest.itemLength,
+          height: this.rest.lensCross,
+        }
   }
 }

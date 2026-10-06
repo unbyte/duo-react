@@ -1,7 +1,7 @@
 import * as React from "react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { expect, test } from "vite-plus/test"
-import { StatusGlyph } from "../src/components/system-chrome/status-glyph"
+import { StatusGlyph } from "../src/components/system/status-glyph"
 
 function render(battery: number, charging = false, wifiStrength = 3, cellularStrength = 0) {
   return renderToStaticMarkup(

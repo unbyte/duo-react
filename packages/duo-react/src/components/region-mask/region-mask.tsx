@@ -1,9 +1,9 @@
 import * as React from "react"
 import { useDuoState } from "../../context/hooks"
-import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
-import { useDuoRegions } from "../../hooks/use-duo-regions"
-import type { DuoRect, DuoScreenInfo } from "../../core/types"
-import "../../style.css"
+import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
+import { useDuoRegions } from "../../inspection/use-duo-regions"
+import type { DuoRect } from "@duo-react/profiles"
+import type { DuoScreenInfo } from "@duo-react/core"
 
 export interface DuoRegionMaskProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   frameRef: React.RefObject<HTMLDivElement | null>

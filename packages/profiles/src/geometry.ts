@@ -1,0 +1,621 @@
+import { type DuoFoldingRegion, type DuoOrientation, type GeometryProfile } from "./types"
+
+// Portrait margins rotate with the fold.
+const portraitFold: DuoFoldingRegion = {
+  frame: { x: 0, y: 455.5, width: 669, height: 40 },
+  margins: { top: 20, right: 0, bottom: 20, left: 0 },
+  active: false,
+}
+const landscapeFold: DuoFoldingRegion = {
+  frame: { x: 455.5, y: 0, width: 40, height: 669 },
+  margins: { top: 0, right: 20, bottom: 0, left: 20 },
+  active: false,
+}
+
+export const foldingRegions: Readonly<Record<DuoOrientation, DuoFoldingRegion>> = {
+  portrait: portraitFold,
+  "portrait-upside-down": portraitFold,
+  "landscape-left": landscapeFold,
+  "landscape-right": landscapeFold,
+}
+
+// Split windows are edge-aligned; the 13px central gap is inferred from reported widths.
+export const geometryProfiles: readonly GeometryProfile[] = [
+  {
+    display: "outer",
+    orientation: "portrait",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 466,
+      height: 678,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 466,
+      height: 678,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [8, 59, 59, 8],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 399.67,
+        y: 29.33,
+        width: 37,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 382,
+        y: 0,
+        width: 84,
+        height: 170,
+      },
+    ],
+  },
+  {
+    display: "outer",
+    orientation: "landscape-left",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 678,
+      height: 466,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 678,
+      height: 466,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [8, 59, 59, 8],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 611.67,
+        y: 399.67,
+        width: 37,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 594,
+        y: 384,
+        width: 84,
+        height: 82,
+      },
+    ],
+  },
+  {
+    display: "outer",
+    orientation: "landscape-right",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 678,
+      height: 466,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 678,
+      height: 466,
+    },
+    safeArea: {
+      top: 0,
+      right: 0,
+      bottom: 34,
+      left: 84,
+    },
+    cornerRadii: [8, 59, 59, 8],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 29.33,
+        y: 29.33,
+        width: 37,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 0,
+        y: 0,
+        width: 84,
+        height: 82,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "portrait",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 669,
+      height: 951,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 669,
+      height: 951,
+    },
+    safeArea: {
+      top: 82,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 535,
+        y: 0,
+        width: 134,
+        height: 82,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "portrait",
+    placement: "full",
+    cameraActive: true,
+    size: {
+      width: 669,
+      height: 951,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 669,
+      height: 951,
+    },
+    safeArea: {
+      top: 82,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 21,
+        y: 215.67,
+        width: 37,
+        height: 58,
+      },
+      {
+        type: "occlusion",
+        x: 535,
+        y: 0,
+        width: 134,
+        height: 82,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 951,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 867,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "full",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 951,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 677.33,
+        y: 21,
+        width: 58,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 867,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "left",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "right",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 482,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 385,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "left",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "right",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 482,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 195.33,
+        y: 21,
+        width: 58,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 385,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "full",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 951,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 867,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "full",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 951,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 215.67,
+        y: 611,
+        width: 58,
+        height: 37,
+      },
+      {
+        type: "occlusion",
+        x: 867,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "left",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "right",
+    cameraActive: false,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 482,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 385,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "left",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 0,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 215.67,
+        y: 611,
+        width: 58,
+        height: 37,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "landscape-right",
+    placement: "right",
+    cameraActive: true,
+    size: {
+      width: 951,
+      height: 669,
+    },
+    window: {
+      x: 482,
+      y: 0,
+      width: 469,
+      height: 669,
+    },
+    safeArea: {
+      top: 0,
+      right: 84,
+      bottom: 34,
+      left: 0,
+    },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      {
+        type: "occlusion",
+        x: 385,
+        y: 0,
+        width: 84,
+        height: 120,
+      },
+    ],
+  },
+  {
+    display: "inner",
+    orientation: "portrait-upside-down",
+    placement: "full",
+    cameraActive: false,
+    size: { width: 669, height: 951 },
+    window: { x: 0, y: 0, width: 669, height: 951 },
+    safeArea: { top: 82, right: 0, bottom: 34, left: 0 },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [{ type: "occlusion", x: 535, y: 0, width: 134, height: 82 }],
+  },
+  {
+    display: "inner",
+    orientation: "portrait-upside-down",
+    placement: "full",
+    cameraActive: true,
+    size: { width: 669, height: 951 },
+    window: { x: 0, y: 0, width: 669, height: 951 },
+    safeArea: { top: 82, right: 0, bottom: 34, left: 0 },
+    cornerRadii: [55, 55, 55, 55],
+    reservedRegions: [
+      { type: "occlusion", x: 611, y: 677.33, width: 37, height: 58 },
+      { type: "occlusion", x: 535, y: 0, width: 134, height: 82 },
+    ],
+  },
+]
+
+// Divider-facing corners are estimated from the Split View illustration, not simulator data.
+export const splitWindowRadius = 32

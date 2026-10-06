@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "jsx": "react"
+  },
+  "include": [
+    "packages/profiles/src",
+    "packages/core/src",
+    "packages/browser/src",
+    "packages/duo-react/src"
+  ]
+}

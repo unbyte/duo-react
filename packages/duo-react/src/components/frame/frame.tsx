@@ -1,13 +1,17 @@
 import * as React from "react"
 import { useDuoState, useDuoStore } from "../../context/hooks"
-import { orientationRotation, rotatedSize } from "../../core/rotation"
-import type { DuoFitPadding, DuoZoom } from "../../core/types"
-import { resolveFitPadding, resolveZoom } from "../../core/zoom"
-import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
-import { useRotation } from "../../hooks/use-rotation"
+import {
+  orientationRotation,
+  rotatedSize,
+  type DuoFitPadding,
+  type DuoZoom,
+  resolveFitPadding,
+  resolveZoom,
+} from "@duo-react/core"
+import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
+import { useRotation } from "./use-rotation"
 import { DisplaySurface } from "./display-surface"
-import { frameOutset } from "./hardware"
-import "../../style.css"
+import { frameOutset } from "@duo-react/profiles"
 
 export interface DuoFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -69,7 +73,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   const padding = resolveFitPadding(fitPadding)
   const active = state.screens[state.posture === "closed" ? "outer" : "inner"]
   const rotation = useRotation(state.rotation)
-  const outset = frameOutset(active.display)
+  const outset = frameOutset[active.display]
   const scale = resolveZoom(
     effectiveZoom,
     size ?? { width: 0, height: 0 },

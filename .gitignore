@@ -15,3 +15,4 @@ dist
 !/docs/design.md
 /packages/duo-react/docs/*
 !/packages/duo-react/docs/design.md
+!/packages/duo-react/docs/architecture.md

@@ -1,7 +1,6 @@
 import * as React from "react"
-import { DuoStore } from "../core/store"
-import type { DuoDefaults, DuoSystemOptions } from "../core/types"
-import { useBrowserLayoutEffect } from "../hooks/use-browser-layout-effect"
+import { DuoStore, type DuoDefaults, type DuoSystemOptions } from "@duo-react/core"
+import { useBrowserLayoutEffect } from "../shared/use-browser-layout-effect"
 import { StoreContext } from "./store-context"
 
 export interface DuoProviderProps {

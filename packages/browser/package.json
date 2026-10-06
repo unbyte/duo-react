@@ -1,0 +1,14 @@
+{
+  "name": "@duo-react/browser",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@duo-react/profiles": "workspace:*",
+    "@zumer/snapdom": "^3.2.0"
+  }
+}

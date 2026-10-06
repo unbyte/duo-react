@@ -1,8 +1,8 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { useAccessoryHost } from "../../context/accessory-context"
-import { useDuoScreen } from "../../context/hooks"
-import { getAccessoryLayout } from "../../core/layout/accessories"
+import { useAccessoryHost } from "../../screen/accessory-context"
+import { useDuoScreen } from "../../screen/screen-context"
+import { getAccessoryLayout } from "@duo-react/core"
 
 export type DuoToolbarProps = React.HTMLAttributes<HTMLDivElement>
 

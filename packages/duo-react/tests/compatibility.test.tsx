@@ -1,3 +1,4 @@
+import { getDuoGeometry, safeAreaStyle } from "../src"
 import * as React from "react"
 import { renderToStaticMarkup, renderToString } from "react-dom/server"
 import { expect, test } from "vite-plus/test"
@@ -13,9 +14,8 @@ import {
   useDuoState,
   useDuoScreen,
   useDuoRegions,
-} from "../src"
-import { DuoStore } from "../src/core/store"
-import { getDuoRegions } from "../src/hooks/use-duo-regions"
+} from "../src/index"
+import { DuoStore, getDuoRegions } from "@duo-react/core"
 
 function ReadState() {
   const width = useDuoState((state) => state.screens.inner.window.width)
@@ -315,4 +315,18 @@ test("partial posture selects its own control and keeps landscape layout control
   expect(html).toMatch(/data-duo-react-action="outer" aria-pressed="false"/)
   expect(html).toContain('data-duo-react-control-group="layout"')
   expect(html).not.toContain("disabled")
+})
+
+test("safe-area CSS uses the resolved window insets", () => {
+  const right = getDuoGeometry({
+    display: "inner",
+    orientation: "landscape-left",
+    placement: "right",
+  })
+  expect(safeAreaStyle(right.safeArea)).toEqual({
+    "--duo-react-safe-area-inset-top": "0px",
+    "--duo-react-safe-area-inset-right": "84px",
+    "--duo-react-safe-area-inset-bottom": "34px",
+    "--duo-react-safe-area-inset-left": "0px",
+  })
 })

@@ -5,7 +5,6 @@
   "scripts": {
     "build": "vp run duo-react#build",
     "dev": "vp run @duo-react/playground#dev",
-    "test": "vp test",
     "check": "vp run build && vp check",
     "watch": "vp run duo-react#watch",
     "build:playground": "vp run @duo-react/playground#build",

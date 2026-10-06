@@ -1,9 +1,8 @@
 import * as React from "react"
 import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector"
-import type { DuoState, DuoWindowChange } from "../core/types"
-import { useBrowserLayoutEffect } from "../hooks/use-browser-layout-effect"
+import type { DuoState, DuoWindowChange } from "@duo-react/core"
+import { useBrowserLayoutEffect } from "../shared/use-browser-layout-effect"
 import { StoreContext } from "./store-context"
-import { ScreenContext } from "./screen-context"
 
 export function useDuoStore() {
   const store = React.useContext(StoreContext)
@@ -27,12 +26,6 @@ export function useDuoState<Value>(
 
 export function useDuoActions() {
   return useDuoStore().actions
-}
-
-export function useDuoScreen() {
-  const display = React.useContext(ScreenContext)
-  if (!display) throw new Error("useDuoScreen must be used within DuoFrame's children.")
-  return useDuoState((state) => state.screens[display])
 }
 
 export function useDuoEvent(type: "windowchange", handler: (event: DuoWindowChange) => void) {

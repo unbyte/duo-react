@@ -1,28 +1,9 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { useAccessoryHost } from "../../context/accessory-context"
+import { useAccessoryHost } from "../../screen/accessory-context"
 import { useDuoState } from "../../context/hooks"
 import { GlassTabs } from "./glass-tabs"
-import type { ResolvedBarLayout } from "../../core/bar-types"
-
-export interface DuoTabBarItem {
-  readonly id: string
-  readonly icon: React.ReactNode
-  readonly label: string
-  /** CSS color for the selected icon and label; defaults to the material's blue. */
-  readonly selectedColor?: React.CSSProperties["color"]
-}
-
-export interface DuoTabBarProps extends Omit<
-  React.HTMLAttributes<HTMLDivElement>,
-  "children" | "onSelect"
-> {
-  readonly items: readonly DuoTabBarItem[]
-  readonly selectedId: string
-  /** Called on activation, including when the selected item is activated again. */
-  readonly onSelect: (id: string) => void
-  readonly layout: ResolvedBarLayout
-}
+import type { DuoTabBarProps } from "./types"
 
 export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(function DuoTabBar(
   { items, selectedId, onSelect, layout, className, style, ...props },

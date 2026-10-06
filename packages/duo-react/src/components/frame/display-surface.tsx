@@ -1,15 +1,15 @@
 import * as React from "react"
-import { BackdropStore } from "../../backdrop/store"
-import { BackdropContext } from "../../context/backdrop-context"
-import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
-import { AccessoryContext } from "../../context/accessory-context"
+import { BackdropStore } from "@duo-react/browser"
+import { BackdropContext } from "../../backdrop/backdrop-context"
+import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
+import { AccessoryContext } from "../../screen/accessory-context"
 import { useDuoState } from "../../context/hooks"
-import { ScreenContext } from "../../context/screen-context"
-import { orientationRotation } from "../../core/rotation"
-import { safeAreaStyle } from "../../core/safe-area"
-import type { DuoDisplay } from "../../core/types"
-import { SystemChrome, SystemMaterial } from "../system-chrome/system-chrome"
-import { frameBezel, Hardware } from "./hardware"
+import { ScreenContext } from "../../screen/screen-context"
+import { orientationRotation } from "@duo-react/core"
+import { safeAreaStyle } from "../../screen/safe-area"
+import { type DuoDisplay, frameBezel } from "@duo-react/profiles"
+import { SystemUI, SystemMaterial } from "../system/system"
+import { Hardware } from "./hardware"
 
 export function DisplaySurface({
   display,
@@ -27,10 +27,13 @@ export function DisplaySurface({
   const [backdrop] = React.useState(() => new BackdropStore())
   const source = React.useRef<HTMLDivElement>(null)
   useBrowserLayoutEffect(() => {
-    backdrop.updateScreen(screen)
+    backdrop.updateScreen({ size: screen.size, visible: screen.visible })
   }, [backdrop, screen, colorMode])
   React.useEffect(() => {
-    backdrop.connect(source.current!)
+    backdrop.connect(
+      source.current!,
+      ".duo-react-accessory-window, .duo-react-status-material, .duo-react-system",
+    )
     return () => backdrop.disconnect()
   }, [backdrop])
   const [barHost, setBarHost] = React.useState<HTMLDivElement>()
@@ -98,7 +101,7 @@ export function DisplaySurface({
           />
           {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
         </div>
-        <SystemChrome screen={screen} showIndicators={showSystemUI} />
+        <SystemUI screen={screen} showIndicators={showSystemUI} />
       </div>
     </BackdropContext.Provider>
   )

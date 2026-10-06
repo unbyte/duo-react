@@ -14,8 +14,6 @@ export function useLensMotion(target: number, expanded: boolean, reducedMotion: 
   const [frame, setFrame] = useState({
     x: target,
     growth: 0,
-    velocity: 0,
-    acceleration: 0,
     deformation: 0,
   })
   useEffect(() => {
@@ -78,8 +76,6 @@ export function useLensMotion(target: number, expanded: boolean, reducedMotion: 
       setFrame({
         x: state.x,
         growth: state.growth,
-        velocity: state.velocity,
-        acceleration: state.acceleration,
         deformation: state.deformation,
       })
       if (!settled) request = requestAnimationFrame(tick)
@@ -87,7 +83,5 @@ export function useLensMotion(target: number, expanded: boolean, reducedMotion: 
     request = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(request)
   }, [target, expanded, reducedMotion])
-  return reducedMotion
-    ? { x: target, growth: expanded ? 1 : 0, velocity: 0, acceleration: 0, deformation: 0 }
-    : frame
+  return reducedMotion ? { x: target, growth: expanded ? 1 : 0, deformation: 0 } : frame
 }

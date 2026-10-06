@@ -1,8 +1,7 @@
 import { expect, test } from "vite-plus/test"
 import { TabLayout } from "../src/components/tab-bar/layout"
-import { getBarsLayout } from "../src/core/layout/bars"
-import { barProfile } from "../src/core/profiles/bars"
-import { DuoStore } from "../src/core/store"
+import { getBarsLayout, DuoStore } from "@duo-react/core"
+import { barProfile } from "@duo-react/profiles"
 
 test("resting tabs retain the measured dimensions for two through five destinations", () => {
   for (const [index, count] of [2, 3, 4, 5].entries()) {
