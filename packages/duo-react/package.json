@@ -1,9 +1,29 @@
 {
   "name": "duo-react",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "description": "React components for previewing web apps in iPhone Duo device layouts.",
+  "keywords": [
+    "iphone-duo",
+    "iphone",
+    "ios",
+    "react",
+    "component",
+    "react-components",
+    "device-frame",
+    "device-preview",
+    "responsive-design",
+    "foldable"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unbyte/duo-react.git",
+    "directory": "packages/duo-react"
+  },
+  "homepage": "https://github.com/unbyte/duo-react#readme",
+  "bugs": {
+    "url": "https://github.com/unbyte/duo-react/issues"
+  },
   "files": [
     "lib",
     "docs"

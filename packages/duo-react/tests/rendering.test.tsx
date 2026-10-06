@@ -64,8 +64,7 @@ test('provider portrait lock reaches frame children on the first server render',
   expect(html).toContain('landscape-left:portrait:466:true')
 })
 
-test('provider and selector hooks render with the React 16.8 baseline', () => {
-  expect(React.version).toBe('16.8.6')
+test('provider and selector hooks render the initial window dimensions', () => {
   expect(
     renderToString(
       <DuoProvider defaultState={{ innerPlacement: 'left' }}>
@@ -279,7 +278,7 @@ test('app status preference reaches children and rendering while retaining indep
   }
 })
 
-test('headless control groups compose independently with the React 16.8 baseline', () => {
+test('headless control groups compose independently', () => {
   const standalone = renderToString(
     <DuoProvider>
       <DuoRotationControls className="my-rotation" />

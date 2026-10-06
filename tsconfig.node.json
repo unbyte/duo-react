@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["es2023", "dom", "dom.iterable"],
+    "lib": ["es2023"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
@@ -9,7 +9,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "tsBuildInfoFile": "../node_modules/.cache/tsconfig.tests.tsbuildinfo"
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo"
   },
-  "include": ["."]
+  "include": ["*.ts", "packages/*/*.ts", "scripts/**/*.ts"]
 }

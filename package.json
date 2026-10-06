@@ -16,7 +16,7 @@
     "cov": "vitest run --coverage",
     "build:playground": "turbo run build --filter=@private/playground",
     "preview:playground": "pnpm --filter @private/playground preview",
-    "deploy:playground": "pnpm build:playground && pnpm --filter @private/playground deploy"
+    "deploy:playground": "pnpm --filter @private/playground run deploy"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.9",

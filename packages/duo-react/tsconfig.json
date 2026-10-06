@@ -4,7 +4,6 @@
     "lib": ["es2023", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "types": ["node"],
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -12,5 +11,5 @@
     "jsx": "react",
     "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   },
-  "include": ["src", "tests", "tsup.config.ts", "../../vitest.config.ts"]
+  "include": ["src", "tests"]
 }

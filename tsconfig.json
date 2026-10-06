@@ -1,6 +1,9 @@
 {
   "references": [
     {
+      "path": "./tsconfig.node.json"
+    },
+    {
       "path": "./packages/profiles"
     },
     {
@@ -14,12 +17,6 @@
     },
     {
       "path": "./packages/playground"
-    },
-    {
-      "path": "./packages/core/tests"
-    },
-    {
-      "path": "./packages/browser/tests"
     }
   ],
   "compilerOptions": {

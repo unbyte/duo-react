@@ -10,16 +10,11 @@ split layouts without losing component state.
 
 ## Installation
 
-The package is currently private in this workspace while the first public release
-is prepared. Once published, install it in your React application:
-
 ```sh
-npm install duo-react
+$ npm install duo-react
+# or pnpm
+$ pnpm add duo-react
 ```
-
-The declared peer range is React and React DOM 16.8–19. The package ships ES modules,
-CommonJS, TypeScript declarations, and a stylesheet. Use a bundler that handles
-CSS imports and a browser with ResizeObserver and CSS container-query support.
 
 ## Quick start
 
