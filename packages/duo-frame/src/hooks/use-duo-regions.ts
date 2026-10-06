@@ -1,14 +1,16 @@
-import { getDuoGeometry } from "../geometry"
-import type { DuoPosture, DuoRect, DuoScreenInfo } from "../types"
+import * as React from "react"
+import { useDuoState } from "../context/hooks"
+import { getDuoGeometry } from "../core/geometry"
+import type { DuoPosture, DuoRect, DuoScreenInfo } from "../core/types"
 
-export interface MaskRegion extends DuoRect {
+export interface DuoRegion extends DuoRect {
   id: string
   name: string
   kind: "safe-area" | "top" | "right" | "bottom" | "left" | "occlusion" | "division" | "gap"
   scope: "window" | "display"
 }
 
-export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, posture: DuoPosture) {
+export function getDuoRegions(screen: DuoScreenInfo, cameraActive: boolean, posture: DuoPosture) {
   const { window: bounds, safeArea: inset } = screen
   const { x, y, width, height } = bounds
   const options = {
@@ -18,7 +20,7 @@ export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, pos
     posture,
   }
   const display = getDuoGeometry(options)
-  const regions: MaskRegion[] = [
+  const regions: DuoRegion[] = [
     {
       id: "safe-area",
       kind: "safe-area",
@@ -86,13 +88,14 @@ export function getMaskRegions(screen: DuoScreenInfo, cameraActive: boolean, pos
   return regions.filter((region) => region.width > 0 && region.height > 0)
 }
 
-export function roundedBoundary(bounds: DuoRect, radii: DuoScreenInfo["cornerRadii"]) {
-  const { x, y, width, height } = bounds
-  const right = x + width
-  const bottom = y + height
-  const [tl, tr, br, bl] = radii
-  return `M ${x + tl} ${y} H ${right - tr} A ${tr} ${tr} 0 0 1 ${right} ${y + tr}
-    V ${bottom - br} A ${br} ${br} 0 0 1 ${right - br} ${bottom}
-    H ${x + bl} A ${bl} ${bl} 0 0 1 ${x} ${bottom - bl}
-    V ${y + tl} A ${tl} ${tl} 0 0 1 ${x + tl} ${y} Z`
+export function useDuoRegions() {
+  const screen = useDuoState(
+    (state) => state.screens[state.posture === "closed" ? "outer" : "inner"],
+  )
+  const cameraActive = useDuoState((state) => state.system.cameraActive)
+  const posture = useDuoState((state) => state.posture)
+  return React.useMemo(
+    () => getDuoRegions(screen, cameraActive, posture),
+    [screen, cameraActive, posture],
+  )
 }

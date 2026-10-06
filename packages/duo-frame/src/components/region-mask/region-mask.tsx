@@ -1,16 +1,29 @@
 import * as React from "react"
 import { useDuoState } from "../../context/hooks"
 import { useBrowserLayoutEffect } from "../../hooks/use-browser-layout-effect"
-import { getMaskRegions, roundedBoundary } from "../../core/layout/regions"
-import type { DuoRect } from "../../core/types"
+import { useDuoRegions } from "../../hooks/use-duo-regions"
+import type { DuoRect, DuoScreenInfo } from "../../core/types"
 import "../../style.css"
 
 export interface DuoRegionMaskProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
   frameRef: React.RefObject<HTMLDivElement | null>
+  highlightedRegionId?: string
+  onHighlightedRegionChange?: (regionId: string | undefined) => void
   theme?: "auto" | "light" | "dark"
 }
 
 let nextMaskId = 0
+
+function roundedBoundary(bounds: DuoRect, radii: DuoScreenInfo["cornerRadii"]) {
+  const { x, y, width, height } = bounds
+  const right = x + width
+  const bottom = y + height
+  const [tl, tr, br, bl] = radii
+  return `M ${x + tl} ${y} H ${right - tr} A ${tr} ${tr} 0 0 1 ${right} ${y + tr}
+    V ${bottom - br} A ${br} ${br} 0 0 1 ${right - br} ${bottom}
+    H ${x + bl} A ${bl} ${bl} 0 0 1 ${x} ${bottom - bl}
+    V ${y + tl} A ${tl} ${tl} 0 0 1 ${x + tl} ${y} Z`
+}
 
 function relativeRect(node: Element, origin: DOMRect): DuoRect {
   const rect = node.getBoundingClientRect()
@@ -24,6 +37,8 @@ function relativeRect(node: Element, origin: DOMRect): DuoRect {
 
 export function DuoRegionMask({
   frameRef,
+  highlightedRegionId,
+  onHighlightedRegionChange,
   theme = "auto",
   className,
   ...props
@@ -33,15 +48,10 @@ export function DuoRegionMask({
   const screen = useDuoState(
     (state) => state.screens[state.posture === "closed" ? "outer" : "inner"],
   )
-  const cameraActive = useDuoState((state) => state.system.cameraActive)
-  const posture = useDuoState((state) => state.posture)
-  const [hovered, setHovered] = React.useState<string>()
-  const [focused, setFocused] = React.useState<string>()
+  const regions = useDuoRegions()
   const [layout, setLayout] = React.useState<{
     transform: DOMMatrix
     frame: DuoRect
-    width: number
-    height: number
   }>()
 
   useBrowserLayoutEffect(() => {
@@ -63,8 +73,6 @@ export function DuoRegionMask({
       setLayout({
         transform,
         frame: relativeRect(frame, origin),
-        width: origin.width,
-        height: origin.height,
       })
     }
     const schedule = () => {
@@ -85,19 +93,7 @@ export function DuoRegionMask({
     }
   }, [frameRef, screen])
 
-  useBrowserLayoutEffect(() => {
-    setHovered(undefined)
-    if (!root.current?.contains(document.activeElement)) setFocused(undefined)
-  }, [screen])
-
-  const regions = getMaskRegions(screen, cameraActive, posture)
-  const highlighted = hovered ?? focused
-  const below = layout && layout.width < 640
-  const labelTop = layout
-    ? below
-      ? layout.frame.y + layout.frame.height + 8
-      : layout.frame.y + 8
-    : 0
+  const inspecting = regions.some((region) => region.id === highlightedRegionId)
   return (
     <div
       role="group"
@@ -106,83 +102,47 @@ export function DuoRegionMask({
       ref={root}
       className={["duo-region-mask", className].filter(Boolean).join(" ")}
       data-theme={theme}
-      data-inspecting={regions.some((region) => region.id === highlighted)}
+      data-inspecting={inspecting}
     >
       {layout && (
-        <>
-          <svg className="duo-region-shapes" aria-hidden="true">
-            <defs>
-              <clipPath id={`${id}-frame`}>
-                <rect {...layout.frame} />
-              </clipPath>
-              <clipPath id={`${id}-display`}>
-                <path d={roundedBoundary({ x: 0, y: 0, ...screen.size }, screen.cornerRadii)} />
-              </clipPath>
-              <clipPath id={`${id}-window`}>
-                <path d={roundedBoundary(screen.window, screen.windowCornerRadii)} />
-              </clipPath>
-            </defs>
-            <g clipPath={`url(#${id}-frame)`}>
-              <g transform={layout.transform.toString()}>
-                <g clipPath={`url(#${id}-display)`}>
-                  {[...regions]
-                    .sort((a, b) => b.width * b.height - a.width * a.height)
-                    .map((region) => (
-                      <g key={region.id} clipPath={`url(#${id}-${region.scope})`}>
-                        <rect
-                          className="duo-region-fill"
-                          data-region={region.id}
-                          data-kind={region.kind}
-                          data-highlighted={highlighted === region.id}
-                          x={region.x}
-                          y={region.y}
-                          width={region.width}
-                          height={region.height}
-                          vectorEffect="non-scaling-stroke"
-                          onMouseEnter={() => setHovered(region.id)}
-                          onMouseLeave={() => setHovered(undefined)}
-                        />
-                      </g>
-                    ))}
-                </g>
+        <svg className="duo-region-shapes" aria-hidden="true">
+          <defs>
+            <clipPath id={`${id}-frame`}>
+              <rect {...layout.frame} />
+            </clipPath>
+            <clipPath id={`${id}-display`}>
+              <path d={roundedBoundary({ x: 0, y: 0, ...screen.size }, screen.cornerRadii)} />
+            </clipPath>
+            <clipPath id={`${id}-window`}>
+              <path d={roundedBoundary(screen.window, screen.windowCornerRadii)} />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${id}-frame)`}>
+            <g transform={layout.transform.toString()}>
+              <g clipPath={`url(#${id}-display)`}>
+                {[...regions]
+                  .sort((a, b) => b.width * b.height - a.width * a.height)
+                  .map((region) => (
+                    <g key={region.id} clipPath={`url(#${id}-${region.scope})`}>
+                      <rect
+                        className="duo-region-fill"
+                        data-region={region.id}
+                        data-kind={region.kind}
+                        data-highlighted={highlightedRegionId === region.id}
+                        x={region.x}
+                        y={region.y}
+                        width={region.width}
+                        height={region.height}
+                        vectorEffect="non-scaling-stroke"
+                        onMouseEnter={() => onHighlightedRegionChange?.(region.id)}
+                        onMouseLeave={() => onHighlightedRegionChange?.(undefined)}
+                      />
+                    </g>
+                  ))}
               </g>
             </g>
-          </svg>
-          <div
-            className="duo-region-labels"
-            role="group"
-            aria-label="Active layout regions"
-            data-below={below}
-            style={{
-              left: below ? 16 : layout.frame.x + layout.frame.width + 16,
-              top: labelTop,
-              width: below ? Math.max(0, layout.width - 32) : 196,
-              maxHeight: Math.max(0, layout.height - labelTop - 8),
-            }}
-          >
-            {[...regions]
-              .sort((a, b) => a.y + a.height / 2 - b.y - b.height / 2)
-              .map((region) => (
-                <button
-                  key={region.id}
-                  type="button"
-                  className="duo-region-label"
-                  data-region={region.id}
-                  data-kind={region.kind}
-                  data-highlighted={highlighted === region.id}
-                  onMouseEnter={() => setHovered(region.id)}
-                  onMouseLeave={() => setHovered(undefined)}
-                  onFocus={() => setFocused(region.id)}
-                  onBlur={() => setFocused(undefined)}
-                >
-                  <span>{region.name}</span>
-                  <small>
-                    {Number(region.width.toFixed(2))} × {Number(region.height.toFixed(2))} pt
-                  </small>
-                </button>
-              ))}
-          </div>
-        </>
+          </g>
+        </svg>
       )}
     </div>
   )

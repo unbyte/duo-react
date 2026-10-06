@@ -1,6 +1,8 @@
 export { DuoProvider } from "./context/provider"
 export { useDuoState, useDuoActions, useDuoScreen, useDuoEvent } from "./context/hooks"
 export { useBars } from "./hooks/use-bars"
+export { useDuoRegions } from "./hooks/use-duo-regions"
+export type { DuoRegion } from "./hooks/use-duo-regions"
 export type {
   BarAxis,
   BarContainerProps,

@@ -1,17 +1,17 @@
 import { expect, test } from "vite-plus/test"
 import { DuoStore } from "../src/core/store"
-import { getMaskRegions } from "../src/core/layout/regions"
+import { getDuoRegions } from "../src/hooks/use-duo-regions"
 
 function regions(store: DuoStore) {
   const state = store.getSnapshot()
-  return getMaskRegions(
+  return getDuoRegions(
     state.screens[state.posture === "closed" ? "outer" : "inner"],
     state.system.cameraActive,
     state.posture,
   )
 }
 
-test("mask uses source names, omits inactive regions and zero insets, and retains window bounds", () => {
+test("regions use source names, omit inactive regions and zero insets, and retain window bounds", () => {
   const store = new DuoStore()
   expect(regions(store).map((r) => r.name)).toEqual([
     "Safe area",
@@ -46,8 +46,8 @@ test("split gap is distinct from the division and does not appear for full or ou
       store.actions.setInnerPlacement(placement)
       for (const posture of ["open", "partially-open"] as const) {
         store.actions.setPosture(posture)
-        const mask = regions(store)
-        expect(mask.find((r) => r.kind === "gap")).toMatchObject({
+        const currentRegions = regions(store)
+        expect(currentRegions.find((r) => r.kind === "gap")).toMatchObject({
           name: "Split View gap",
           x: 469,
           y: 0,
@@ -55,8 +55,12 @@ test("split gap is distinct from the division and does not appear for full or ou
           height: 669,
           scope: "display",
         })
-        expect(mask.filter((r) => r.kind === "division")).toHaveLength(posture === "open" ? 0 : 1)
-        expect(mask.find((r) => r.kind === "safe-area")?.x).toBe(placement === "left" ? 0 : 482)
+        expect(currentRegions.filter((r) => r.kind === "division")).toHaveLength(
+          posture === "open" ? 0 : 1,
+        )
+        expect(currentRegions.find((r) => r.kind === "safe-area")?.x).toBe(
+          placement === "left" ? 0 : 482,
+        )
       }
     }
   }

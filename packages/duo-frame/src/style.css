@@ -305,21 +305,9 @@
 }
 
 .duo-region-mask {
-  --duo-region-label-background: #fff;
   position: absolute;
   inset: 0;
   pointer-events: none;
-  font:
-    13px system-ui,
-    sans-serif;
-}
-.duo-region-mask[data-theme="dark"] {
-  --duo-region-label-background: #18212b;
-}
-@media (prefers-color-scheme: dark) {
-  .duo-region-mask[data-theme="auto"] {
-    --duo-region-label-background: #18212b;
-  }
 }
 .duo-region-mask [data-kind="safe-area"] {
   --duo-region-light: #21834b;
@@ -384,39 +372,4 @@
   fill-opacity: 0.18;
   stroke: currentColor;
   stroke-width: 1.5px;
-}
-.duo-region-labels {
-  position: absolute;
-  display: grid;
-  gap: 4px;
-  overflow: auto;
-  pointer-events: auto;
-}
-.duo-region-labels[data-below="true"] {
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-}
-.duo-region-label {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--duo-region-label-background);
-  font: inherit;
-  font-weight: 600;
-  text-align: left;
-  cursor: default;
-}
-.duo-region-mask[data-inspecting="true"] .duo-region-label[data-highlighted="false"] > * {
-  opacity: 0.4;
-}
-.duo-region-label small {
-  font-size: 11px;
-  font-weight: 400;
-}
-.duo-region-label:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: -2px;
 }

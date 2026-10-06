@@ -1,5 +1,5 @@
 import * as React from "react"
-import { renderToString } from "react-dom/server"
+import { renderToStaticMarkup, renderToString } from "react-dom/server"
 import { expect, test } from "vite-plus/test"
 import {
   DuoFrame,
@@ -12,7 +12,10 @@ import {
   DuoZoomControls,
   useDuoState,
   useDuoScreen,
+  useDuoRegions,
 } from "../src"
+import { DuoStore } from "../src/core/store"
+import { getDuoRegions } from "../src/hooks/use-duo-regions"
 
 function ReadState() {
   const width = useDuoState((state) => state.screens.inner.window.width)
@@ -127,12 +130,53 @@ test("both displays preserve the supplied time including leading zeros", () => {
 test("region masks can be server-rendered before frame measurement", () => {
   const html = renderToString(
     <DuoProvider>
-      <DuoRegionMask frameRef={React.createRef<HTMLDivElement>()} theme="dark" />
+      <DuoRegionMask
+        frameRef={React.createRef<HTMLDivElement>()}
+        theme="dark"
+        highlightedRegionId="safe-area"
+        onHighlightedRegionChange={() => {}}
+      />
     </DuoProvider>,
   )
   expect(html).toContain('class="duo-region-mask"')
   expect(html).toContain('data-theme="dark"')
   expect(html).not.toContain("clipPath")
+  expect(html).toContain('data-inspecting="true"')
+  expect(html).not.toContain("duo-region-label")
+  expect(html).not.toContain("highlightedRegionId")
+})
+
+test("region data is available outside the frame and follows the active provider geometry", () => {
+  function ReadRegions() {
+    const regions = useDuoRegions()
+    return <pre>{JSON.stringify(regions)}</pre>
+  }
+  for (const posture of ["open", "partially-open", "closed"] as const) {
+    for (const innerPlacement of ["full", "left", "right"] as const) {
+      for (const cameraActive of [false, true]) {
+        const defaults = { posture, innerPlacement, orientation: "landscape-left" } as const
+        const state = new DuoStore(defaults, { cameraActive }, true).getSnapshot()
+        const html = renderToStaticMarkup(
+          <DuoProvider defaultState={defaults} defaultSystem={{ cameraActive }} outerPortraitLocked>
+            <ReadRegions />
+          </DuoProvider>,
+        )
+        expect(html).toBe(
+          renderToStaticMarkup(
+            <pre>
+              {JSON.stringify(
+                getDuoRegions(
+                  state.screens[posture === "closed" ? "outer" : "inner"],
+                  cameraActive,
+                  posture,
+                ),
+              )}
+            </pre>,
+          ),
+        )
+      }
+    }
+  }
 })
 
 test("frame children receive the active display's screen context on the server", () => {

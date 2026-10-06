@@ -341,45 +341,66 @@ include preview scaling and rotation.
 ## Inspecting safe areas
 
 Add `DuoRegionMask` beside the frame to inspect safe areas, reserved regions,
-and the split-window gap. Pass the frame ref and leave room for labels:
+and the split-window gap. The mask renders only the overlay. Use
+`useDuoRegions()` inside `DuoProvider` to render your own labels or other region
+information anywhere, including outside `DuoFrame`. It returns the active
+display's regions, with IDs, names, kinds, and rectangles in unscaled
+display CSS pixels, and updates when the provider's geometry changes.
+
+Highlighting is controlled by `highlightedRegionId`. The optional
+`onHighlightedRegionChange` callback reports the ID under the pointer, or
+`undefined` when it leaves. Share this state with your own list to link
+interactions in either direction:
 
 ```tsx
 import * as React from "react"
-import { DuoFrame, DuoProvider, DuoRegionMask } from "duo-frame"
+import { DuoFrame, DuoProvider, DuoRegionMask, useDuoRegions } from "duo-frame"
 
-function LayoutPreview() {
+function RegionPreview() {
   const frame = React.useRef<HTMLDivElement>(null)
+  const regions = useDuoRegions()
+  const [highlightedRegionId, setHighlightedRegionId] = React.useState<string>()
 
   return (
-    <DuoProvider>
-      <div className="preview-with-regions">
+    <>
+      <div style={{ position: "relative", height: 700 }}>
         <DuoFrame ref={frame} style={{ height: "100%" }}>
           <App />
         </DuoFrame>
-        <DuoRegionMask frameRef={frame} />
+        <DuoRegionMask
+          frameRef={frame}
+          highlightedRegionId={highlightedRegionId}
+          onHighlightedRegionChange={setHighlightedRegionId}
+        />
       </div>
+      <ul>
+        {regions.map((region) => (
+          <li key={region.id}>
+            <button
+              type="button"
+              onMouseEnter={() => setHighlightedRegionId(region.id)}
+              onMouseLeave={() => setHighlightedRegionId(undefined)}
+              onFocus={() => setHighlightedRegionId(region.id)}
+              onBlur={() => setHighlightedRegionId(undefined)}
+            >
+              {region.name}: {region.width} × {region.height}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+function LayoutPreview() {
+  return (
+    <DuoProvider>
+      <RegionPreview />
     </DuoProvider>
   )
 }
 ```
 
-```css
-.preview-with-regions {
-  position: relative;
-  box-sizing: border-box;
-  height: 700px;
-  padding-right: 220px;
-}
-
-@media (max-width: 639px) {
-  .preview-with-regions {
-    padding-right: 0;
-    padding-bottom: 280px;
-  }
-}
-```
-
-Labels move below the frame when the container is narrower than 640px. Adapt
-the padding rule to your container if the preview does not fill the page width.
-Hover or focus a label to highlight its region. Hide the mask to interact with
-the app beneath it.
+The mask highlights only IDs present in the current region list; stale IDs do
+not dim the other regions. Your UI controls label content, placement, focus
+handling, and overlay visibility. Hide the mask to interact with the app beneath it.
