@@ -1,8 +1,9 @@
-# Duo Frame
+# Duo React
 
-A React device frame for previewing applications on iPhone Duo. Preview your app
-on the inner or outer display, rotate the device, and try full-screen or split
-layouts without losing app state.
+React components for previewing applications on iPhone Duo, including a device
+frame, adaptive tab bars and toolbars, system indicators, and layout helpers.
+Preview your app on the inner or outer display, rotate the device, and try
+full-screen or split layouts without losing app state.
 
 Requires React and React DOM 16.8–19 and a modern browser with ResizeObserver and
 CSS container-query support.
@@ -14,8 +15,8 @@ a definite height:
 
 ```tsx
 import * as React from "react"
-import { DuoFrame, DuoProvider, DuoSafeArea } from "duo-frame"
-import "duo-frame/style.css"
+import { DuoFrame, DuoProvider, DuoSafeArea } from "duo-react"
+import "duo-react/style.css"
 
 export function Preview() {
   return (
@@ -49,7 +50,7 @@ import {
   DuoRotationControls,
   DuoControls,
   DuoZoomControls,
-} from "duo-frame"
+} from "duo-react"
 
 <DuoControls className="preview-controls">
   <DuoDisplayControls />
@@ -73,7 +74,7 @@ selection through `aria-pressed`; style them with `[data-duo-action]`,
 For custom controls, call actions from an event handler:
 
 ```tsx
-import { useDuoActions } from "duo-frame"
+import { useDuoActions } from "duo-react"
 
 function CloseDeviceButton() {
   const { setPosture } = useDuoActions()
@@ -108,7 +109,7 @@ Inside the frame, `useDuoScreen()` gives you the active app window's dimensions
 and effective orientation:
 
 ```tsx
-import { useDuoScreen } from "duo-frame"
+import { useDuoScreen } from "duo-react"
 
 function App() {
   const { window } = useDuoScreen()
@@ -224,7 +225,7 @@ with `useBars`, then update the selected destination in `onSelect`:
 
 ```tsx
 import * as React from "react"
-import { DuoTabBar, useBars } from "duo-frame"
+import { DuoTabBar, useBars } from "duo-react"
 
 function App() {
   const [selectedId, setSelectedId] = React.useState("home")
@@ -261,7 +262,7 @@ For a simple group of app actions, render your buttons in `DuoToolbar` inside
 the frame. It places them at an edge appropriate to the current layout:
 
 ```tsx
-import { DuoToolbar } from "duo-frame"
+import { DuoToolbar } from "duo-react"
 
 <DuoToolbar aria-label="Document actions">
   <button onClick={createDocument}>New</button>
@@ -315,7 +316,7 @@ For controlled zoom, pass both `zoom` and `onZoomChange`:
 
 ```tsx
 import * as React from "react"
-import { DuoFrame, DuoProvider, type DuoZoom } from "duo-frame"
+import { DuoFrame, DuoProvider, type DuoZoom } from "duo-react"
 
 function PreviewWithZoom() {
   const [zoom, setZoom] = React.useState<DuoZoom>("fit")
@@ -354,7 +355,7 @@ interactions in either direction:
 
 ```tsx
 import * as React from "react"
-import { DuoFrame, DuoProvider, DuoRegionMask, useDuoRegions } from "duo-frame"
+import { DuoFrame, DuoProvider, DuoRegionMask, useDuoRegions } from "duo-react"
 
 function RegionPreview() {
   const frame = React.useRef<HTMLDivElement>(null)

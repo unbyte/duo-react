@@ -226,7 +226,7 @@ importers:
         specifier: 'catalog:'
         version: 1.0.0(@types/node@26.6.3)(@vitest/ui@5.0.1(vitest@5.0.1))(esbuild@0.28.1)(jiti@2.7.0)(typescript@7.0.2)(yaml@2.9.1)
 
-  packages/duo-frame:
+  packages/duo-react:
     dependencies:
       '@zumer/snapdom':
         specifier: ^3.2.0

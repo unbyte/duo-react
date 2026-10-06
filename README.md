@@ -1,19 +1,19 @@
-# Duo Frame workspace
+# Duo React workspace
 
 A workspace for React device previews and system UI packages.
 
-The [duo-frame package](packages/duo-frame/README.md) provides the iPhone Duo
-frame, provider, layout helpers, system indicators, and preview controls. Its
-[design](packages/duo-frame/docs/design.md) and
-[calibration review](packages/duo-frame/docs/calibration/README.md) describe the
+The [duo-react package](packages/duo-react/README.md) provides the iPhone Duo
+frame, provider, adaptive bars, layout helpers, system indicators, and preview controls. Its
+[design](packages/duo-react/docs/design.md) and
+[calibration review](packages/duo-react/docs/calibration/README.md) describe the
 architecture, measurements, and remaining rendering decisions.
 
 ## Workspace layout
 
 ```text
 packages/
-  duo-frame/          Library source, tests, documentation, and package build
-  playground/               Private React 19 playground and Vite configuration
+  duo-react/          Library source, tests, documentation, and package build
+  playground/         Private React 19 playground and Vite configuration
     index.html        Playground entry page and page metadata
     wrangler.jsonc    Playground-only Cloudflare Workers deployment
     public/           Static playground assets
@@ -43,13 +43,13 @@ pnpm dev
 pnpm watch
 ```
 
-`dev` builds `duo-frame` and opens the React 19 development server at
+`dev` builds `duo-react` and opens the React 19 development server at
 [127.0.0.1:5119](http://127.0.0.1:5119). The playground consumes the library's package
-exports from `packages/duo-frame/dist`.
+exports from `packages/duo-react/dist`.
 
 | Command                   | Purpose                                                                      |
 | ------------------------- | ---------------------------------------------------------------------------- |
-| `pnpm build`              | Build the `duo-frame` library                                                |
+| `pnpm build`              | Build the `duo-react` library                                                |
 | `pnpm build:playground`   | Build the library and React 19 playground                                    |
 | `pnpm preview:playground` | Preview the built playground in the local Workers runtime                    |
 | `pnpm deploy:playground`  | Build the library and playground, then deploy only the playground            |
@@ -58,8 +58,8 @@ exports from `packages/duo-frame/dist`.
 | `pnpm check`              | Build the library, check formatting and lint, and check the playground types |
 | `pnpm watch`              | Watch the library build                                                      |
 
-Use a package filter for focused work, such as `pnpm --filter duo-frame test --run`.
-The [package usage guide](packages/duo-frame/README.md)
+Use a package filter for focused work, such as `pnpm --filter duo-react test --run`.
+The [package usage guide](packages/duo-react/README.md)
 describes how to integrate the frame into an application.
 
 ## Playground deployment

@@ -2,7 +2,7 @@ import { defineConfig } from "vite-plus"
 
 export default defineConfig({
   test: {
-    projects: ["packages/duo-frame/vite.config.ts"],
+    projects: ["packages/duo-react/vite.config.ts"],
   },
   lint: {
     plugins: ["typescript", "unicorn", "oxc", "import", "react", "jsx-a11y"],
@@ -33,6 +33,6 @@ export default defineConfig({
       },
     ],
     // Preserve reference snapshots byte for byte so their provenance hashes stay valid.
-    ignorePatterns: ["packages/duo-frame/docs/calibration/sources/**"],
+    ignorePatterns: ["packages/duo-react/docs/calibration/sources/**"],
   },
 })

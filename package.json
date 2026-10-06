@@ -1,13 +1,13 @@
 {
-  "name": "duo-frame-workspace",
+  "name": "duo-react-workspace",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vp run duo-frame#build",
+    "build": "vp run duo-react#build",
     "dev": "vp run build && vp run @duo-frame/playground#dev",
     "test": "vp test",
     "check": "vp run build && vp check && vp run @duo-frame/playground#check:types",
-    "watch": "vp run duo-frame#watch",
+    "watch": "vp run duo-react#watch",
     "build:playground": "vp run build && vp run @duo-frame/playground#build",
     "preview:playground": "vp run @duo-frame/playground#preview",
     "deploy:playground": "vp run build:playground && vp run @duo-frame/playground#deploy"

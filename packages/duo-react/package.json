@@ -1,8 +1,8 @@
 {
-  "name": "duo-frame",
+  "name": "duo-react",
   "version": "0.0.0",
   "private": true,
-  "description": "A React device frame for iPhone Duo previews.",
+  "description": "React components for iPhone Duo device previews and system UI.",
   "files": [
     "dist"
   ],

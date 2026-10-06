@@ -8,6 +8,6 @@ export default defineConfig({
     exports: { legacy: true },
   },
   test: {
-    name: "duo-frame",
+    name: "duo-react",
   },
 })
