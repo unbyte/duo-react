@@ -58,17 +58,19 @@ pnpm watch
 `dev` builds `duo-react` and opens the React 19 development server at
 [127.0.0.1:5119](http://127.0.0.1:5119). The playground consumes the library's package
 exports from `packages/duo-react/dist`.
+The playground's Vite Plus config declares dependency builds as prerequisites for
+both `build` and `dev`, using its workspace dependencies from `package.json`.
 
-| Command                   | Purpose                                                                      |
-| ------------------------- | ---------------------------------------------------------------------------- |
-| `pnpm build`              | Build the `duo-react` library                                                |
-| `pnpm build:playground`   | Build the library and React 19 playground                                    |
-| `pnpm preview:playground` | Preview the built playground in the local Workers runtime                    |
-| `pnpm deploy:playground`  | Deploy the previously built playground                                      |
-| `pnpm test --run`         | Run all package test projects once                                           |
-| `pnpm test`               | Run package tests in watch mode in an interactive terminal                   |
-| `pnpm check`              | Build the library, check formatting and lint, and check the playground types |
-| `pnpm watch`              | Watch the library build                                                      |
+| Command                   | Purpose                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `pnpm build`              | Build the `duo-react` library                                                  |
+| `pnpm build:playground`   | Build the library and React 19 playground                                      |
+| `pnpm preview:playground` | Preview the built playground in the local Workers runtime                      |
+| `pnpm deploy:playground`  | Deploy the previously built playground                                         |
+| `pnpm test --run`         | Run all package test projects once                                             |
+| `pnpm test`               | Run package tests in watch mode in an interactive terminal                     |
+| `pnpm check`              | Build the library, then check formatting, lint, and types across the workspace |
+| `pnpm watch`              | Watch the library build                                                        |
 
 Use a package filter for focused work, such as `pnpm --filter duo-react test --run`.
 The [package usage guide](packages/duo-react/README.md)

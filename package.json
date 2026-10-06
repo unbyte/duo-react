@@ -4,11 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "vp run duo-react#build",
-    "dev": "vp run build && vp run @duo-react/playground#dev",
+    "dev": "vp run @duo-react/playground#dev",
     "test": "vp test",
-    "check": "vp run build && vp check && vp run @duo-react/playground#check:types",
+    "check": "vp run build && vp check",
     "watch": "vp run duo-react#watch",
-    "build:playground": "vp run build && vp run @duo-react/playground#build",
+    "build:playground": "vp run @duo-react/playground#build",
     "preview:playground": "vp run @duo-react/playground#preview",
     "deploy:playground": "vp run @duo-react/playground#deploy"
   },

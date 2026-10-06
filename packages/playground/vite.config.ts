@@ -7,6 +7,19 @@ import { defineConfig } from "vite-plus"
 const path = (relative: string) => fileURLToPath(new URL(relative, import.meta.url))
 
 export default defineConfig({
+  run: {
+    tasks: {
+      build: {
+        command: "vp build",
+        dependsOn: [{ task: "build", from: "dependencies" }],
+      },
+      dev: {
+        command: "vp dev",
+        dependsOn: [{ task: "build", from: "dependencies" }],
+        cache: false,
+      },
+    },
+  },
   root: path("./"),
   plugins: [react(), tailwindcss(), cloudflare({ configPath: path("./wrangler.jsonc") })],
   resolve: {
