@@ -144,7 +144,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         Drag me
       </text>
       <g
-        className="playground-block-resize pointer-events-auto touch-none cursor-nwse-resize focus:outline-none [&:focus-visible>rect]:fill-black/20 [&:focus-visible>rect]:stroke-white"
+        className="playground-block-resize pointer-events-auto touch-none cursor-nwse-resize focus:outline-none"
         transform={`translate(${x + blockWidth - 28} ${y + blockHeight - 28})`}
         role="button"
         tabIndex={0}
