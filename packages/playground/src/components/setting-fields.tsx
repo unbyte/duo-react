@@ -1,12 +1,12 @@
-import * as React from "react"
-import { cn } from "cn"
-import type { LucideIcon } from "lucide-react"
-import type { TablerIcon } from "@tabler/icons-react"
-import { Field, FieldLabel } from "./ui/field"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select"
-import { Switch } from "./ui/switch"
-import { Slider } from "./ui/slider"
-import { Input } from "./ui/input"
+import type { TablerIcon } from '@tabler/icons-react'
+import { cn } from 'cn'
+import type { LucideIcon } from 'lucide-react'
+import * as React from 'react'
+import { Field, FieldLabel } from './ui/field'
+import { Input } from './ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
+import { Slider } from './ui/slider'
+import { Switch } from './ui/switch'
 
 interface SettingProps {
   icon?: LucideIcon | TablerIcon
@@ -42,17 +42,17 @@ interface TimeInputProps {
 }
 
 const fieldRow =
-  "grid min-h-[30px] min-w-0 grid-cols-[minmax(0,1fr)_124px] items-center gap-2 text-xs/normal font-medium text-[#526174]"
+  'grid min-h-[30px] min-w-0 grid-cols-[minmax(0,1fr)_124px] items-center gap-2 text-xs/normal font-medium text-[#526174]'
 const fieldLabel =
-  "flex min-w-0 items-center gap-2 text-xs/normal font-medium leading-[1.35] [&>svg]:shrink-0 [&>svg]:text-[#8390a0]"
+  'flex min-w-0 items-center gap-2 text-xs/normal font-medium leading-[1.35] [&>svg]:shrink-0 [&>svg]:text-[#8390a0]'
 const fieldControl =
-  "box-border h-7 w-full min-w-0 cursor-pointer rounded-md border border-input bg-background px-2 py-0 text-xs/5 text-foreground"
+  'box-border h-7 w-full min-w-0 cursor-pointer rounded-md border border-input bg-background px-2 py-0 text-xs/5 text-foreground'
 const colorControl =
-  "h-7 w-9 cursor-pointer justify-self-end rounded-md border border-input bg-background p-[3px] [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-[3px] [&::-webkit-color-swatch]:border-0 [&::-moz-color-swatch]:rounded-[3px] [&::-moz-color-swatch]:border-0"
+  'h-7 w-9 cursor-pointer justify-self-end rounded-md border border-input bg-background p-[3px] [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-[3px] [&::-webkit-color-swatch]:border-0 [&::-moz-color-swatch]:rounded-[3px] [&::-moz-color-swatch]:border-0'
 
 function SettingLabel({ icon: Icon, label, id }: SettingProps & { id: string }) {
   return (
-    <FieldLabel htmlFor={id} className={cn("playground-field-label", fieldLabel)}>
+    <FieldLabel htmlFor={id} className={cn('playground-field-label', fieldLabel)}>
       {Icon && <Icon size={16} strokeWidth={1.5} aria-hidden="true" />}
       <span>{label}</span>
     </FieldLabel>
@@ -64,7 +64,7 @@ export function SelectSetting(props: SelectSettingProps) {
   return (
     <Field
       orientation="horizontal"
-      className={cn("playground-select", fieldRow)}
+      className={cn('playground-select', fieldRow)}
       title={props.title}
     >
       <SettingLabel {...props} id={id} />
@@ -78,7 +78,7 @@ export function SelectSetting(props: SelectSettingProps) {
         <SelectTrigger
           className={cn(
             fieldControl,
-            "[&_svg]:size-3 [&_.playground-option-icon]:size-3.5 [&_.playground-placement-preview]:size-3.5 [&_.playground-distribution-preview]:h-3.5 [&_.playground-distribution-preview]:w-5",
+            '[&_svg]:size-3 [&_.playground-option-icon]:size-3.5 [&_.playground-placement-preview]:size-3.5 [&_.playground-distribution-preview]:h-3.5 [&_.playground-distribution-preview]:w-5',
           )}
           id={id}
           size="sm"
@@ -98,7 +98,7 @@ export function SelectSetting(props: SelectSettingProps) {
               value={option.value}
               aria-label={option.text}
               label={
-                option.text ?? (typeof option.label === "string" ? option.label : option.value)
+                option.text ?? (typeof option.label === 'string' ? option.label : option.value)
               }
             >
               {option.label}
@@ -116,9 +116,9 @@ export function ToggleSetting(props: ToggleSettingProps) {
     <Field
       orientation="horizontal"
       className={cn(
-        "playground-toggle",
+        'playground-toggle',
         fieldRow,
-        "cursor-pointer select-none grid-cols-[minmax(0,1fr)_auto]",
+        'cursor-pointer select-none grid-cols-[minmax(0,1fr)_auto]',
       )}
       title={props.title}
       onClick={(event) => {
@@ -145,7 +145,7 @@ export function RangeSetting(props: RangeSettingProps) {
     setInputId(input?.id)
   }, [])
   return (
-    <Field orientation="horizontal" className={cn("playground-range", fieldRow)}>
+    <Field orientation="horizontal" className={cn('playground-range', fieldRow)}>
       <SettingLabel {...props} id={inputId ?? id} />
       <Slider
         className="px-1"
@@ -155,8 +155,8 @@ export function RangeSetting(props: RangeSettingProps) {
         step={1}
         thumbProps={{
           inputRef: attachInput,
-          "aria-label": props.ariaLabel ?? props.label,
-          "aria-valuetext": `${props.value}%`,
+          'aria-label': props.ariaLabel ?? props.label,
+          'aria-valuetext': `${props.value}%`,
         }}
         onValueChange={(value) => props.onValueChange(Array.isArray(value) ? value[0] : value)}
       />
@@ -169,7 +169,7 @@ export function ColorSetting(props: ColorSettingProps) {
   return (
     <Field
       orientation="horizontal"
-      className={cn("playground-color", fieldRow, "grid-cols-[minmax(0,1fr)_auto]")}
+      className={cn('playground-color', fieldRow, 'grid-cols-[minmax(0,1fr)_auto]')}
     >
       <SettingLabel {...props} id={id} />
       <Input
@@ -186,11 +186,11 @@ export function ColorSetting(props: ColorSettingProps) {
 
 export function TimeInput({ value, onValueChange }: TimeInputProps) {
   return (
-    <Field className={cn("playground-time", fieldRow)}>
+    <Field className={cn('playground-time', fieldRow)}>
       <Input
         className={cn(
           fieldControl,
-          "col-start-2 cursor-text appearance-none select-text tabular-nums md:text-xs [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none",
+          'col-start-2 cursor-text appearance-none select-text tabular-nums md:text-xs [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none',
         )}
         type="time"
         aria-label="Specified time"

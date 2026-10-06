@@ -1,12 +1,12 @@
-import * as React from "react"
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector"
-import type { DuoState, DuoWindowChange } from "@duo-react/core"
-import { useBrowserLayoutEffect } from "../shared/use-browser-layout-effect"
-import { StoreContext } from "./store-context"
+import type { DuoState, DuoWindowChange } from '@private/core'
+import React from 'react'
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
+import { useBrowserLayoutEffect } from '../shared/use-browser-layout-effect'
+import { StoreContext } from './store-context'
 
 export function useDuoStore() {
   const store = React.useContext(StoreContext)
-  if (!store) throw new Error("Duo components and hooks must be inside a DuoProvider.")
+  if (!store) throw new Error('Duo components and hooks must be inside a DuoProvider.')
   return store
 }
 
@@ -28,7 +28,7 @@ export function useDuoActions() {
   return useDuoStore().actions
 }
 
-export function useDuoEvent(type: "windowchange", handler: (event: DuoWindowChange) => void) {
+export function useDuoEvent(type: 'windowchange', handler: (event: DuoWindowChange) => void) {
   const store = useDuoStore()
   const latest = React.useRef(handler)
   useBrowserLayoutEffect(() => {

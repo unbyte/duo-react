@@ -1,9 +1,10 @@
 {
-  "name": "@duo-react/profiles",
+  "name": "@private/profiles",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "sideEffects": false,
+  "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   }

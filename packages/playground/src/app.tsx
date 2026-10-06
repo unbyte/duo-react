@@ -1,16 +1,16 @@
-import * as React from "react"
-import { DuoFrame, DuoRegionMask, DuoProvider, type BarsLayout, type DuoInsets } from "duo-react"
-import { SettingsPanel } from "./settings/settings-panel"
-import { initialBarSettings, barRequest, type BarSettings } from "./settings/bar-settings"
-import { StateInspector } from "./inspector/state-inspector"
-import { PreviewCanvas } from "./preview/preview-canvas"
-import { PreviewFrame } from "./preview/preview-frame"
-import { PreviewControls } from "./preview/preview-controls"
-import { tabItems, ExampleApp, ExampleBars } from "./preview/example-content"
+import { type BarsLayout, DuoFrame, type DuoInsets, DuoProvider, DuoRegionMask } from 'duo-react'
+import * as React from 'react'
+import { StateInspector } from './inspector/state-inspector'
+import { ExampleApp, ExampleBars, tabItems } from './preview/example-content'
+import { PreviewCanvas } from './preview/preview-canvas'
+import { PreviewControls } from './preview/preview-controls'
+import { PreviewFrame } from './preview/preview-frame'
+import { type BarSettings, barRequest, initialBarSettings } from './settings/bar-settings'
+import { SettingsPanel } from './settings/settings-panel'
 
 export function App() {
-  const [selectedTab, setSelectedTab] = React.useState("home")
-  const [backgrounds, setBackgrounds] = React.useState({ light: "#ffffff", dark: "#111111" })
+  const [selectedTab, setSelectedTab] = React.useState('home')
+  const [backgrounds, setBackgrounds] = React.useState({ light: '#ffffff', dark: '#111111' })
   const [regionsPinned, setRegionsPinned] = React.useState(false)
   const [highlightedRegionId, setHighlightedRegionId] = React.useState<string>()
   const [showBarBounds, setShowBarBounds] = React.useState(false)
@@ -21,12 +21,12 @@ export function App() {
       next.tabbarCount > 0 &&
       !tabItems.slice(0, next.tabbarCount).some((item) => item.id === selectedTab)
     )
-      setSelectedTab("home")
+      setSelectedTab('home')
   }
   const [barsLayout, setBarsLayout] = React.useState<BarsLayout>()
   const request = React.useMemo(() => barRequest(barSettings), [barSettings])
   const [showBlock, setShowBlock] = React.useState(true)
-  const [blockColor, setBlockColor] = React.useState("#0066ff")
+  const [blockColor, setBlockColor] = React.useState('#0066ff')
   const [outerPortraitLocked, setOuterPortraitLocked] = React.useState(false)
   const [inspectorOpen, setInspectorOpen] = React.useState(false)
   const [fitPadding, setFitPadding] = React.useState<DuoInsets>({
@@ -53,7 +53,7 @@ export function App() {
   }, [])
   return (
     <DuoProvider
-      defaultSystem={{ colorMode: "light", cameraActive: true }}
+      defaultSystem={{ colorMode: 'light', cameraActive: true }}
       outerPortraitLocked={outerPortraitLocked}
     >
       <div
@@ -87,7 +87,7 @@ export function App() {
                 <DuoFrame
                   ref={frame}
                   fitPadding={fitPadding}
-                  style={{ width: "100%", height: "100%" }}
+                  style={{ width: '100%', height: '100%' }}
                   aria-label="Duo layout preview"
                 >
                   <ExampleApp

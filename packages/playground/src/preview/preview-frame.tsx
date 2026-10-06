@@ -1,5 +1,5 @@
-import type * as React from "react"
-import { useDuoState, type DuoColorMode } from "duo-react"
+import { type DuoColorMode, useDuoState } from 'duo-react'
+import type * as React from 'react'
 
 function foregroundColor(background: string) {
   const channels = background
@@ -10,7 +10,7 @@ function foregroundColor(background: string) {
       return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
     })
   const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
-  return luminance > 0.179 ? "#000000" : "#ffffff"
+  return luminance > 0.179 ? '#000000' : '#ffffff'
 }
 
 export function PreviewFrame({
@@ -27,8 +27,8 @@ export function PreviewFrame({
       className="playground-frame absolute inset-0"
       style={
         {
-          "--playground-background": background,
-          "--playground-color": foregroundColor(background),
+          '--playground-background': background,
+          '--playground-color': foregroundColor(background),
         } as React.CSSProperties
       }
     >

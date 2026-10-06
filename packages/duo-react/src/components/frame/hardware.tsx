@@ -1,10 +1,10 @@
-import * as React from "react"
 import {
-  hardwareProfiles,
-  hardwareRotation,
   type DuoDisplay,
   type DuoOrientation,
-} from "@duo-react/profiles"
+  hardwareProfiles,
+  hardwareRotation,
+} from '@private/profiles'
+import React from 'react'
 
 export function Hardware({
   display,
@@ -13,7 +13,7 @@ export function Hardware({
   display: DuoDisplay
   orientation: DuoOrientation
 }) {
-  const inner = display === "inner"
+  const inner = display === 'inner'
   const { width, height, buttons } = hardwareProfiles[display]
   return (
     <div

@@ -1,5 +1,5 @@
-import * as React from "react"
-import type { LucideIcon } from "lucide-react"
+import type { LucideIcon } from 'lucide-react'
+import type * as React from 'react'
 
 export function LevelLabel({
   level,
@@ -33,14 +33,14 @@ export function LevelLabel({
   )
 }
 
-export function CountLabel({ count, unit = "bar" }: { count: number; unit?: "bar" | "tab" }) {
+export function CountLabel({ count, unit = 'bar' }: { count: number; unit?: 'bar' | 'tab' }) {
   return (
     <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
       <span className="playground-option-number text-[11px] font-semibold tabular-nums text-[#2165c5]">
         {count}
       </span>
       <span className="playground-option-description text-muted-foreground">
-        {count === 0 ? "None" : count === 1 ? unit : `${unit}s`}
+        {count === 0 ? 'None' : count === 1 ? unit : `${unit}s`}
       </span>
     </span>
   )
@@ -70,7 +70,7 @@ export function PlacementLabel({
   placement,
   children,
 }: {
-  placement: "top-leading" | "top-trailing" | "bottom"
+  placement: 'top-leading' | 'top-trailing' | 'bottom'
   children: React.ReactNode
 }) {
   return (
@@ -84,9 +84,9 @@ export function PlacementLabel({
       >
         <rect x="1" y="1" width="12" height="14" rx="2" fill="none" stroke="currentColor" />
         <rect
-          x={placement === "top-trailing" ? 7 : 3}
-          y={placement === "bottom" ? 10 : 3}
-          width={placement === "bottom" ? 8 : 4}
+          x={placement === 'top-trailing' ? 7 : 3}
+          y={placement === 'bottom' ? 10 : 3}
+          width={placement === 'bottom' ? 8 : 4}
           height="3"
           rx="1"
           className="playground-placement-bar fill-primary"
@@ -101,7 +101,7 @@ export function DistributionLabel({
   distribution,
   children,
 }: {
-  distribution: "packed" | "edges"
+  distribution: 'packed' | 'edges'
   children: React.ReactNode
 }) {
   return (
@@ -113,7 +113,7 @@ export function DistributionLabel({
         className="playground-distribution-preview size-5 h-3.5 shrink-0 text-primary"
         aria-hidden="true"
       >
-        {(distribution === "packed" ? [6, 10, 14] : [2, 10, 18]).map((x) => (
+        {(distribution === 'packed' ? [6, 10, 14] : [2, 10, 18]).map((x) => (
           <circle key={x} cx={x} cy="7" r="1.5" fill="currentColor" />
         ))}
       </svg>

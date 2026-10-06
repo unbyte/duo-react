@@ -1,46 +1,46 @@
-import * as React from "react"
-import { cn } from "cn"
 import {
-  IconRadiusTopLeft,
-  IconRadiusTopRight,
-  IconRadiusBottomLeft,
-  IconRadiusBottomRight,
-  IconBorderTop,
-  IconBorderRight,
   IconBorderBottom,
   IconBorderLeft,
-} from "@tabler/icons-react"
+  IconBorderRight,
+  IconBorderTop,
+  IconRadiusBottomLeft,
+  IconRadiusBottomRight,
+  IconRadiusTopLeft,
+  IconRadiusTopRight,
+} from '@tabler/icons-react'
+import { cn } from 'cn'
 import {
-  useDuoState,
-  useDuoRegions,
   type BarsLayout,
   type BarsLayoutRequest,
   type DuoRect,
   type DuoRegion,
   type DuoScreenInfo,
-} from "duo-react"
-import { InspectorTabs } from "./inspector-tabs"
-import { IconHint, PinOverlay } from "./inspector-controls"
-import { ToggleSetting } from "../components/setting-fields"
-import { ScrollSurface } from "../components/scroll-surface"
-import { CopyableNumber } from "../components/copyable-number"
+  useDuoRegions,
+  useDuoState,
+} from 'duo-react'
+import * as React from 'react'
+import { CopyableNumber } from '../components/copyable-number'
+import { ScrollSurface } from '../components/scroll-surface'
+import { ToggleSetting } from '../components/setting-fields'
+import { IconHint, PinOverlay } from './inspector-controls'
+import { InspectorTabs } from './inspector-tabs'
 
 const headingRow =
-  "flex items-center justify-between gap-2 @max-[280px]:flex-wrap @max-[280px]:gap-y-0"
-const heading = "m-0 text-xs/normal font-semibold text-foreground"
-const metric = "flex min-w-0 items-center justify-between gap-2 whitespace-nowrap"
+  'flex items-center justify-between gap-2 @max-[280px]:flex-wrap @max-[280px]:gap-y-0'
+const heading = 'm-0 text-xs/normal font-semibold text-foreground'
+const metric = 'flex min-w-0 items-center justify-between gap-2 whitespace-nowrap'
 const metricLabel =
-  "inline-flex items-center gap-[5px] text-[11px] font-normal capitalize text-muted-foreground [&>svg]:shrink-0"
-const metricValue = "m-0 text-xs/normal font-normal tabular-nums text-[#526174]"
-const regionColors: Record<DuoRegion["kind"], string> = {
-  "safe-area": "#21834b",
-  top: "#966000",
-  right: "#2563cc",
-  bottom: "#a13dac",
-  left: "#00828b",
-  occlusion: "#c53b33",
-  division: "#8c6b17",
-  gap: "#5b50b4",
+  'inline-flex items-center gap-[5px] text-[11px] font-normal capitalize text-muted-foreground [&>svg]:shrink-0'
+const metricValue = 'm-0 text-xs/normal font-normal tabular-nums text-[#526174]'
+const regionColors: Record<DuoRegion['kind'], string> = {
+  'safe-area': '#21834b',
+  top: '#966000',
+  right: '#2563cc',
+  bottom: '#a13dac',
+  left: '#00828b',
+  occlusion: '#c53b33',
+  division: '#8c6b17',
+  gap: '#5b50b4',
 }
 
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -63,7 +63,7 @@ function JsonData({
 }) {
   return (
     <ScrollSurface
-      className={cn("playground-json-scroll", className)}
+      className={cn('playground-json-scroll', className)}
       contentClassName="w-max min-w-full!"
       label={label}
     >
@@ -74,11 +74,11 @@ function JsonData({
   )
 }
 
-function Size({ rect }: { rect: Pick<DuoRect, "width" | "height"> }) {
+function Size({ rect }: { rect: Pick<DuoRect, 'width' | 'height'> }) {
   return (
     <span className="playground-inspector-size m-0 shrink-0 text-[11px] font-normal tabular-nums text-muted-foreground">
-      <CopyableNumber value={rect.width} label="Width" /> ×{" "}
-      <CopyableNumber value={rect.height} label="Height" />{" "}
+      <CopyableNumber value={rect.width} label="Width" /> ×{' '}
+      <CopyableNumber value={rect.height} label="Height" />{' '}
       <small className="playground-inspector-unit text-[#9ba6b5] font-normal [font-size:inherit]">
         pt
       </small>
@@ -88,15 +88,15 @@ function Size({ rect }: { rect: Pick<DuoRect, "width" | "height"> }) {
 
 function GeometryDetails({ rect }: { rect: DuoRect }) {
   const bounds = [
-    ["Top", rect.y, IconBorderTop],
-    ["Right", rect.x + rect.width, IconBorderRight],
-    ["Bottom", rect.y + rect.height, IconBorderBottom],
-    ["Left", rect.x, IconBorderLeft],
+    ['Top', rect.y, IconBorderTop],
+    ['Right', rect.x + rect.width, IconBorderRight],
+    ['Bottom', rect.y + rect.height, IconBorderBottom],
+    ['Left', rect.x, IconBorderLeft],
   ] as const
   return (
     <span className="playground-inspector-metrics m-0 grid grid-cols-2 gap-x-6 gap-y-[5px] @max-[280px]:gap-x-4">
       {bounds.map(([label, value, Icon]) => (
-        <span className={cn("playground-inspector-metric", metric)} key={label}>
+        <span className={cn('playground-inspector-metric', metric)} key={label}>
           <small className={metricLabel}>
             <Icon size={14} stroke={1.5} aria-hidden="true" />
             {label}
@@ -111,7 +111,7 @@ function GeometryDetails({ rect }: { rect: DuoRect }) {
 function RegionDetails({ region }: { region: DuoRegion }) {
   return (
     <>
-      <span className={cn("playground-region-heading", headingRow)}>
+      <span className={cn('playground-region-heading', headingRow)}>
         <span className="playground-region-name flex items-baseline gap-1.5 font-medium capitalize text-[color:var(--playground-region-color)] before:size-1.5 before:shrink-0 before:self-center before:rounded-full before:bg-[var(--playground-region-color)] before:content-['']">
           {region.name}
         </span>
@@ -122,12 +122,12 @@ function RegionDetails({ region }: { region: DuoRegion }) {
   )
 }
 
-function CornerRadii({ values, label }: { values: DuoScreenInfo["cornerRadii"]; label: string }) {
+function CornerRadii({ values, label }: { values: DuoScreenInfo['cornerRadii']; label: string }) {
   const corners = [
-    ["Top left", 0, IconRadiusTopLeft],
-    ["Top right", 1, IconRadiusTopRight],
-    ["Bottom left", 3, IconRadiusBottomLeft],
-    ["Bottom right", 2, IconRadiusBottomRight],
+    ['Top left', 0, IconRadiusTopLeft],
+    ['Top right', 1, IconRadiusTopRight],
+    ['Bottom left', 3, IconRadiusBottomLeft],
+    ['Bottom right', 2, IconRadiusBottomRight],
   ] as const
   return (
     <div
@@ -140,7 +140,7 @@ function CornerRadii({ values, label }: { values: DuoScreenInfo["cornerRadii"]; 
         <dl className="playground-inspector-metrics playground-corner-metrics m-0 grid grid-cols-[repeat(4,auto)] gap-2">
           {corners.map(([corner, index, Icon]) => (
             <div
-              className={cn("playground-inspector-metric", metric, "justify-start gap-1.5")}
+              className={cn('playground-inspector-metric', metric, 'justify-start gap-1.5')}
               key={corner}
             >
               <dt className={metricLabel}>
@@ -161,19 +161,19 @@ function CornerRadii({ values, label }: { values: DuoScreenInfo["cornerRadii"]; 
 
 function ScreenInformation() {
   const state = useDuoState((value) => value)
-  const screen = state.screens[state.posture === "closed" ? "outer" : "inner"]
+  const screen = state.screens[state.posture === 'closed' ? 'outer' : 'inner']
   const displayInformation = [
-    ["Posture", state.posture.replace(/-/g, " ")],
-    ["Orientation", screen.orientation.replace(/-/g, " ")],
+    ['Posture', state.posture.replace(/-/g, ' ')],
+    ['Orientation', screen.orientation.replace(/-/g, ' ')],
   ]
   const windowHasDifferentCorners = screen.windowCornerRadii.some(
     (radius, index) => radius !== screen.cornerRadii[index],
   )
   return (
     <section className="playground-screen-information" aria-label="Screen information">
-      <div className={cn("playground-region-heading", headingRow)}>
+      <div className={cn('playground-region-heading', headingRow)}>
         <h3 className={heading}>
-          {screen.display === "inner" ? "Inner display" : "Outer display"}
+          {screen.display === 'inner' ? 'Inner display' : 'Outer display'}
         </h3>
         <Size rect={screen.size} />
       </div>
@@ -186,7 +186,7 @@ function ScreenInformation() {
         <CornerRadii label="Display corner radii" values={screen.cornerRadii} />
       </dl>
       <div
-        className={cn("playground-region-heading playground-window-heading mt-[18px]", headingRow)}
+        className={cn('playground-region-heading playground-window-heading mt-[18px]', headingRow)}
       >
         <h3 className={heading}>App window</h3>
         <Size rect={screen.window} />
@@ -229,7 +229,7 @@ export function StateInspector({
 }) {
   const state = useDuoState((value) => value)
   const regions = useDuoRegions()
-  const [tab, setTab] = React.useState("regions")
+  const [tab, setTab] = React.useState('regions')
   const panel = React.useRef<HTMLElement>(null)
 
   React.useEffect(() => {
@@ -237,7 +237,7 @@ export function StateInspector({
   }, [regions, open, tab, onHoveredRegionChange])
 
   React.useLayoutEffect(() => {
-    panel.current?.toggleAttribute("inert", !open)
+    panel.current?.toggleAttribute('inert', !open)
     if (open)
       panel.current
         ?.querySelector<HTMLButtonElement>('[role="tab"][aria-selected="true"]')
@@ -247,17 +247,17 @@ export function StateInspector({
   React.useEffect(() => {
     if (!open) return
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && panel.current?.contains(document.activeElement)) {
+      if (event.key === 'Escape' && panel.current?.contains(document.activeElement)) {
         event.preventDefault()
         onClose()
       }
     }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
   }, [open, onClose])
 
   const bars = [
-    ...(layout?.tabbar ? [{ id: "Tab bar", ...layout.tabbar }] : []),
+    ...(layout?.tabbar ? [{ id: 'Tab bar', ...layout.tabbar }] : []),
     ...(layout?.toolbars.map((bar) => ({ ...bar, id: `Toolbar ${bar.id}` })) ?? []),
   ]
 
@@ -275,12 +275,12 @@ export function StateInspector({
           onValueChange={setTab}
           sections={[
             {
-              value: "regions",
-              label: "Regions",
+              value: 'regions',
+              label: 'Regions',
               content: (
                 <>
                   <ScreenInformation />
-                  <div className={cn("playground-inspector-section-heading mt-5", headingRow)}>
+                  <div className={cn('playground-inspector-section-heading mt-5', headingRow)}>
                     <h3 className={heading}>Regions</h3>
                     <PinOverlay pinned={regionsPinned} onPinnedChange={onRegionsPinnedChange} />
                   </div>
@@ -303,7 +303,7 @@ export function StateInspector({
                           data-highlighted={highlightedRegionId === region.id}
                           style={
                             {
-                              "--playground-region-color": regionColors[region.kind],
+                              '--playground-region-color': regionColors[region.kind],
                             } as React.CSSProperties
                           }
                           onPointerEnter={() => onHoveredRegionChange(region.id)}
@@ -317,8 +317,8 @@ export function StateInspector({
               ),
             },
             {
-              value: "bars",
-              label: "Bars",
+              value: 'bars',
+              label: 'Bars',
               content: (
                 <>
                   <ToggleSetting
@@ -333,13 +333,13 @@ export function StateInspector({
                         aria-label={bar.id}
                         key={bar.id}
                       >
-                        <div className={cn("playground-region-heading", headingRow)}>
+                        <div className={cn('playground-region-heading', headingRow)}>
                           <h3 className={heading}>{bar.id}</h3>
                           <Size rect={bar.rect} />
                         </div>
                         <dl className="playground-screen-details playground-bar-properties m-0 grid gap-[5px]">
                           <DetailRow label="Placement">
-                            {bar.placement.replace(/-/g, " ")}
+                            {bar.placement.replace(/-/g, ' ')}
                           </DetailRow>
                           <DetailRow label="Axis">{bar.axis}</DetailRow>
                         </dl>
@@ -369,8 +369,8 @@ export function StateInspector({
               ),
             },
             {
-              value: "states",
-              label: "States",
+              value: 'states',
+              label: 'States',
               content: (
                 <JsonData
                   className="playground-state-data min-h-0 max-h-none flex-1"

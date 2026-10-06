@@ -1,19 +1,19 @@
-import { expect, test } from "vite-plus/test"
-import { normalizeRotation } from "../src/geometry/orientation"
-import { rotationStart } from "../src/preview/rotation"
+import { expect, test } from 'vitest'
+import { normalizeRotation } from '../src/geometry/orientation'
+import { rotationStart } from '../src/preview/rotation'
 
-test("normalization handles negative angles and whole turns without negative zero", () => {
+test('normalization handles negative angles and whole turns without negative zero', () => {
   expect(normalizeRotation(-90)).toBe(270)
   expect(normalizeRotation(810)).toBe(90)
   expect(normalizeRotation(-720)).toBe(0)
 })
 
-test("animation crosses zero with a quarter-turn in the requested direction", () => {
+test('animation crosses zero with a quarter-turn in the requested direction', () => {
   expect(rotationStart(270, 270, 0)).toBe(-90)
   expect(rotationStart(0, 0, 270)).toBe(360)
 })
 
-test("interrupted turns preserve unfinished travel and can reverse", () => {
+test('interrupted turns preserve unfinished travel and can reverse', () => {
   // Continue right even though 270 would be nearer counterclockwise from 40.
   expect(rotationStart(40, 180, 270)).toBe(40)
   expect(rotationStart(300, 270, 0)).toBe(-60)
@@ -22,7 +22,7 @@ test("interrupted turns preserve unfinished travel and can reverse", () => {
   expect(rotationStart(20, 0, 270)).toBe(380)
 })
 
-test("continuous retargeting keeps animation values bounded in either direction", () => {
+test('continuous retargeting keeps animation values bounded in either direction', () => {
   for (const direction of [-90, 90]) {
     let current = 0
     let previousTarget = 0

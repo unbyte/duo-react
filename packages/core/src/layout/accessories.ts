@@ -1,18 +1,18 @@
-import { getSystemLayout } from "./system"
-import { barProfile as profile } from "@duo-react/profiles"
-import type { DuoScreenInfo } from "../geometry/types"
+import { barProfile as profile } from '@private/profiles'
+import type { DuoScreenInfo } from '../geometry/types'
+import { getSystemLayout } from './system'
 
 const { railInset: sideInset, railWidth: controlWidth, sectionGap: edgeGap } = profile
 
 export function getAccessoryLayout(screen: DuoScreenInfo) {
   const { window, safeArea, placement } = screen
-  const horizontal = screen.display === "inner" && screen.orientation.startsWith("portrait")
+  const horizontal = screen.display === 'inner' && screen.orientation.startsWith('portrait')
   if (horizontal) {
     const statusRegion = screen.reservedRegions.find(
       (region) => region.y === 0 && region.height === safeArea.top,
     )
     return {
-      side: "horizontal" as const,
+      side: 'horizontal' as const,
       left: profile.horizontalInset,
       right: profile.horizontalInset,
       top: profile.top,
@@ -23,14 +23,14 @@ export function getAccessoryLayout(screen: DuoScreenInfo) {
       ),
     }
   }
-  const side = placement === "left" || safeArea.left > 0 ? "left" : "right"
-  const railLeft = side === "left" ? sideInset : window.width - sideInset - controlWidth
+  const side = placement === 'left' || safeArea.left > 0 ? 'left' : 'right'
+  const railLeft = side === 'left' ? sideInset : window.width - sideInset - controlWidth
   const railRight = railLeft + controlWidth
-  const inner = screen.display === "inner"
+  const inner = screen.display === 'inner'
   let top: number = inner ? profile.railTop : edgeGap
-  const calibrated = inner || screen.orientation === "portrait"
+  const calibrated = inner || screen.orientation === 'portrait'
   let bottom =
-    calibrated && placement === "full" ? profile.railBottom : Math.max(edgeGap, safeArea.bottom)
+    calibrated && placement === 'full' ? profile.railBottom : Math.max(edgeGap, safeArea.bottom)
   const displayStatus = getSystemLayout(screen).status
   const status = { ...displayStatus, x: displayStatus.x - window.x, y: displayStatus.y - window.y }
   // The measured status reservations include clearance: inner y = 120,

@@ -1,4 +1,4 @@
-import type { DuoInsets } from "@duo-react/profiles"
+import type { DuoInsets } from '@private/profiles'
 
-export type DuoZoom = "fit" | number
+export type DuoZoom = 'fit' | number
 export type DuoFitPadding = number | Partial<DuoInsets>

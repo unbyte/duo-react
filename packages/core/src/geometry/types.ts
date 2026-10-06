@@ -1,14 +1,14 @@
 import type {
   DuoDisplay,
+  DuoFoldingRegion,
+  DuoInsets,
   DuoOrientation,
   DuoPlacement,
   DuoPosture,
-  DuoFoldingRegion,
-  DuoInsets,
   DuoRect,
   DuoReservedRegion,
   DuoSize,
-} from "@duo-react/profiles"
+} from '@private/profiles'
 
 export interface DuoScreenInfo {
   readonly display: DuoDisplay

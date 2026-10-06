@@ -1,4 +1,4 @@
-import type { DuoSize } from "@duo-react/profiles"
+import type { DuoSize } from '@private/profiles'
 
 function nearestRotation(rotation: number, target: number) {
   return target + Math.round((rotation - target) / 360) * 360

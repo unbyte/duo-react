@@ -1,13 +1,14 @@
 {
-  "name": "@duo-react/core",
+  "name": "@private/core",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "sideEffects": false,
+  "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@duo-react/profiles": "workspace:*"
+    "@private/profiles": "workspace:*"
   }
 }

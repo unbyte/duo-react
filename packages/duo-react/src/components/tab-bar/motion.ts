@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react"
+import React from 'react'
 
 export function useLensMotion(target: number, expanded: boolean, reducedMotion: boolean) {
-  const current = useRef({
+  const current = React.useRef({
     x: target,
     growth: 0,
     velocity: 0,
@@ -11,12 +11,12 @@ export function useLensMotion(target: number, expanded: boolean, reducedMotion: 
     growthVelocity: 0,
     lastTime: 0,
   })
-  const [frame, setFrame] = useState({
+  const [frame, setFrame] = React.useState({
     x: target,
     growth: 0,
     deformation: 0,
   })
-  useEffect(() => {
+  React.useEffect(() => {
     if (reducedMotion) {
       Object.assign(current.current, {
         x: target,

@@ -1,9 +1,9 @@
-import { expect, test } from "vite-plus/test"
-import { TabLayout } from "../src/components/tab-bar/layout"
-import { getBarsLayout, DuoStore } from "@duo-react/core"
-import { barProfile } from "@duo-react/profiles"
+import { DuoStore, getBarsLayout } from '@private/core'
+import { barProfile } from '@private/profiles'
+import { expect, test } from 'vitest'
+import { TabLayout } from '../src/components/tab-bar/layout'
 
-test("resting tabs retain the measured dimensions for two through five destinations", () => {
+test('resting tabs retain the measured dimensions for two through five destinations', () => {
   for (const [index, count] of [2, 3, 4, 5].entries()) {
     expect(new TabLayout(false, count).rest).toMatchObject({
       length: [188, 274, 400, 400][index],
@@ -18,7 +18,7 @@ test("resting tabs retain the measured dimensions for two through five destinati
   }
 })
 
-test("vertical expansion retains the resting axis and fits its reserved clearance", () => {
+test('vertical expansion retains the resting axis and fits its reserved clearance', () => {
   for (const count of [2, 3, 4, 5]) {
     const layout = new TabLayout(true, count)
     for (const reveal of [0, 0.5, 1]) {
@@ -35,7 +35,7 @@ test("vertical expansion retains the resting axis and fits its reserved clearanc
   }
 })
 
-test("an upward drag keeps its destination when the vertical bar expands before release", () => {
+test('an upward drag keeps its destination when the vertical bar expands before release', () => {
   const layout = new TabLayout(true, 3)
   for (const scale of [0.5, 1, 2]) {
     const start = { top: 100, height: layout.rest.length * scale } as DOMRect
@@ -55,7 +55,7 @@ test("an upward drag keeps its destination when the vertical bar expands before 
   }
 })
 
-test("drag travel follows the current tab spacing at each expansion and zoom", () => {
+test('drag travel follows the current tab spacing at each expansion and zoom', () => {
   for (const vertical of [false, true]) {
     const layout = new TabLayout(vertical, 3)
     for (const reveal of [0, 0.5, 1]) {
@@ -77,18 +77,18 @@ test("drag travel follows the current tab spacing at each expansion and zoom", (
   }
 })
 
-test("toolbar and status reservations clear the expanded vertical tab silhouette", () => {
+test('toolbar and status reservations clear the expanded vertical tab silhouette', () => {
   const store = new DuoStore()
   for (const screen of Object.values(store.getSnapshot().screens)) {
     for (const count of [0, 1, 3]) {
       const result = getBarsLayout(screen, {
         toolbars: Array.from({ length: count }, (_, index) => ({
           id: String(index),
-          placement: "top-trailing",
+          placement: 'top-trailing',
         })),
         tabbar: {},
       })
-      if (result.tabbar!.axis !== "vertical") continue
+      if (result.tabbar!.axis !== 'vertical') continue
       const top = result.tabbar!.rect.y - barProfile.tabExpansion
       for (const toolbar of result.toolbars) {
         expect(top - toolbar.rect.y - toolbar.rect.height).toBeGreaterThanOrEqual(16 - 0.00001)

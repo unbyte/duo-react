@@ -1,10 +1,10 @@
-import * as React from "react"
-import { useSyncExternalStoreWithSelector } from "use-sync-external-store/shim/with-selector"
-import { useBackdropStore } from "../../backdrop/backdrop-context"
-import type { IndicatorSample } from "@duo-react/browser"
-import { useBackdropRegion } from "../../backdrop/use-backdrop-region"
-import type { DuoRect } from "@duo-react/profiles"
-import type { DuoIndicatorStyle } from "@duo-react/core"
+import type { IndicatorSample } from '@private/browser'
+import type { DuoIndicatorStyle } from '@private/core'
+import type { DuoRect } from '@private/profiles'
+import React from 'react'
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
+import { useBackdropStore } from '../../backdrop/backdrop-context'
+import { useBackdropRegion } from '../../backdrop/use-backdrop-region'
 
 export function SystemIndicator({
   width,
@@ -33,7 +33,7 @@ export function SystemIndicator({
     store.subscribe,
     store.getSnapshot,
     store.getServerSnapshot,
-    (snapshot) => (appearance === "auto" ? snapshot.colors[sample] : appearance),
+    (snapshot) => (appearance === 'auto' ? snapshot.colors[sample] : appearance),
   )
   return (
     <span

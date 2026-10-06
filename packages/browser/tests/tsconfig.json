@@ -1,8 +1,15 @@
 {
-  "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "types": ["node"]
+    "target": "esnext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "../node_modules/.cache/tsconfig.tests.tsbuildinfo"
   },
   "include": ["."]
 }

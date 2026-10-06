@@ -1,12 +1,12 @@
-import { expect, test } from "vite-plus/test"
-import { rotatedSize } from "../src/preview/rotation"
-import { getDuoGeometry } from "../src/geometry/screen"
-import { resolveFitPadding, resolveZoom } from "../src/preview/zoom"
+import { expect, test } from 'vitest'
+import { getDuoGeometry } from '../src/geometry/screen'
+import { rotatedSize } from '../src/preview/rotation'
+import { resolveFitPadding, resolveZoom } from '../src/preview/zoom'
 
-test("split windows preserve a common pixel density and local reserved-region coordinates", () => {
-  const options = { display: "inner", orientation: "landscape-left", cameraActive: true } as const
-  const left = getDuoGeometry({ ...options, placement: "left" })
-  const right = getDuoGeometry({ ...options, placement: "right" })
+test('split windows preserve a common pixel density and local reserved-region coordinates', () => {
+  const options = { display: 'inner', orientation: 'landscape-left', cameraActive: true } as const
+  const left = getDuoGeometry({ ...options, placement: 'left' })
+  const right = getDuoGeometry({ ...options, placement: 'right' })
   expect(left.window).toEqual({ x: 0, y: 0, width: 469, height: 669 })
   expect(right.window).toEqual({ x: 482, y: 0, width: 469, height: 669 })
   expect(left.reservedRegions).toEqual([])
@@ -14,7 +14,7 @@ test("split windows preserve a common pixel density and local reserved-region co
   expect(left.windowCornerRadii).toEqual([55, 32, 32, 55])
   expect(right.windowCornerRadii).toEqual([32, 55, 55, 32])
   expect(right.reservedRegions[0]).toEqual({
-    type: "occlusion",
+    type: 'occlusion',
     x: 195.33,
     y: 21,
     width: 58,
@@ -22,29 +22,29 @@ test("split windows preserve a common pixel density and local reserved-region co
   })
 })
 
-test("portrait profiles and the outer display retain their reported asymmetry", () => {
-  const inner = getDuoGeometry({ display: "inner", orientation: "portrait" })
-  const outer = getDuoGeometry({ display: "outer", orientation: "portrait" })
+test('portrait profiles and the outer display retain their reported asymmetry', () => {
+  const inner = getDuoGeometry({ display: 'inner', orientation: 'portrait' })
+  const outer = getDuoGeometry({ display: 'outer', orientation: 'portrait' })
   expect(inner.window).toMatchObject({ width: 669, height: 951 })
   expect(inner.safeArea.top).toBe(82)
   expect(outer.window).toMatchObject({ width: 466, height: 678 })
   expect(outer.cornerRadii).toEqual([8, 59, 59, 8])
   expect(outer.windowCornerRadii).toEqual(outer.cornerRadii)
   expect(() =>
-    getDuoGeometry({ display: "inner", orientation: "portrait", placement: "left" }),
-  ).toThrow("No measured Duo profile")
+    getDuoGeometry({ display: 'inner', orientation: 'portrait', placement: 'left' }),
+  ).toThrow('No measured Duo profile')
 })
 
-test("the inner fold follows the display axis and stays inactive in fully open layouts", () => {
+test('the inner fold follows the display axis and stays inactive in fully open layouts', () => {
   for (const orientation of [
-    "portrait",
-    "portrait-upside-down",
-    "landscape-left",
-    "landscape-right",
+    'portrait',
+    'portrait-upside-down',
+    'landscape-left',
+    'landscape-right',
   ] as const) {
-    const portrait = orientation.startsWith("portrait")
+    const portrait = orientation.startsWith('portrait')
     for (const cameraActive of [false, true]) {
-      const full = getDuoGeometry({ display: "inner", orientation, cameraActive })
+      const full = getDuoGeometry({ display: 'inner', orientation, cameraActive })
       const fold = full.foldingRegion!
       expect(fold.active).toBe(false)
       expect(fold.frame).toEqual(
@@ -56,21 +56,21 @@ test("the inner fold follows the display axis and stays inactive in fully open l
       expect(fold.frame.y + fold.frame.height / 2).toBe(full.size.height / 2)
       expect(fold.frame.width - fold.margins.left - fold.margins.right).toBe(portrait ? 669 : 0)
       expect(fold.frame.height - fold.margins.top - fold.margins.bottom).toBe(portrait ? 0 : 669)
-      expect(full.reservedRegions.some((region) => region.type === "division")).toBe(false)
+      expect(full.reservedRegions.some((region) => region.type === 'division')).toBe(false)
       expect(Object.isFrozen(fold.frame)).toBe(true)
       expect(Object.isFrozen(fold.margins)).toBe(true)
       if (!portrait) {
         const left = getDuoGeometry({
-          display: "inner",
+          display: 'inner',
           orientation,
           cameraActive,
-          placement: "left",
+          placement: 'left',
         })
         const right = getDuoGeometry({
-          display: "inner",
+          display: 'inner',
           orientation,
           cameraActive,
-          placement: "right",
+          placement: 'right',
         })
         expect(left.foldingRegion).toEqual(fold)
         expect(right.foldingRegion).toEqual(fold)
@@ -79,21 +79,21 @@ test("the inner fold follows the display axis and stays inactive in fully open l
     }
   }
   expect(
-    getDuoGeometry({ display: "outer", orientation: "portrait" }).foldingRegion,
+    getDuoGeometry({ display: 'outer', orientation: 'portrait' }).foldingRegion,
   ).toBeUndefined()
 })
 
-test("fit responds to container bounds while numeric zoom preserves app scale", () => {
+test('fit responds to container bounds while numeric zoom preserves app scale', () => {
   const device = { width: 951, height: 669 }
-  expect(resolveZoom("fit", { width: 499.5, height: 1000 }, device, 12)).toBe(0.5)
+  expect(resolveZoom('fit', { width: 499.5, height: 1000 }, device, 12)).toBe(0.5)
   expect(resolveZoom(2, { width: 100, height: 100 }, device)).toBe(2)
-  expect(resolveZoom("fit", { width: 20, height: 20 }, device)).toBe(0)
+  expect(resolveZoom('fit', { width: 20, height: 20 }, device)).toBe(0)
   expect(resolveZoom(1, { width: 0, height: 200 }, device)).toBe(0)
   for (const zoom of [0, -1, Infinity, NaN])
     expect(() => resolveZoom(zoom, device, device)).toThrow(RangeError)
 })
 
-test("fit accepts uniform or optional per-side padding with 24px defaults", () => {
+test('fit accepts uniform or optional per-side padding with 24px defaults', () => {
   expect(resolveFitPadding()).toEqual({ top: 24, right: 24, bottom: 24, left: 24 })
   expect(resolveFitPadding({})).toEqual(resolveFitPadding())
   expect(resolveFitPadding(0)).toEqual({ top: 0, right: 0, bottom: 0, left: 0 })
@@ -105,46 +105,46 @@ test("fit accepts uniform or optional per-side padding with 24px defaults", () =
   })
   const device = { width: 100, height: 100 }
   const container = { width: 300, height: 300 }
-  expect(resolveZoom("fit", container, device, { bottom: 104 })).toBe(1.72)
-  expect(resolveZoom("fit", container, device, { left: 104 })).toBe(1.72)
-  expect(resolveZoom("fit", container, device, { top: 200, bottom: 200 })).toBe(0)
+  expect(resolveZoom('fit', container, device, { bottom: 104 })).toBe(1.72)
+  expect(resolveZoom('fit', container, device, { left: 104 })).toBe(1.72)
+  expect(resolveZoom('fit', container, device, { top: 200, bottom: 200 })).toBe(0)
   expect(resolveZoom(2, container, device, { bottom: 104 })).toBe(2)
-  expect(resolveZoom("fit", container, device, 12)).toBe(
-    resolveZoom("fit", container, device, { top: 12, right: 12, bottom: 12, left: 12 }),
+  expect(resolveZoom('fit', container, device, 12)).toBe(
+    resolveZoom('fit', container, device, { top: 12, right: 12, bottom: 12, left: 12 }),
   )
 })
 
-test("fit rejects negative and nonfinite padding on every side", () => {
+test('fit rejects negative and nonfinite padding on every side', () => {
   for (const value of [-1, NaN, Infinity, -Infinity]) {
     expect(() => resolveFitPadding(value)).toThrow(RangeError)
-    for (const side of ["top", "right", "bottom", "left"] as const)
+    for (const side of ['top', 'right', 'bottom', 'left'] as const)
       expect(() => resolveFitPadding({ [side]: value })).toThrow(RangeError)
   }
 })
 
-test("partial folding clips the active division to each window without changing measured layout", () => {
+test('partial folding clips the active division to each window without changing measured layout', () => {
   for (const orientation of [
-    "portrait",
-    "portrait-upside-down",
-    "landscape-left",
-    "landscape-right",
+    'portrait',
+    'portrait-upside-down',
+    'landscape-left',
+    'landscape-right',
   ] as const) {
-    const portrait = orientation.startsWith("portrait")
+    const portrait = orientation.startsWith('portrait')
     for (const cameraActive of [false, true]) {
-      for (const placement of ["full", "left", "right"] as const) {
-        if (portrait && placement !== "full") continue
-        const options = { display: "inner", orientation, cameraActive, placement } as const
+      for (const placement of ['full', 'left', 'right'] as const) {
+        if (portrait && placement !== 'full') continue
+        const options = { display: 'inner', orientation, cameraActive, placement } as const
         const open = getDuoGeometry(options)
-        const partial = getDuoGeometry({ ...options, posture: "partially-open" })
-        const division = partial.reservedRegions.find((region) => region.type === "division")!
+        const partial = getDuoGeometry({ ...options, posture: 'partially-open' })
+        const division = partial.reservedRegions.find((region) => region.type === 'division')!
         expect(division).toEqual({
-          type: "division",
+          type: 'division',
           ...(portrait
             ? { x: 0, y: 455.5, width: 669, height: 40 }
             : {
-                x: placement === "right" ? 0 : 455.5,
+                x: placement === 'right' ? 0 : 455.5,
                 y: 0,
-                width: placement === "full" ? 40 : 13.5,
+                width: placement === 'full' ? 40 : 13.5,
                 height: 669,
               }),
         })
@@ -160,14 +160,14 @@ test("partial folding clips the active division to each window without changing 
       }
     }
   }
-  const outer = { display: "outer", orientation: "portrait" } as const
-  expect(getDuoGeometry({ ...outer, posture: "partially-open" })).toEqual(getDuoGeometry(outer))
+  const outer = { display: 'outer', orientation: 'portrait' } as const
+  expect(getDuoGeometry({ ...outer, posture: 'partially-open' })).toEqual(getDuoGeometry(outer))
 })
 
-test("outer corners rotate with the hinge edge and camera", () => {
-  const portrait = getDuoGeometry({ display: "outer", orientation: "portrait" })
-  const clockwise = getDuoGeometry({ display: "outer", orientation: "landscape-left" })
-  const counterclockwise = getDuoGeometry({ display: "outer", orientation: "landscape-right" })
+test('outer corners rotate with the hinge edge and camera', () => {
+  const portrait = getDuoGeometry({ display: 'outer', orientation: 'portrait' })
+  const clockwise = getDuoGeometry({ display: 'outer', orientation: 'landscape-left' })
+  const counterclockwise = getDuoGeometry({ display: 'outer', orientation: 'landscape-right' })
   expect(portrait.cornerRadii).toEqual([8, 59, 59, 8])
   expect(clockwise.cornerRadii).toEqual([8, 8, 59, 59])
   expect(counterclockwise.cornerRadii).toEqual([59, 59, 8, 8])
@@ -181,19 +181,19 @@ test("outer corners rotate with the hinge edge and camera", () => {
   }
 })
 
-test("upside-down inner profiles preserve measured camera and safe-area coordinates", () => {
-  const options = { display: "inner", orientation: "portrait-upside-down" } as const
+test('upside-down inner profiles preserve measured camera and safe-area coordinates', () => {
+  const options = { display: 'inner', orientation: 'portrait-upside-down' } as const
   const screen = getDuoGeometry(options)
   expect(screen.size).toEqual({ width: 669, height: 951 })
   expect(screen.safeArea).toEqual({ top: 82, right: 0, bottom: 34, left: 0 })
   expect(getDuoGeometry({ ...options, cameraActive: true }).reservedRegions).toEqual([
-    { type: "occlusion", x: 611, y: 677.33, width: 37, height: 58 },
-    { type: "occlusion", x: 535, y: 0, width: 134, height: 82 },
+    { type: 'occlusion', x: 611, y: 677.33, width: 37, height: 58 },
+    { type: 'occlusion', x: 535, y: 0, width: 134, height: 82 },
   ])
-  expect(() => getDuoGeometry({ ...options, display: "outer" })).toThrow("No measured Duo profile")
+  expect(() => getDuoGeometry({ ...options, display: 'outer' })).toThrow('No measured Duo profile')
 })
 
-test("rotated fit includes intermediate diagonal bounds and both portrait directions", () => {
+test('rotated fit includes intermediate diagonal bounds and both portrait directions', () => {
   const size = { width: 700, height: 500 }
   for (const angle of [90, -90, 450]) {
     expect(rotatedSize(size, angle).width).toBeCloseTo(500)
@@ -203,6 +203,6 @@ test("rotated fit includes intermediate diagonal bounds and both portrait direct
   expect(diagonal.width).toBeCloseTo(1200 / Math.sqrt(2))
   expect(diagonal.height).toBeCloseTo(diagonal.width)
   expect(
-    resolveZoom("fit", { width: 648, height: 648 }, diagonal, 24) * diagonal.width,
+    resolveZoom('fit', { width: 648, height: 648 }, diagonal, 24) * diagonal.width,
   ).toBeCloseTo(600)
 })

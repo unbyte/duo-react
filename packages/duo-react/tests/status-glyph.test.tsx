@@ -1,7 +1,7 @@
-import * as React from "react"
-import { renderToStaticMarkup } from "react-dom/server"
-import { expect, test } from "vite-plus/test"
-import { StatusGlyph } from "../src/components/system/status-glyph"
+import * as React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { expect, test } from 'vitest'
+import { StatusGlyph } from '../src/components/system/status-glyph'
 
 function render(battery: number, charging = false, wifiStrength = 3, cellularStrength = 0) {
   return renderToStaticMarkup(
@@ -14,7 +14,7 @@ function render(battery: number, charging = false, wifiStrength = 3, cellularStr
   )
 }
 
-test("battery outlines preserve the charge angle and ring thickness", () => {
+test('battery outlines preserve the charge angle and ring thickness', () => {
   for (const battery of [0, 0.1, 25, 50, 75, 75.1, 99.9, 100]) {
     const html = render(battery)
     expect(html).not.toMatch(/stroke-width|stroke-dasharray|pathLength|NaN/)
@@ -22,7 +22,7 @@ test("battery outlines preserve the charge angle and ring thickness", () => {
     expect(paths).toHaveLength(battery === 0 || battery === 100 ? 1 : 2)
     if (battery === 0) continue
     const outline = paths.at(-1)![1]
-    expect(outline).toContain("A44.25 44.25")
+    expect(outline).toContain('A44.25 44.25')
     expect(outline).toMatch(/ Z$/)
     const arc = outline.match(/A50.75 50.75 0 ([01]) 1 ([\d.e+-]+) ([\d.e+-]+)/)!
     expect(Number(arc[1])).toBe(battery > 75 ? 1 : 0)
@@ -34,7 +34,7 @@ test("battery outlines preserve the charge angle and ring thickness", () => {
   }
 })
 
-test("charging keeps Wi-Fi and cellular signals with a green battery and a top lightning mark", () => {
+test('charging keeps Wi-Fi and cellular signals with a green battery and a top lightning mark', () => {
   const normal = render(50)
   const charging = render(50, true)
   expect(normal.match(/<circle/g)).toHaveLength(5)
@@ -48,24 +48,24 @@ test("charging keeps Wi-Fi and cellular signals with a green battery and a top l
     expect(paths).toHaveLength(battery === 0 || battery === 100 ? 1 : 2)
     const normalPaths = [...render(battery).matchAll(/<path d="([^"]*A50\.75 [^"]*)"/g)]
     expect(paths.map(([, path]) => path)).toEqual(normalPaths.map(([, path]) => path))
-    expect(html).toContain("clip-path:path(evenodd,")
+    expect(html).toContain('clip-path:path(evenodd,')
   }
 })
 
-test("the charging accent separates colored battery artwork from the adaptive mask", () => {
+test('the charging accent separates colored battery artwork from the adaptive mask', () => {
   const props = { battery: 100, charging: true, wifiStrength: 3, cellularStrength: 2 }
   const adaptive = renderToStaticMarkup(<StatusGlyph {...props} layer="adaptive" />)
   const accent = renderToStaticMarkup(<StatusGlyph {...props} layer="accent" />)
-  expect(adaptive).not.toContain("A50.75")
+  expect(adaptive).not.toContain('A50.75')
   expect(adaptive.match(/<circle/g)).toHaveLength(5)
   expect(accent).toContain('fill="#34c759"')
   expect(accent.match(/A50\.75 50\.75/g)).toHaveLength(1)
-  expect(accent).not.toContain("<circle")
+  expect(accent).not.toContain('<circle')
 })
 
-test("the charging clip encloses its whole hole in artwork coordinates", () => {
+test('the charging clip encloses its whole hole in artwork coordinates', () => {
   const html = render(100, true)
-  expect(html).toContain("view-box")
+  expect(html).toContain('view-box')
   const contour = html.match(
     /M(-?[\d.]+)[ ,]?(-?[\d.]+)H([\d.]+)V([\d.]+)H-?[\d.]+Z M([\d.]+) ([\d.]+)a([\d.]+) /,
   )!
@@ -77,7 +77,7 @@ test("the charging clip encloses its whole hole in artwork coordinates", () => {
   expect(bottom).toBeGreaterThan(centerY + radius)
 })
 
-test("signal levels light Wi-Fi from the center out and cellular dots from left to right", () => {
+test('signal levels light Wi-Fi from the center out and cellular dots from left to right', () => {
   for (const wifi of [0, 1, 2, 3]) {
     for (const cellular of [0, 1, 2, 3, 4]) {
       const html = render(100, false, wifi, cellular)

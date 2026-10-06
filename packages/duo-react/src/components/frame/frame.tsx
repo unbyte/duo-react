@@ -1,17 +1,17 @@
-import * as React from "react"
-import { useDuoState, useDuoStore } from "../../context/hooks"
 import {
-  orientationRotation,
-  rotatedSize,
   type DuoFitPadding,
   type DuoZoom,
+  orientationRotation,
   resolveFitPadding,
   resolveZoom,
-} from "@duo-react/core"
-import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
-import { useRotation } from "./use-rotation"
-import { DisplaySurface } from "./display-surface"
-import { frameOutset } from "@duo-react/profiles"
+  rotatedSize,
+} from '@private/core'
+import { frameOutset } from '@private/profiles'
+import React from 'react'
+import { useDuoState, useDuoStore } from '../../context/hooks'
+import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
+import { DisplaySurface } from './display-surface'
+import { useRotation } from './use-rotation'
 
 export interface DuoFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -40,7 +40,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   useBrowserLayoutEffect(() => {
     const previous = previousScreens.current
     previousScreens.current = state.screens
-    for (const display of ["inner", "outer"] as const) {
+    for (const display of ['inner', 'outer'] as const) {
       if (previous[display] !== state.screens[display]) {
         store.emitWindowChange({
           display,
@@ -71,7 +71,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
   }, [])
   const effectiveZoom = zoom ?? state.zoom
   const padding = resolveFitPadding(fitPadding)
-  const active = state.screens[state.posture === "closed" ? "outer" : "inner"]
+  const active = state.screens[state.posture === 'closed' ? 'outer' : 'inner']
   const rotation = useRotation(state.rotation)
   const outset = frameOutset[active.display]
   const scale = resolveZoom(
@@ -90,7 +90,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
     <div
       {...props}
       ref={root}
-      className={["duo-react-frame", className].filter(Boolean).join(" ")}
+      className={['duo-react-frame', className].filter(Boolean).join(' ')}
       style={style}
     >
       <div
@@ -98,11 +98,11 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
         style={{
           transform: `rotate(${rotation}deg)`,
           left:
-            effectiveZoom === "fit"
+            effectiveZoom === 'fit'
               ? `calc(50% + ${(padding.left - padding.right) / 2}px)`
               : undefined,
           top:
-            effectiveZoom === "fit"
+            effectiveZoom === 'fit'
               ? `calc(50% + ${(padding.top - padding.bottom) / 2}px)`
               : undefined,
         }}

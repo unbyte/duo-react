@@ -1,11 +1,11 @@
-export type DuoDisplay = "inner" | "outer"
-export type DuoPlacement = "full" | "left" | "right"
+export type DuoDisplay = 'inner' | 'outer'
+export type DuoPlacement = 'full' | 'left' | 'right'
 export type DuoOrientation =
-  | "portrait"
-  | "portrait-upside-down"
-  | "landscape-left"
-  | "landscape-right"
-export type DuoPosture = "open" | "closed" | "partially-open"
+  | 'portrait'
+  | 'portrait-upside-down'
+  | 'landscape-left'
+  | 'landscape-right'
+export type DuoPosture = 'open' | 'closed' | 'partially-open'
 export interface DuoRect {
   readonly x: number
   readonly y: number
@@ -21,7 +21,7 @@ export interface DuoInsets {
 }
 
 export interface DuoReservedRegion extends DuoRect {
-  readonly type: "occlusion" | "division"
+  readonly type: 'occlusion' | 'division'
 }
 
 export interface DuoFoldingRegion {

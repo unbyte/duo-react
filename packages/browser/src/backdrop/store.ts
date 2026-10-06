@@ -1,14 +1,14 @@
-import type { DuoRect, DuoSize } from "@duo-react/profiles"
-import { chooseIndicatorStyle, type ResolvedIndicatorStyle } from "./contrast"
-import { blur, paddedRegion, samePixels, sameRect } from "./image"
-import { iframeCapture } from "./iframe-capture"
+import type { DuoRect, DuoSize } from '@private/profiles'
+import { chooseIndicatorStyle, type ResolvedIndicatorStyle } from './contrast'
+import { iframeCapture } from './iframe-capture'
+import { blur, paddedRegion, samePixels, sameRect } from './image'
 
 export interface BackdropScreen {
   readonly size: DuoSize
   readonly visible: boolean
 }
 
-export type IndicatorSample = "time" | "glyph" | "home"
+export type IndicatorSample = 'time' | 'glyph' | 'home'
 export interface BackdropRequest {
   readonly area: DuoRect
   readonly blur: number
@@ -28,7 +28,7 @@ interface BackdropSnapshot {
 
 const initial: BackdropSnapshot = {
   regions: new Map(),
-  colors: { time: "dark", glyph: "dark", home: "dark" },
+  colors: { time: 'dark', glyph: 'dark', home: 'dark' },
 }
 
 export class BackdropStore {
@@ -113,10 +113,10 @@ export class BackdropStore {
       this.observer.observe(parent, { attributes: true })
     this.resize = new ResizeObserver(this.schedule)
     this.resize.observe(source)
-    source.addEventListener("scroll", this.schedule, true)
-    source.addEventListener("input", this.schedule, true)
-    source.addEventListener("load", this.schedule, true)
-    document.addEventListener("visibilitychange", this.schedule)
+    source.addEventListener('scroll', this.schedule, true)
+    source.addEventListener('input', this.schedule, true)
+    source.addEventListener('load', this.schedule, true)
+    document.addEventListener('visibilitychange', this.schedule)
     // CSSOM, canvas drawing, and iframe interiors have no parent DOM mutation signal.
     this.refresh = setInterval(this.schedule, 500)
     this.invalidate()
@@ -129,10 +129,10 @@ export class BackdropStore {
     clearInterval(this.refresh)
     this.observer?.disconnect()
     this.resize?.disconnect()
-    this.source?.removeEventListener("scroll", this.schedule, true)
-    this.source?.removeEventListener("input", this.schedule, true)
-    this.source?.removeEventListener("load", this.schedule, true)
-    document.removeEventListener("visibilitychange", this.schedule)
+    this.source?.removeEventListener('scroll', this.schedule, true)
+    this.source?.removeEventListener('input', this.schedule, true)
+    this.source?.removeEventListener('load', this.schedule, true)
+    document.removeEventListener('visibilitychange', this.schedule)
     this.source = undefined
   }
 
@@ -169,12 +169,12 @@ export class BackdropStore {
       }
       let next = this.snapshot
       if (requests.size) {
-        const { snapdom } = await import("@zumer/snapdom")
+        const { snapdom } = await import('@zumer/snapdom')
         const canvas = await snapdom.toCanvas(source, {
           scale: 1,
           dpr: 1,
           exclude: this.excludedSelector,
-          excludeMode: "remove",
+          excludeMode: 'remove',
           fast: false,
           invalidate: true,
           plugins: [iframeCapture],
@@ -185,7 +185,9 @@ export class BackdropStore {
       }
       if (generation !== this.generation || next === this.snapshot) return
       this.snapshot = next
-      this.listeners.forEach((listener) => listener())
+      this.listeners.forEach((listener) => {
+        listener()
+      })
     } catch {
       // Keep the last completed image if a resource cannot be captured.
     } finally {
@@ -198,7 +200,7 @@ export class BackdropStore {
     const previous = this.snapshot
     // Read the shared image once; reading separate GPU-backed crops repeats the
     // readback cost for every consumer, even when all of them are unchanged.
-    const source = canvas.getContext("2d", { willReadFrequently: true })!
+    const source = canvas.getContext('2d', { willReadFrequently: true })!
     const image = source.getImageData(0, 0, canvas.width, canvas.height)
     const regions = new Map<symbol, BackdropRegion>()
     const colors = { ...previous.colors }
@@ -223,10 +225,10 @@ export class BackdropStore {
           return
         }
         changed = true
-        const raw = document.createElement("canvas")
+        const raw = document.createElement('canvas')
         raw.width = area.width
         raw.height = area.height
-        const context = raw.getContext("2d")!
+        const context = raw.getContext('2d')!
         const crop = context.createImageData(raw.width, raw.height)
         crop.data.set(pixels)
         context.putImageData(crop, 0, 0)

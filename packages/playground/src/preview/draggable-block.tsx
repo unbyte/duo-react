@@ -1,5 +1,5 @@
-import * as React from "react"
-import { useDuoScreen } from "duo-react"
+import { useDuoScreen } from 'duo-react'
+import * as React from 'react'
 
 const initialPosition = { x: 0.6, y: 0.55 }
 const initialSize = { width: 144, height: 144 }
@@ -24,7 +24,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
   const drag = React.useRef<
     | {
         pointerId: number
-        mode: "move" | "resize"
+        mode: 'move' | 'resize'
         x: number
         y: number
         offsetX: number
@@ -58,7 +58,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
     `V ${bottom - bottomRight} A ${bottomRight} ${bottomRight} 0 0 1 ${right - bottomRight} ${bottom}`,
     `H ${x + bottomLeft} A ${bottomLeft} ${bottomLeft} 0 0 1 ${x} ${bottom - bottomLeft}`,
     `V ${y + topLeft} A ${topLeft} ${topLeft} 0 0 1 ${x + topLeft} ${y} Z`,
-  ].join(" ")
+  ].join(' ')
   const radiusLabels = radii.map((value) => value.toFixed(1))
   const gripRadius = radii[2] - 3
   const gripHalfAngle = Math.min(Math.PI / 4, 12 / gripRadius)
@@ -69,7 +69,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
   const grip = [
     `M ${gripCenterX + gripRadius * Math.cos(gripStart)} ${gripCenterY + gripRadius * Math.sin(gripStart)}`,
     `A ${gripRadius} ${gripRadius} 0 0 1 ${gripCenterX + gripRadius * Math.cos(gripEnd)} ${gripCenterY + gripRadius * Math.sin(gripEnd)}`,
-  ].join(" ")
+  ].join(' ')
 
   React.useEffect(() => {
     drag.current = undefined
@@ -84,7 +84,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
     return point.matrixTransform(matrix.inverse())
   }
 
-  function start(event: React.PointerEvent<SVGElement>, mode: "move" | "resize") {
+  function start(event: React.PointerEvent<SVGElement>, mode: 'move' | 'resize') {
     if (!event.isPrimary || event.button !== 0 || drag.current) return
     const point = localPoint(event.clientX, event.clientY)
     if (!point) return
@@ -96,8 +96,8 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
       mode,
       x,
       y,
-      offsetX: point.x - (mode === "move" ? x : blockWidth),
-      offsetY: point.y - (mode === "move" ? y : blockHeight),
+      offsetX: point.x - (mode === 'move' ? x : blockWidth),
+      offsetY: point.y - (mode === 'move' ? y : blockHeight),
     }
   }
 
@@ -112,19 +112,19 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
     })
   }
 
-  function keyDown(event: React.KeyboardEvent<SVGElement>, mode: "move" | "resize") {
-    if (["Home", "Enter", " "].includes(event.key)) {
+  function keyDown(event: React.KeyboardEvent<SVGElement>, mode: 'move' | 'resize') {
+    if (['Home', 'Enter', ' '].includes(event.key)) {
       event.preventDefault()
       setPosition(initialPosition)
       setSize(initialSize)
       return
     }
     const step = event.shiftKey ? 1 : 10
-    const dx = event.key === "ArrowLeft" ? -step : event.key === "ArrowRight" ? step : 0
-    const dy = event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0
+    const dx = event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0
+    const dy = event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0
     if (!dx && !dy) return
     event.preventDefault()
-    if (mode === "resize") resize(blockWidth + dx, blockHeight + dy)
+    if (mode === 'resize') resize(blockWidth + dx, blockHeight + dy)
     else
       setPosition((current) => ({
         x: rangeX ? clamp(current.x + dx / rangeX) : 0,
@@ -145,7 +145,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         if (!current || current.pointerId !== event.pointerId) return
         const point = localPoint(event.clientX, event.clientY)
         if (!point) return
-        if (current.mode === "resize")
+        if (current.mode === 'resize')
           resize(point.x - current.offsetX, point.y - current.offsetY, current.x, current.y)
         else
           setPosition({
@@ -168,8 +168,8 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         role="button"
         tabIndex={0}
         aria-label={`Draggable color block. Width ${blockWidth} points, height ${blockHeight} points. Edge distances in points: top ${edgeDistances.top}, right ${edgeDistances.right}, bottom ${edgeDistances.bottom}, left ${edgeDistances.left}. Corner radii in points: top left ${radiusLabels[0]}, top right ${radiusLabels[1]}, bottom right ${radiusLabels[2]}, bottom left ${radiusLabels[3]}.`}
-        onPointerDown={(event) => start(event, "move")}
-        onKeyDown={(event) => keyDown(event, "move")}
+        onPointerDown={(event) => start(event, 'move')}
+        onKeyDown={(event) => keyDown(event, 'move')}
       >
         <title>
           Drag to move in whole points. Arrow keys move; Shift moves by 1 pt; Home resets.
@@ -195,7 +195,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
           const labelX = left ? x + inset - 4 : right - inset + 4
           const labelY = top ? y + inset : bottom - inset
           return (
-            <text key={index} x={labelX} y={labelY} textAnchor={left ? "start" : "end"}>
+            <text key={index} x={labelX} y={labelY} textAnchor={left ? 'start' : 'end'}>
               {value}
               {unit}
             </text>
@@ -228,8 +228,8 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         role="button"
         tabIndex={0}
         aria-label="Resize color block"
-        onPointerDown={(event) => start(event, "resize")}
-        onKeyDown={(event) => keyDown(event, "resize")}
+        onPointerDown={(event) => start(event, 'resize')}
+        onKeyDown={(event) => keyDown(event, 'resize')}
       >
         <title>Drag to resize. Arrow keys resize; Shift adjusts precisely; Home resets.</title>
         <path

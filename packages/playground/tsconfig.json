@@ -1,14 +1,21 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "esnext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["vite/client"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
-      // The linked library has React 16 development types.
-      // Check its declarations with the playground's React 19 types.
-      // Published consumers resolve their own React types without this mapping.
-      "react": ["./node_modules/@types/react"]
-    }
+      "react": ["./node_modules/@types/react"],
+      "duo-react": ["../duo-react/lib/index.d.ts"]
+    },
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   },
   "include": ["src", "vite.config.ts"]
 }

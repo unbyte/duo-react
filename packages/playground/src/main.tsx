@@ -1,12 +1,12 @@
-import * as React from "react"
-import { createRoot } from "react-dom/client"
-import "./styles/theme.css"
-import "duo-react/style.css"
-import "./styles/app.css"
-import { App } from "./app"
+import * as React from 'react'
+import { createRoot } from 'react-dom/client'
+import './styles/theme.css'
+import 'duo-react/style.css'
+import './styles/app.css'
+import { App } from './app'
 
-const root = document.getElementById("root")
-if (!root) throw new Error("Missing playground root")
+const root = document.getElementById('root')
+if (!root) throw new Error('Missing playground root')
 createRoot(root).render(
   <React.StrictMode>
     <App />

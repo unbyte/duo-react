@@ -1,7 +1,7 @@
-import { Contrast, PanelTop, PaintBucket, LockKeyhole, Square } from "lucide-react"
-import { IconColorSwatch } from "@tabler/icons-react"
-import { useDuoActions, useDuoState, type DuoIndicatorStyle, type DuoColorMode } from "duo-react"
-import { SelectSetting, ToggleSetting, ColorSetting } from "../components/setting-fields"
+import { IconColorSwatch } from '@tabler/icons-react'
+import { type DuoColorMode, type DuoIndicatorStyle, useDuoActions, useDuoState } from 'duo-react'
+import { Contrast, LockKeyhole, PaintBucket, PanelTop, Square } from 'lucide-react'
+import { ColorSetting, SelectSetting, ToggleSetting } from '../components/setting-fields'
 
 export interface AppSettingsProps {
   backgrounds: Record<DuoColorMode, string>
@@ -23,9 +23,9 @@ function IndicatorStylePicker() {
       label="Icons"
       value={indicatorStyle}
       options={[
-        { value: "auto", label: "Auto" },
-        { value: "light", label: "Light" },
-        { value: "dark", label: "Dark" },
+        { value: 'auto', label: 'Auto' },
+        { value: 'light', label: 'Light' },
+        { value: 'dark', label: 'Dark' },
       ]}
       onValueChange={(value) => {
         const styles = {
@@ -45,14 +45,14 @@ function StatusBarPicker() {
     <SelectSetting
       icon={PanelTop}
       label="Status bar"
-      value={hidden === undefined ? "auto" : hidden ? "hide" : "show"}
+      value={hidden === undefined ? 'auto' : hidden ? 'hide' : 'show'}
       options={[
-        { value: "auto", label: "Auto" },
-        { value: "show", label: "Show" },
-        { value: "hide", label: "Hide" },
+        { value: 'auto', label: 'Auto' },
+        { value: 'show', label: 'Show' },
+        { value: 'hide', label: 'Hide' },
       ]}
       onValueChange={(value) =>
-        setSystem({ prefersStatusBarHidden: value === "auto" ? undefined : value === "hide" })
+        setSystem({ prefersStatusBarHidden: value === 'auto' ? undefined : value === 'hide' })
       }
     />
   )

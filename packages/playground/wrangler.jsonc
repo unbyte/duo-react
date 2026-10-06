@@ -3,6 +3,6 @@
   "name": "duo-react-playground",
   "compatibility_date": "2026-10-06",
   "assets": {
-    "not_found_handling": "single-page-application",
-  },
+    "not_found_handling": "single-page-application"
+  }
 }

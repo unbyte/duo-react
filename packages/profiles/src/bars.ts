@@ -1,4 +1,4 @@
-import { sideControlMetrics } from "./controls"
+import { sideControlMetrics } from './controls'
 
 // Measured resting offsets; allocation shares are library policy, not native item sizes.
 export const barProfile = {

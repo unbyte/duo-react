@@ -1,30 +1,30 @@
-import * as React from "react"
-import { renderToString } from "react-dom/server"
-import { expect, expectTypeOf, test } from "vite-plus/test"
+import * as React from 'react'
+import { renderToString } from 'react-dom/server'
+import { expect, expectTypeOf, test } from 'vitest'
 import {
+  type BarsLayoutRequest,
   DuoFrame,
   DuoProvider,
-  useBars,
-  type BarsLayoutRequest,
   type ResolvedBarLayout,
-} from "../src"
+  useBars,
+} from '../src'
 
-test("the hook renders custom content with application context on React 16.8 and the server", () => {
-  const Label = React.createContext("missing")
+test('the hook renders custom content with application context on React 16.8 and the server', () => {
+  const Label = React.createContext('missing')
   function App() {
     const label = React.useContext(Label)
-    const bars = useBars({ toolbars: [{ id: "actions", placement: "top-trailing" }], tabbar: {} })
+    const bars = useBars({ toolbars: [{ id: 'actions', placement: 'top-trailing' }], tabbar: {} })
     for (const bar of [...bars.toolbars, bars.tabbar]) {
       expect(bar.containerProps.style).toMatchObject({
-        position: "absolute",
+        position: 'absolute',
         left: bar.rect.x,
         top: bar.rect.y,
         width: bar.rect.width,
         height: bar.rect.height,
-        flexDirection: bar.axis === "horizontal" ? "row" : "column",
+        flexDirection: bar.axis === 'horizontal' ? 'row' : 'column',
       })
-      expect(bar.containerProps["data-duo-react-bar-placement"]).toBe(bar.placement)
-      expect(bar.containerProps["data-duo-react-bar-axis"]).toBe(bar.axis)
+      expect(bar.containerProps['data-duo-react-bar-placement']).toBe(bar.placement)
+      expect(bar.containerProps['data-duo-react-bar-axis']).toBe(bar.axis)
     }
     return (
       <>
@@ -33,8 +33,8 @@ test("the hook renders custom content with application context on React 16.8 and
       </>
     )
   }
-  expect(() => renderToString(<App />)).toThrow("within DuoFrame")
-  for (const orientation of ["portrait", "landscape-right"] as const) {
+  expect(() => renderToString(<App />)).toThrow('within DuoFrame')
+  for (const orientation of ['portrait', 'landscape-right'] as const) {
     const html = renderToString(
       <DuoProvider defaultState={{ orientation }}>
         <DuoFrame>
@@ -44,16 +44,16 @@ test("the hook renders custom content with application context on React 16.8 and
         </DuoFrame>
       </DuoProvider>,
     )
-    expect(html).toContain("App actions")
-    expect(html).toContain("Tabs")
+    expect(html).toContain('App actions')
+    expect(html).toContain('Tabs')
     expect(html).toContain(
-      `data-duo-react-bar-placement="${orientation === "portrait" ? "top" : "right"}"`,
+      `data-duo-react-bar-placement="${orientation === 'portrait' ? 'top' : 'right'}"`,
     )
-    expect(html).toContain(`left:${orientation === "portrait" ? 20 : 879}px`)
+    expect(html).toContain(`left:${orientation === 'portrait' ? 20 : 879}px`)
   }
 })
 
-test("the hook infers tab bar presence from the request", () => {
+test('the hook infers tab bar presence from the request', () => {
   function App({ request }: { request: BarsLayoutRequest }) {
     const requested = useBars({ tabbar: {} })
     const omitted = useBars({ toolbars: [] })

@@ -1,26 +1,26 @@
-import { getDuoGeometry, validatePosture } from "../geometry/screen"
-import { type DuoScreenInfo } from "../geometry/types"
-import { validateZoom } from "../preview/zoom"
+import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture } from '@private/profiles'
 import {
   normalizeRotation,
   orientationAtRotation,
   orientationRotation,
-} from "../geometry/orientation"
-import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture } from "@duo-react/profiles"
-import {
-  type DuoIndicatorStyles,
-  type DuoSystem,
-  type DuoSystemOptions,
-  type DuoDefaults,
-  type DuoState,
-  type DuoWindowChange,
-} from "./types"
-import type { DuoZoom } from "../preview/types"
+} from '../geometry/orientation'
+import { getDuoGeometry, validatePosture } from '../geometry/screen'
+import type { DuoScreenInfo } from '../geometry/types'
+import type { DuoZoom } from '../preview/types'
+import { validateZoom } from '../preview/zoom'
+import type {
+  DuoDefaults,
+  DuoIndicatorStyles,
+  DuoState,
+  DuoSystem,
+  DuoSystemOptions,
+  DuoWindowChange,
+} from './types'
 
 type Listener = () => void
 type Model = Pick<
   DuoState,
-  "posture" | "orientation" | "rotation" | "innerPlacement" | "zoom" | "system"
+  'posture' | 'orientation' | 'rotation' | 'innerPlacement' | 'zoom' | 'system'
 >
 
 function mergeIndicatorStyles(current: DuoIndicatorStyles, patch?: Partial<DuoIndicatorStyles>) {
@@ -49,24 +49,24 @@ function mergeSystem(current: DuoSystem, patch: DuoSystemOptions) {
 function validateModel(model: Model) {
   validateZoom(model.zoom)
   validatePosture(model.posture)
-  if (model.system.colorMode !== "light" && model.system.colorMode !== "dark")
+  if (model.system.colorMode !== 'light' && model.system.colorMode !== 'dark')
     throw new RangeError('System color mode must be "light" or "dark".')
   if (
     !Number.isFinite(model.system.battery) ||
     model.system.battery < 0 ||
     model.system.battery > 100
   )
-    throw new RangeError("Battery must be between 0 and 100.")
+    throw new RangeError('Battery must be between 0 and 100.')
   for (const [name, value, maximum] of [
-    ["Wi-Fi", model.system.wifiStrength, 3],
-    ["Cellular", model.system.cellularStrength, 4],
+    ['Wi-Fi', model.system.wifiStrength, 3],
+    ['Cellular', model.system.cellularStrength, 4],
   ] as const) {
     if (!Number.isInteger(value) || value < 0 || value > maximum)
       throw new RangeError(`${name} strength must be an integer between 0 and ${maximum}.`)
   }
   for (const styles of Object.values(model.system.indicatorStyles)) {
     for (const style of [styles.statusBar, styles.homeIndicator]) {
-      if (style !== "auto" && style !== "light" && style !== "dark")
+      if (style !== 'auto' && style !== 'light' && style !== 'dark')
         throw new RangeError('Indicator style must be "auto", "light", or "dark".')
     }
   }
@@ -89,17 +89,17 @@ export class DuoStore {
     system: DuoSystemOptions = {},
     private outerPortraitLocked = false,
   ) {
-    const indicatorStyles = Object.freeze({ statusBar: "auto", homeIndicator: "auto" } as const)
+    const indicatorStyles = Object.freeze({ statusBar: 'auto', homeIndicator: 'auto' } as const)
     this.initial = {
-      posture: defaults.posture ?? "open",
-      orientation: defaults.orientation ?? "landscape-left",
-      rotation: orientationRotation[defaults.orientation ?? "landscape-left"],
-      innerPlacement: defaults.innerPlacement ?? "full",
-      zoom: defaults.zoom ?? "fit",
+      posture: defaults.posture ?? 'open',
+      orientation: defaults.orientation ?? 'landscape-left',
+      rotation: orientationRotation[defaults.orientation ?? 'landscape-left'],
+      innerPlacement: defaults.innerPlacement ?? 'full',
+      zoom: defaults.zoom ?? 'fit',
       system: mergeSystem(
         Object.freeze({
-          colorMode: "light",
-          time: "09:41",
+          colorMode: 'light',
+          time: '09:41',
           battery: 100,
           charging: false,
           wifiStrength: 3,
@@ -119,31 +119,31 @@ export class DuoStore {
   private snapshot(previous?: DuoState): DuoState {
     validateModel(this.model)
     const screens = {} as Record<DuoDisplay, DuoScreenInfo>
-    for (const display of ["inner", "outer"] as const) {
+    for (const display of ['inner', 'outer'] as const) {
       const old = previous?.screens[display]
       // Unsupported outer orientations retain the app layout while the shell turns.
       const orientation =
-        display === "outer"
+        display === 'outer'
           ? this.outerPortraitLocked
-            ? "portrait"
-            : this.model.orientation === "portrait-upside-down"
-              ? (old?.orientation ?? "portrait")
+            ? 'portrait'
+            : this.model.orientation === 'portrait-upside-down'
+              ? (old?.orientation ?? 'portrait')
               : this.model.orientation
           : this.model.orientation
-      const placement = display === "inner" ? this.model.innerPlacement : "full"
+      const placement = display === 'inner' ? this.model.innerPlacement : 'full'
       const visible =
-        display === "inner" ? this.model.posture !== "closed" : this.model.posture === "closed"
+        display === 'inner' ? this.model.posture !== 'closed' : this.model.posture === 'closed'
       const statusBarVisible = !(
         this.model.system.prefersStatusBarHidden ??
-        (display === "outer" && orientation !== "portrait")
+        (display === 'outer' && orientation !== 'portrait')
       )
       const sameGeometry =
         old &&
         old.orientation === orientation &&
         old.placement === placement &&
-        (display === "outer" ||
+        (display === 'outer' ||
           (previous.system.cameraActive === this.model.system.cameraActive &&
-            old.foldingRegion?.active === (this.model.posture === "partially-open")))
+            old.foldingRegion?.active === (this.model.posture === 'partially-open')))
       const geometry = sameGeometry
         ? old
         : getDuoGeometry({
@@ -211,7 +211,7 @@ export class DuoStore {
   }
 
   private stepZoom(factor: number) {
-    const current = typeof this.state.zoom === "number" ? this.state.zoom : this.renderedZoom
+    const current = typeof this.state.zoom === 'number' ? this.state.zoom : this.renderedZoom
     if (current === undefined || current <= 0) return
     const next = current * factor
     if (Number.isFinite(next) && next > 0) this.setZoom(next)
@@ -224,13 +224,13 @@ export class DuoStore {
         orientation,
         rotation: orientationRotation[orientation],
       }),
-    rotate: (direction: "left" | "right") => {
-      const rotation = normalizeRotation(this.model.rotation + (direction === "left" ? -90 : 90))
+    rotate: (direction: 'left' | 'right') => {
+      const rotation = normalizeRotation(this.model.rotation + (direction === 'left' ? -90 : 90))
       const orientation = orientationAtRotation(rotation)
       this.update({
         rotation,
         orientation,
-        innerPlacement: orientation.startsWith("portrait") ? "full" : this.model.innerPlacement,
+        innerPlacement: orientation.startsWith('portrait') ? 'full' : this.model.innerPlacement,
       })
     },
     setInnerPlacement: (innerPlacement: DuoPlacement) => this.update({ innerPlacement }),
@@ -280,7 +280,7 @@ export class DuoStore {
   connectFrame() {
     if (this.frameConnected)
       throw new Error(
-        "Mount one DuoFrame per DuoProvider. Use separate providers for independent devices.",
+        'Mount one DuoFrame per DuoProvider. Use separate providers for independent devices.',
       )
     this.frameConnected = true
     return () => {
@@ -301,11 +301,11 @@ export class DuoStore {
 
   reportRenderedZoom(zoom: number) {
     if (!Number.isFinite(zoom) || zoom < 0)
-      throw new RangeError("Rendered zoom must be nonnegative and finite.")
+      throw new RangeError('Rendered zoom must be nonnegative and finite.')
     if (this.renderedZoom === zoom) return
     this.renderedZoom = zoom
     this.publish()
   }
 }
 
-export type DuoActions = DuoStore["actions"]
+export type DuoActions = DuoStore['actions']

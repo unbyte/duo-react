@@ -1,26 +1,26 @@
-import * as React from "react"
-import { cn } from "cn"
-import { Home, Library, Settings, Search } from "lucide-react"
+import { cn } from 'cn'
 import {
+  type BarsLayout,
+  type BarsLayoutRequest,
   DuoSafeArea,
   DuoTabBar,
   useBars,
   useDuoState,
-  type BarsLayout,
-  type BarsLayoutRequest,
-} from "duo-react"
-import { DraggableBlock } from "./draggable-block"
+} from 'duo-react'
+import { Home, Library, Search, Settings } from 'lucide-react'
+import * as React from 'react'
+import { DraggableBlock } from './draggable-block'
 
 export const tabItems = [
-  { id: "home", icon: <Home />, label: "Home" },
-  { id: "library", icon: <Library />, label: "Library", selectedColor: "#af52de" },
-  { id: "settings", icon: <Settings />, label: "Settings", selectedColor: "#ff9500" },
-  { id: "search", icon: <Search />, label: "Search" },
+  { id: 'home', icon: <Home />, label: 'Home' },
+  { id: 'library', icon: <Library />, label: 'Library', selectedColor: '#af52de' },
+  { id: 'settings', icon: <Settings />, label: 'Settings', selectedColor: '#ff9500' },
+  { id: 'search', icon: <Search />, label: 'Search' },
   {
-    id: "favorites",
+    id: 'favorites',
     icon: <img src="/icons/heart.png" width={27} height={27} alt="" draggable={false} />,
-    label: "Favorites",
-    selectedColor: "#ff2d55",
+    label: 'Favorites',
+    selectedColor: '#ff2d55',
   },
 ]
 
@@ -79,8 +79,8 @@ export function ExampleBars({
         >
           <div
             className={cn(
-              "playground-app-bar pointer-events-auto box-border flex min-h-0 min-w-0 max-h-full max-w-full gap-1 overflow-auto rounded-[28px] bg-[#f0f3f8] p-0.5 text-foreground [flex-direction:inherit]",
-              colorMode === "dark" && "bg-[#2c2c2e] text-[#f4f4f4]",
+              'playground-app-bar pointer-events-auto box-border flex min-h-0 min-w-0 max-h-full max-w-full gap-1 overflow-auto rounded-[28px] bg-[#f0f3f8] p-0.5 text-foreground [flex-direction:inherit]',
+              colorMode === 'dark' && 'bg-[#2c2c2e] text-[#f4f4f4]',
             )}
           >
             <button

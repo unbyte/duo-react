@@ -1,10 +1,10 @@
-import type { CSSProperties } from "react"
-import type { BarAxis, BarPlacement, BarRect } from "@duo-react/core"
+import type { BarAxis, BarPlacement, BarRect } from '@private/core'
+import type { CSSProperties } from 'react'
 
 export interface BarContainerProps {
   readonly style: CSSProperties
-  readonly "data-duo-react-bar-placement": BarPlacement
-  readonly "data-duo-react-bar-axis": BarAxis
+  readonly 'data-duo-react-bar-placement': BarPlacement
+  readonly 'data-duo-react-bar-axis': BarAxis
 }
 
 export interface ResolvedBarLayout {

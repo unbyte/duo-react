@@ -325,8 +325,8 @@ void main() {
 export function glassShaders(vertical: boolean) {
   const specialize = (source: string) =>
     source.replaceAll(
-      "uniform float uVertical;",
-      `const float uVertical = ${vertical ? "1.0" : "0.0"};`,
+      'uniform float uVertical;',
+      `const float uVertical = ${vertical ? '1.0' : '0.0'};`,
     )
   return { fragment: specialize(fragment), outerFragment: specialize(outerFragment) }
 }

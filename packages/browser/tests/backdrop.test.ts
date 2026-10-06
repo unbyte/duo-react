@@ -1,9 +1,9 @@
-import { afterEach, beforeEach, expect, test, vi } from "vite-plus/test"
-import { paddedRegion, samePixels } from "../src/backdrop/image"
-import { snapdom } from "@zumer/snapdom"
-import { BackdropStore } from "../src/backdrop/store"
+import { snapdom } from '@zumer/snapdom'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import { paddedRegion, samePixels } from '../src/backdrop/image'
+import { BackdropStore } from '../src/backdrop/store'
 
-vi.mock("@zumer/snapdom", () => ({ snapdom: { toCanvas: vi.fn() } }))
+vi.mock('@zumer/snapdom', () => ({ snapdom: { toCanvas: vi.fn() } }))
 
 function canvas(value = 255) {
   return {
@@ -21,15 +21,15 @@ beforeEach(() => {
   vi.useFakeTimers()
   vi.mocked(snapdom.toCanvas).mockReset().mockResolvedValue(canvas())
   vi.stubGlobal(
-    "document",
+    'document',
     Object.assign(new EventTarget(), { hidden: false, createElement: () => canvas() }),
   )
   class Observer {
     observe() {}
     disconnect() {}
   }
-  vi.stubGlobal("MutationObserver", Observer)
-  vi.stubGlobal("ResizeObserver", Observer)
+  vi.stubGlobal('MutationObserver', Observer)
+  vi.stubGlobal('ResizeObserver', Observer)
 })
 
 afterEach(() => {
@@ -37,7 +37,7 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-test("blur padding rounds outward and clips to the display", () => {
+test('blur padding rounds outward and clips to the display', () => {
   const size = { width: 669, height: 951 }
   const tab = paddedRegion({ x: 592.5, y: 700, width: 48, height: 162 }, 18, size)!
   const status = paddedRegion({ x: 590, y: 30, width: 50, height: 70 }, 36, size)!
@@ -46,7 +46,7 @@ test("blur padding rounds outward and clips to the display", () => {
   expect(paddedRegion({ x: 800, y: 0, width: 10, height: 10 }, 0, size)).toBeUndefined()
 })
 
-test("pixel comparison notices alpha changes and differences at the end of the region", () => {
+test('pixel comparison notices alpha changes and differences at the end of the region', () => {
   const pixels = new Uint8ClampedArray([0, 1, 2, 255, 3, 4, 5, 255])
   expect(samePixels(pixels, pixels.slice())).toBe(true)
   const changed = pixels.slice()
@@ -55,14 +55,14 @@ test("pixel comparison notices alpha changes and differences at the end of the r
   expect(samePixels(pixels, pixels.slice(0, 4))).toBe(false)
 })
 
-test("capture stays single-flight across disconnect and reconnect, discarding the old image", async () => {
+test('capture stays single-flight across disconnect and reconnect, discarding the old image', async () => {
   const store = new BackdropStore()
   const source = new EventTarget() as HTMLElement
   const key = Symbol()
   const changed = vi.fn()
   store.subscribe(changed)
   store.updateScreen({ size: { width: 1, height: 1 }, visible: true })
-  store.request(key, { area: { x: 0, y: 0, width: 1, height: 1 }, blur: 0, indicator: "time" })
+  store.request(key, { area: { x: 0, y: 0, width: 1, height: 1 }, blur: 0, indicator: 'time' })
   let finish!: (canvas: HTMLCanvasElement) => void
   vi.mocked(snapdom.toCanvas).mockImplementationOnce(
     () =>
@@ -72,7 +72,7 @@ test("capture stays single-flight across disconnect and reconnect, discarding th
   )
   store.connect(source)
   await vi.advanceTimersByTimeAsync(0)
-  for (let i = 0; i < 20; i++) source.dispatchEvent(new Event("input"))
+  for (let i = 0; i < 20; i++) source.dispatchEvent(new Event('input'))
   await vi.advanceTimersByTimeAsync(100)
   expect(snapdom.toCanvas).toHaveBeenCalledTimes(1)
   store.disconnect()
@@ -92,15 +92,15 @@ test("capture stays single-flight across disconnect and reconnect, discarding th
   expect(snapdom.toCanvas).toHaveBeenCalledTimes(2)
   finishNew(canvas(255))
   await vi.advanceTimersByTimeAsync(50)
-  expect(store.getSnapshot().colors.time).toBe("dark")
+  expect(store.getSnapshot().colors.time).toBe('dark')
   expect(changed).toHaveBeenCalledTimes(1)
   store.disconnect()
-  source.dispatchEvent(new Event("input"))
+  source.dispatchEvent(new Event('input'))
   await vi.advanceTimersByTimeAsync(1000)
   expect(snapdom.toCanvas).toHaveBeenCalledTimes(2)
 })
 
-test("unchanged captures and failures retain snapshots; released regions disappear", async () => {
+test('unchanged captures and failures retain snapshots; released regions disappear', async () => {
   const store = new BackdropStore()
   const source = new EventTarget() as HTMLElement
   const key = Symbol()
@@ -117,16 +117,16 @@ test("unchanged captures and failures retain snapshots; released regions disappe
   store.request(key, { ...request, area: { ...request.area } })
   await vi.advanceTimersByTimeAsync(50)
   expect(snapdom.toCanvas).toHaveBeenCalledTimes(1)
-  source.dispatchEvent(new Event("input"))
+  source.dispatchEvent(new Event('input'))
   await vi.advanceTimersByTimeAsync(50)
   expect(store.getSnapshot()).toBe(snapshot)
   expect(draw).toHaveBeenCalledTimes(1)
-  vi.mocked(snapdom.toCanvas).mockRejectedValueOnce(new Error("Unreadable image"))
-  source.dispatchEvent(new Event("input"))
+  vi.mocked(snapdom.toCanvas).mockRejectedValueOnce(new Error('Unreadable image'))
+  source.dispatchEvent(new Event('input'))
   await vi.advanceTimersByTimeAsync(50)
   expect(store.getSnapshot()).toBe(snapshot)
   vi.mocked(snapdom.toCanvas).mockResolvedValue(canvas(0))
-  source.dispatchEvent(new Event("input"))
+  source.dispatchEvent(new Event('input'))
   await vi.advanceTimersByTimeAsync(50)
   expect(store.getSnapshot()).not.toBe(snapshot)
   expect(draw).toHaveBeenCalledTimes(2)

@@ -1,6 +1,6 @@
-import type * as React from "react"
-import { cn } from "cn"
-import { ScrollArea } from "./ui/scroll-area"
+import { cn } from 'cn'
+import type * as React from 'react'
+import { ScrollArea } from './ui/scroll-area'
 
 interface ScrollSurfaceProps {
   className?: string
@@ -17,9 +17,9 @@ export function ScrollSurface({
 }: ScrollSurfaceProps) {
   return (
     <ScrollArea
-      className={cn("playground-scroll-surface", className)}
+      className={cn('playground-scroll-surface', className)}
       contentClassName={contentClassName}
-      viewportProps={{ role: label ? "region" : undefined, "aria-label": label }}
+      viewportProps={{ role: label ? 'region' : undefined, 'aria-label': label }}
     >
       {children}
     </ScrollArea>

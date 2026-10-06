@@ -1,5 +1,5 @@
-import type { CSSProperties } from "react"
-import { barProfile, tabProfile } from "@duo-react/profiles"
+import { barProfile, tabProfile } from '@private/profiles'
+import type { CSSProperties } from 'react'
 
 export interface GlassGeometry {
   readonly length: number

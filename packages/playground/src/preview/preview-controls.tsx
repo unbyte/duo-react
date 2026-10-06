@@ -1,4 +1,3 @@
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
 import {
   DuoControls,
   DuoDisplayControls,
@@ -6,12 +5,13 @@ import {
   DuoZoomControls,
   useDuoActions,
   useDuoState,
-} from "duo-react"
+} from 'duo-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 
 const previewControls =
-  "pointer-events-none absolute left-(--playground-sidebar-space) right-(--playground-inspector-space) bottom-[calc(var(--playground-bottom-space)+max(16px,env(safe-area-inset-bottom)))] z-2 flex flex-wrap justify-center gap-1.5 bg-transparent px-2 py-1 transition-[left,right] duration-220 ease-[ease] motion-reduce:transition-none"
+  'pointer-events-none absolute left-(--playground-sidebar-space) right-(--playground-inspector-space) bottom-[calc(var(--playground-bottom-space)+max(16px,env(safe-area-inset-bottom)))] z-2 flex flex-wrap justify-center gap-1.5 bg-transparent px-2 py-1 transition-[left,right] duration-220 ease-[ease] motion-reduce:transition-none'
 const previewControlGroup =
-  "pointer-events-auto flex gap-0.5 rounded-full border border-[#d8dfe7] bg-white/90 p-[3px] shadow-[0_3px_12px_#18283b0a,0_12px_28px_#18283b0a] backdrop-blur-[16px]"
+  'pointer-events-auto flex gap-0.5 rounded-full border border-[#d8dfe7] bg-white/90 p-[3px] shadow-[0_3px_12px_#18283b0a,0_12px_28px_#18283b0a] backdrop-blur-[16px]'
 
 function PlacementControls() {
   const state = useDuoState((value) => value)
@@ -20,24 +20,24 @@ function PlacementControls() {
     <div
       role="group"
       aria-label="Inner layout"
-      aria-hidden={state.posture === "closed"}
+      aria-hidden={state.posture === 'closed'}
       data-duo-react-control-group="layout"
       className={`playground-control-group ${previewControlGroup}`}
     >
-      {(["left", "full", "right"] as const).map((placement) => (
+      {(['left', 'full', 'right'] as const).map((placement) => (
         <button
           key={placement}
           type="button"
           aria-label={
-            placement === "full"
-              ? "Full width"
-              : `${placement === "left" ? "Left" : "Right"} layout`
+            placement === 'full'
+              ? 'Full width'
+              : `${placement === 'left' ? 'Left' : 'Right'} layout`
           }
           data-duo-react-action={`layout-${placement}`}
           aria-pressed={state.innerPlacement === placement}
           disabled={
-            state.posture === "closed" ||
-            (placement !== "full" && state.screens.inner.orientation.startsWith("portrait"))
+            state.posture === 'closed' ||
+            (placement !== 'full' && state.screens.inner.orientation.startsWith('portrait'))
           }
           onClick={() => setInnerPlacement(placement)}
         >
@@ -53,9 +53,9 @@ function PlacementControls() {
             aria-hidden="true"
           >
             <rect
-              x={placement === "right" ? 12 : 3}
+              x={placement === 'right' ? 12 : 3}
               y="4"
-              width={placement === "full" ? 18 : 9}
+              width={placement === 'full' ? 18 : 9}
               height="16"
               rx="2"
               fill="currentColor"
@@ -63,7 +63,7 @@ function PlacementControls() {
               stroke="none"
             />
             <rect x="3" y="4" width="18" height="16" rx="2" />
-            {placement !== "full" && <path d="M12 4v16" />}
+            {placement !== 'full' && <path d="M12 4v16" />}
           </svg>
         </button>
       ))}
@@ -72,10 +72,10 @@ function PlacementControls() {
 }
 
 export function PreviewControls() {
-  const showPlacement = useDuoState((state) => state.posture !== "closed")
+  const showPlacement = useDuoState((state) => state.posture !== 'closed')
   const reducedMotion = useReducedMotion()
-  const layout = reducedMotion ? false : "position"
-  const transition = { duration: reducedMotion ? 0 : 0.2, ease: "easeOut" } as const
+  const layout = reducedMotion ? false : 'position'
+  const transition = { duration: reducedMotion ? 0 : 0.2, ease: 'easeOut' } as const
 
   return (
     <DuoControls className={`playground-preview-controls ${previewControls}`}>

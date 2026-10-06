@@ -1,15 +1,15 @@
-import * as React from "react"
-import { BackdropStore } from "@duo-react/browser"
-import { BackdropContext } from "../../backdrop/backdrop-context"
-import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
-import { AccessoryContext } from "../../screen/accessory-context"
-import { useDuoState } from "../../context/hooks"
-import { ScreenContext } from "../../screen/screen-context"
-import { orientationRotation } from "@duo-react/core"
-import { safeAreaStyle } from "../../screen/safe-area"
-import { type DuoDisplay, frameBezel } from "@duo-react/profiles"
-import { SystemUI, SystemMaterial } from "../system/system"
-import { Hardware } from "./hardware"
+import { BackdropStore } from '@private/browser'
+import { orientationRotation } from '@private/core'
+import { type DuoDisplay, frameBezel } from '@private/profiles'
+import React from 'react'
+import { BackdropContext } from '../../backdrop/backdrop-context'
+import { useDuoState } from '../../context/hooks'
+import { AccessoryContext } from '../../screen/accessory-context'
+import { safeAreaStyle } from '../../screen/safe-area'
+import { ScreenContext } from '../../screen/screen-context'
+import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
+import { SystemMaterial, SystemUI } from '../system/system'
+import { Hardware } from './hardware'
 
 export function DisplaySurface({
   display,
@@ -32,7 +32,7 @@ export function DisplaySurface({
   React.useEffect(() => {
     backdrop.connect(
       source.current!,
-      ".duo-react-accessory-window, .duo-react-status-material, .duo-react-system",
+      '.duo-react-accessory-window, .duo-react-status-material, .duo-react-system',
     )
     return () => backdrop.disconnect()
   }, [backdrop])
@@ -58,10 +58,10 @@ export function DisplaySurface({
           marginLeft: -screen.size.width / 2,
           marginTop: -screen.size.height / 2,
           transform: `scale(${scale}) rotate(${-orientationRotation[screen.orientation]}deg)`,
-          visibility: screen.visible && scale > 0 ? "visible" : "hidden",
-          borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(" "),
+          visibility: screen.visible && scale > 0 ? 'visible' : 'hidden',
+          borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(' '),
           boxShadow:
-            display === "inner"
+            display === 'inner'
               ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-react-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-react-rim-color)`
               : undefined,
         }}
@@ -76,7 +76,7 @@ export function DisplaySurface({
               top: bounds.y,
               width: bounds.width,
               height: bounds.height,
-              borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
+              borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(' '),
               ...safeAreaStyle(screen.safeArea),
             }}
           >
@@ -95,7 +95,7 @@ export function DisplaySurface({
               top: bounds.y,
               width: bounds.width,
               height: bounds.height,
-              borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(" "),
+              borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(' '),
               ...safeAreaStyle(screen.safeArea),
             }}
           />

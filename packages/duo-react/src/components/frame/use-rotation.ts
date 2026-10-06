@@ -1,13 +1,13 @@
-import * as React from "react"
-import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
-import { rotationStart } from "@duo-react/core"
+import { rotationStart } from '@private/core'
+import React from 'react'
+import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
 
 export function useRotation(target: number) {
   const [rotation, setRotation] = React.useState(target)
   const current = React.useRef(target)
   const previousTarget = React.useRef(target)
   useBrowserLayoutEffect(() => {
-    const motion = matchMedia("(prefers-reduced-motion: reduce)")
+    const motion = matchMedia('(prefers-reduced-motion: reduce)')
     const from = rotationStart(current.current, previousTarget.current, target)
     previousTarget.current = target
     current.current = from
@@ -29,10 +29,10 @@ export function useRotation(target: number) {
     }
     if (motion.matches || from === target) apply(target)
     else pending = requestAnimationFrame(tick)
-    motion.addEventListener("change", finish)
+    motion.addEventListener('change', finish)
     return () => {
       cancelAnimationFrame(pending)
-      motion.removeEventListener("change", finish)
+      motion.removeEventListener('change', finish)
     }
   }, [target])
   return rotation

@@ -1,6 +1,6 @@
-import * as React from "react"
-import { cn } from "cn"
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
+import { cn } from 'cn'
+import * as React from 'react'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 export function CopyableNumber({
   value,
@@ -13,7 +13,7 @@ export function CopyableNumber({
 }) {
   const text = String(Number(value.toFixed(2)))
   const triggerId = React.useId()
-  const [feedback, setFeedback] = React.useState({ message: "Copied", open: false })
+  const [feedback, setFeedback] = React.useState({ message: 'Copied', open: false })
 
   const close = () => setFeedback((current) => ({ ...current, open: false }))
 
@@ -29,9 +29,9 @@ export function CopyableNumber({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(text)
-      setFeedback({ message: "Copied", open: true })
+      setFeedback({ message: 'Copied', open: true })
     } catch {
-      setFeedback({ message: "Copy failed", open: true })
+      setFeedback({ message: 'Copy failed', open: true })
     }
   }
 
@@ -50,7 +50,7 @@ export function CopyableNumber({
         aria-label={`Copy ${label.toLowerCase()}: ${text}`}
         aria-describedby={feedback.open ? `${triggerId}-feedback` : undefined}
         className={cn(
-          "inline cursor-pointer border-0 bg-transparent p-0 text-inherit tabular-nums transition-colors hover:text-primary data-popup-open:text-primary motion-reduce:transition-none",
+          'inline cursor-pointer border-0 bg-transparent p-0 text-inherit tabular-nums transition-colors hover:text-primary data-popup-open:text-primary motion-reduce:transition-none',
           className,
         )}
         onClick={() => void copy()}

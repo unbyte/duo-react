@@ -1,25 +1,25 @@
-import { systemMetrics } from "@duo-react/profiles"
-import { expect, test } from "vite-plus/test"
-import { DuoStore } from "../src/state/store"
-import { getSystemLayout } from "../src/layout/system"
+import { systemMetrics } from '@private/profiles'
+import { expect, test } from 'vitest'
+import { getSystemLayout } from '../src/layout/system'
+import { DuoStore } from '../src/state/store'
 
-test("clock and glyph anchors match the three native full-window captures", () => {
+test('clock and glyph anchors match the three native full-window captures', () => {
   const fixtures = [
     {
-      display: "outer",
-      orientation: "portrait",
+      display: 'outer',
+      orientation: 'portrait',
       clock: [399 + 1 / 3, 86 + 2 / 3, 36, 12],
       glyph: [397 + 2 / 3, 109 + 2 / 3, 41, 41 + 1 / 3],
     },
     {
-      display: "inner",
-      orientation: "landscape-right",
+      display: 'inner',
+      orientation: 'landscape-right',
       clock: [881 + 1 / 3, 34, 43, 12],
       glyph: [882 + 2 / 3, 57, 41, 41 + 1 / 3],
     },
     {
-      display: "inner",
-      orientation: "portrait-upside-down",
+      display: 'inner',
+      orientation: 'portrait-upside-down',
       clock: [549 + 1 / 3, 42 + 2 / 3, 40 + 2 / 3, 11 + 1 / 3],
       glyph: [601, 27 + 2 / 3, 41, 41 + 1 / 3],
     },
@@ -43,12 +43,12 @@ test("clock and glyph anchors match the three native full-window captures", () =
   }
 })
 
-test("status belongs to the display while the home indicator follows the app window", () => {
+test('status belongs to the display while the home indicator follows the app window', () => {
   const store = new DuoStore()
   const full = getSystemLayout(store.getSnapshot().screens.inner)
   expect(full.home.x + full.home.width / 2).toBe(951 / 2)
   expect(full.divider).toBeUndefined()
-  for (const placement of ["left", "right"] as const) {
+  for (const placement of ['left', 'right'] as const) {
     store.actions.setInnerPlacement(placement)
     const screen = store.getSnapshot().screens.inner
     const layout = getSystemLayout(screen)
@@ -58,25 +58,25 @@ test("status belongs to the display while the home indicator follows the app win
   }
 })
 
-test("the outer cutout uses measured coordinates independently of status visibility", () => {
-  const store = new DuoStore({ orientation: "portrait" })
+test('the outer cutout uses measured coordinates independently of status visibility', () => {
+  const store = new DuoStore({ orientation: 'portrait' })
   const portrait = getSystemLayout(store.getSnapshot().screens.outer)
   expect(portrait.camera).toMatchObject({ x: 399.67, y: 29.33, width: 37, height: 37 })
   expect(portrait.status.y).toBeGreaterThan(portrait.camera!.y + portrait.camera!.height)
   expect(getSystemLayout(store.getSnapshot().screens.inner).camera).toBeUndefined()
-  store.actions.setOrientation("landscape-left")
+  store.actions.setOrientation('landscape-left')
   const landscape = getSystemLayout(store.getSnapshot().screens.outer)
   expect(landscape.camera).toMatchObject({ x: 611.67, y: 399.67, width: 37, height: 37 })
   expect(store.getSnapshot().screens.outer.statusBarVisible).toBe(false)
 })
 
-test("explicitly shown status stays in the reserved edge strip in all supported orientations", () => {
+test('explicitly shown status stays in the reserved edge strip in all supported orientations', () => {
   const store = new DuoStore({}, { prefersStatusBarHidden: false })
   for (const orientation of [
-    "portrait",
-    "portrait-upside-down",
-    "landscape-left",
-    "landscape-right",
+    'portrait',
+    'portrait-upside-down',
+    'landscape-left',
+    'landscape-right',
   ] as const) {
     store.actions.setOrientation(orientation)
     for (const screen of Object.values(store.getSnapshot().screens)) {
@@ -94,13 +94,13 @@ test("explicitly shown status stays in the reserved edge strip in all supported 
   }
 })
 
-test("capsule encloses the complete control group with consistent padding in every orientation", () => {
+test('capsule encloses the complete control group with consistent padding in every orientation', () => {
   const store = new DuoStore({}, { prefersStatusBarHidden: false })
   for (const orientation of [
-    "portrait",
-    "portrait-upside-down",
-    "landscape-left",
-    "landscape-right",
+    'portrait',
+    'portrait-upside-down',
+    'landscape-left',
+    'landscape-right',
   ] as const) {
     store.actions.setOrientation(orientation)
     for (const screen of Object.values(store.getSnapshot().screens)) {

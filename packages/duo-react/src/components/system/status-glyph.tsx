@@ -1,5 +1,5 @@
-import * as React from "react"
-import type { DuoSystem } from "@duo-react/core"
+import type { DuoSystem } from '@private/core'
+import React from 'react'
 
 const statusArtwork = { width: 104, height: 108 } as const
 
@@ -44,15 +44,15 @@ export function StatusGlyph({
   charging,
   wifiStrength,
   cellularStrength,
-  layer = "all",
-  width = "100%",
-  height = "100%",
-}: Pick<DuoSystem, "battery" | "charging" | "wifiStrength" | "cellularStrength"> & {
+  layer = 'all',
+  width = '100%',
+  height = '100%',
+}: Pick<DuoSystem, 'battery' | 'charging' | 'wifiStrength' | 'cellularStrength'> & {
   width?: number | string
   height?: number | string
-  layer?: "all" | "adaptive" | "accent"
+  layer?: 'all' | 'adaptive' | 'accent'
 }) {
-  const showBattery = layer === "all" || layer === (charging ? "accent" : "adaptive")
+  const showBattery = layer === 'all' || layer === (charging ? 'accent' : 'adaptive')
   return (
     <svg
       viewBox={`0 0 ${statusArtwork.width} ${statusArtwork.height}`}
@@ -61,18 +61,18 @@ export function StatusGlyph({
       fill="currentColor"
       stroke="none"
       focusable="false"
-      style={{ overflow: "visible" }}
+      style={{ overflow: 'visible' }}
     >
       {showBattery && (
         <g
-          fill={charging ? "#34c759" : "currentColor"}
+          fill={charging ? '#34c759' : 'currentColor'}
           style={charging ? { clipPath: chargingClip } : undefined}
         >
           {battery < 100 && <path d={batteryTrack} opacity={0.2} />}
           {battery > 0 && <path d={batteryArc(battery)} />}
         </g>
       )}
-      {layer !== "accent" && (
+      {layer !== 'accent' && (
         <>
           {charging && (
             <path d="M56 -3 43 12h8l-3 11L61 7h-8z" opacity={0.5} transform="translate(0 -3)" />

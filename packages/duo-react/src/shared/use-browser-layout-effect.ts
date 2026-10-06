@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from 'react'
 
 export const useBrowserLayoutEffect =
-  typeof document === "undefined" ? React.useEffect : React.useLayoutEffect
+  typeof document === 'undefined' ? React.useEffect : React.useLayoutEffect

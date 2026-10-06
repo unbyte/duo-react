@@ -1,4 +1,4 @@
-import type { DuoRect, DuoSize } from "@duo-react/profiles"
+import type { DuoRect, DuoSize } from '@private/profiles'
 
 export function sameRect(a: DuoRect, b: DuoRect) {
   return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height
@@ -20,16 +20,16 @@ export function samePixels(a: Uint8ClampedArray, b: Uint8ClampedArray) {
 }
 
 export async function blur(canvas: HTMLCanvasElement, radius: number) {
-  const output = document.createElement("canvas")
+  const output = document.createElement('canvas')
   output.width = canvas.width
   output.height = canvas.height
-  const context = output.getContext("2d")!
+  const context = output.getContext('2d')!
   // Extend the source edges so a blur near a display boundary stays opaque.
   const padding = Math.ceil(radius * 3)
-  const padded = document.createElement("canvas")
+  const padded = document.createElement('canvas')
   padded.width = canvas.width + padding * 2
   padded.height = canvas.height + padding * 2
-  const p = padded.getContext("2d")!
+  const p = padded.getContext('2d')!
   p.drawImage(canvas, padding, padding)
   p.drawImage(canvas, 0, 0, canvas.width, 1, padding, 0, canvas.width, padding)
   p.drawImage(

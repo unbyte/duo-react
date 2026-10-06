@@ -5,34 +5,31 @@
   "description": "React components for previewing web apps in iPhone Duo device layouts.",
   "license": "MIT",
   "files": [
-    "dist",
+    "lib",
     "docs"
   ],
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "src/index.ts",
   "exports": {
-    ".": "./dist/index.js",
+    ".": "./src/index.ts",
     "./package.json": "./package.json",
-    "./style.css": "./dist/style.css"
+    "./style.css": "./src/style.css"
   },
   "scripts": {
-    "build": "vp pack",
-    "test": "vp test",
-    "watch": "vp pack --watch"
+    "build": "tsup",
+    "prepublishOnly": "turbo run build"
   },
   "dependencies": {
     "@zumer/snapdom": "^3.2.0",
     "use-sync-external-store": "^1.6.0"
   },
   "devDependencies": {
-    "@duo-react/browser": "workspace:*",
-    "@duo-react/core": "workspace:*",
-    "@duo-react/profiles": "workspace:*",
+    "@private/browser": "workspace:*",
+    "@private/core": "workspace:*",
+    "@private/profiles": "workspace:*",
     "@types/react": "^16.14.0",
     "@types/react-dom": "^16.9.0",
     "@types/use-sync-external-store": "^1.5.0",
@@ -42,5 +39,24 @@
   "peerDependencies": {
     "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "publishConfig": {
+    "main": "lib/index.cjs",
+    "module": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./lib/index.d.ts",
+          "default": "./lib/index.js"
+        },
+        "require": {
+          "types": "./lib/index.d.cts",
+          "default": "./lib/index.cjs"
+        }
+      },
+      "./package.json": "./package.json",
+      "./style.css": "./lib/index.css"
+    }
   }
 }

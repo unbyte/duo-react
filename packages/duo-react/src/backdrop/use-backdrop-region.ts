@@ -1,7 +1,7 @@
-import * as React from "react"
-import { useBackdropStore } from "./backdrop-context"
-import { useBrowserLayoutEffect } from "../shared/use-browser-layout-effect"
-import type { BackdropRequest } from "@duo-react/browser"
+import type { BackdropRequest } from '@private/browser'
+import React from 'react'
+import { useBrowserLayoutEffect } from '../shared/use-browser-layout-effect'
+import { useBackdropStore } from './backdrop-context'
 
 export function useBackdropRegion(getRequest: () => BackdropRequest) {
   const store = useBackdropStore()

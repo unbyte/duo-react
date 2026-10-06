@@ -1,6 +1,6 @@
-import * as React from "react"
-import { useDuoState } from "../context/hooks"
-import type { DuoDisplay } from "@duo-react/profiles"
+import type { DuoDisplay } from '@private/profiles'
+import React from 'react'
+import { useDuoState } from '../context/hooks'
 
 export const ScreenContext = React.createContext<DuoDisplay | undefined>(undefined)
 

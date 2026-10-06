@@ -1,15 +1,15 @@
-import { statusAnchors, systemMetrics, sideControlMetrics, type DuoRect } from "@duo-react/profiles"
-import { getDuoGeometry } from "../geometry/screen"
-import { type DuoScreenInfo } from "../geometry/types"
+import { type DuoRect, sideControlMetrics, statusAnchors, systemMetrics } from '@private/profiles'
+import { getDuoGeometry } from '../geometry/screen'
+import type { DuoScreenInfo } from '../geometry/types'
 
 export function getSystemLayout(screen: DuoScreenInfo) {
   const display = getDuoGeometry({ display: screen.display, orientation: screen.orientation })
   const { safeArea, size, reservedRegions } = display
   const metrics = systemMetrics
   const camera =
-    screen.display === "outer"
+    screen.display === 'outer'
       ? reservedRegions.find(
-          (region) => region.type === "occlusion" && region.width === region.height,
+          (region) => region.type === 'occlusion' && region.width === region.height,
         )
       : undefined
   const horizontal = safeArea.top > 0
@@ -30,7 +30,7 @@ export function getSystemLayout(screen: DuoScreenInfo) {
       height: metrics.glyphHeight,
     }
   } else {
-    const calibrated = screen.display === "inner" || screen.orientation === "portrait"
+    const calibrated = screen.display === 'inner' || screen.orientation === 'portrait'
     const height = metrics.lineHeight + metrics.gap + metrics.glyphHeight
     const sideCenter = size.width - sideControlMetrics.edgeInset - sideControlMetrics.width / 2
     const center = calibrated ? sideCenter : camera ? camera.x + camera.width / 2 : sideCenter
@@ -40,7 +40,7 @@ export function getSystemLayout(screen: DuoScreenInfo) {
         ? camera.y + camera.height + metrics.cameraGap
         : camera.y - metrics.cameraGap - height
       : metrics.top
-    const inner = screen.display === "inner"
+    const inner = screen.display === 'inner'
     time = {
       x: center - metrics.timeWidth / 2,
       y: calibrated
@@ -89,7 +89,7 @@ export function getSystemLayout(screen: DuoScreenInfo) {
       height: bottom - top + paddingY * 2,
     },
     divider:
-      screen.display === "inner" && screen.placement !== "full"
+      screen.display === 'inner' && screen.placement !== 'full'
         ? {
             x: (size.width - metrics.dividerWidth) / 2,
             y: (size.height - metrics.dividerHeight) / 2,

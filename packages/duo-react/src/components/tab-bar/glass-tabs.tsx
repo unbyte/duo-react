@@ -1,19 +1,19 @@
-import * as React from "react"
-import { useBackdropStore } from "../../backdrop/backdrop-context"
-import { useBackdropRegion } from "../../backdrop/use-backdrop-region"
-import { useLensMotion } from "./motion"
-import { GlassRenderer } from "./renderer"
-import { canvasPadding } from "./shaders"
-import { clamp, TabLayout } from "./layout"
-import { makeArtwork } from "./artwork"
-import type { TabContent } from "./types"
+import React from 'react'
+import { useBackdropStore } from '../../backdrop/backdrop-context'
+import { useBackdropRegion } from '../../backdrop/use-backdrop-region'
+import { makeArtwork } from './artwork'
+import { clamp, TabLayout } from './layout'
+import { useLensMotion } from './motion'
+import { GlassRenderer } from './renderer'
+import { canvasPadding } from './shaders'
+import type { TabContent } from './types'
 
 /** Offset-parent coordinates exclude the frame's presentation zoom and rotation. */
 function backdropOrigin(element: HTMLElement) {
   let x = 0
   let y = 0
   let current: HTMLElement | null = element
-  while (current && !current.classList.contains("duo-react-screen")) {
+  while (current && !current.classList.contains('duo-react-screen')) {
     x += current.offsetLeft
     y += current.offsetTop
     current = current.offsetParent as HTMLElement | null
@@ -27,8 +27,8 @@ function useMedia(query: string) {
     const media = window.matchMedia(query)
     const update = () => setMatches(media.matches)
     update()
-    media.addEventListener("change", update)
-    return () => media.removeEventListener("change", update)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
   }, [query])
   return matches
 }
@@ -76,7 +76,7 @@ export function GlassTabs({
   const [expanded, setExpanded] = React.useState(false)
   const [detailed, setDetailed] = React.useState(false)
   const [target, setTarget] = React.useState<number>()
-  const reducedMotion = useMedia("(prefers-reduced-motion: reduce)")
+  const reducedMotion = useMedia('(prefers-reduced-motion: reduce)')
   const holdTimer = React.useRef<ReturnType<typeof setTimeout>>()
   const shrinkTimer = React.useRef<ReturnType<typeof setTimeout>>()
   const suppressClick = React.useRef(false)
@@ -89,7 +89,7 @@ export function GlassTabs({
     started: number
   }>()
   const selected = items.findIndex((item) => item.id === selectedId)
-  const defaultAccent = dark ? "#209bff" : "#0088ff"
+  const defaultAccent = dark ? '#209bff' : '#0088ff'
   const { rest } = layout
   const selectedPosition = rest.first + Math.max(0, selected) * rest.pitch
   const motion = useLensMotion(target ?? selectedPosition, expanded, reducedMotion)
@@ -110,16 +110,16 @@ export function GlassTabs({
     function restored() {
       setGeneration((value) => value + 1)
     }
-    element.addEventListener("webglcontextlost", lost)
-    element.addEventListener("webglcontextrestored", restored)
+    element.addEventListener('webglcontextlost', lost)
+    element.addEventListener('webglcontextrestored', restored)
     try {
       renderer.current = new GlassRenderer(element, vertical)
     } catch {
       renderer.current = undefined
     }
     return () => {
-      element.removeEventListener("webglcontextlost", lost)
-      element.removeEventListener("webglcontextrestored", restored)
+      element.removeEventListener('webglcontextlost', lost)
+      element.removeEventListener('webglcontextrestored', restored)
       renderer.current?.dispose()
       renderer.current = undefined
     }
@@ -147,7 +147,7 @@ export function GlassTabs({
         })
         .catch(() => {
           if (!disposed && requested === revision) {
-            artwork.current = document.createElement("canvas")
+            artwork.current = document.createElement('canvas')
             artwork.current.width = artwork.current.height = 1
             setArtworkReady(false)
             setGenerationArtwork((value) => value + 1)
@@ -156,14 +156,14 @@ export function GlassTabs({
     }
     const request = requestAnimationFrame(load)
     const observer = new MutationObserver(load)
-    source.querySelectorAll(".duo-react-tab-bar-icon").forEach((icon) =>
+    source.querySelectorAll('.duo-react-tab-bar-icon').forEach((icon) => {
       observer.observe(icon, {
         subtree: true,
         childList: true,
         attributes: true,
         characterData: true,
-      }),
-    )
+      })
+    })
     return () => {
       disposed = true
       observer.disconnect()
@@ -185,7 +185,7 @@ export function GlassTabs({
             growth: clamp(motion.growth, 0, 1),
             dark,
             accents: Array.from(
-              root.current!.querySelectorAll("button"),
+              root.current!.querySelectorAll('button'),
               (button) => getComputedStyle(button).color,
             ),
           },
@@ -303,7 +303,7 @@ export function GlassTabs({
       const index = Math.round((bounded(value) - rest.first) / rest.pitch)
       onSelect(items[index].id)
       root.current
-        ?.querySelectorAll<HTMLButtonElement>("button")
+        ?.querySelectorAll<HTMLButtonElement>('button')
         [index]?.focus({ preventScroll: true })
     }
     if (event.currentTarget.hasPointerCapture(event.pointerId))
@@ -352,7 +352,7 @@ export function GlassTabs({
               ...layout.itemStyle(geometry, index),
               color: item.selectedColor ?? defaultAccent,
             }}
-            aria-current={item.id === selectedId ? "page" : undefined}
+            aria-current={item.id === selectedId ? 'page' : undefined}
             aria-label={item.label}
             title={item.label}
             onClick={(event) => {
@@ -365,16 +365,16 @@ export function GlassTabs({
             }}
             onKeyDown={(event) => {
               let next = index
-              if (event.key === (vertical ? "ArrowDown" : "ArrowRight"))
+              if (event.key === (vertical ? 'ArrowDown' : 'ArrowRight'))
                 next = (index + 1) % items.length
-              else if (event.key === (vertical ? "ArrowUp" : "ArrowLeft"))
+              else if (event.key === (vertical ? 'ArrowUp' : 'ArrowLeft'))
                 next = (index + items.length - 1) % items.length
-              else if (event.key === "Home") next = 0
-              else if (event.key === "End") next = items.length - 1
+              else if (event.key === 'Home') next = 0
+              else if (event.key === 'End') next = items.length - 1
               else return
               event.preventDefault()
               root.current
-                ?.querySelectorAll<HTMLButtonElement>("button")
+                ?.querySelectorAll<HTMLButtonElement>('button')
                 [next]?.focus({ preventScroll: true })
             }}
           >

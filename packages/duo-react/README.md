@@ -18,8 +18,8 @@ npm install duo-react
 ```
 
 The declared peer range is React and React DOM 16.8–19. The package ships ES modules,
-TypeScript declarations, and a stylesheet. Use a bundler that handles CSS imports
-and a browser with ResizeObserver and CSS container-query support.
+CommonJS, TypeScript declarations, and a stylesheet. Use a bundler that handles
+CSS imports and a browser with ResizeObserver and CSS container-query support.
 
 ## Quick start
 

@@ -1,20 +1,38 @@
 {
+  "references": [
+    {
+      "path": "./packages/profiles"
+    },
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./packages/browser"
+    },
+    {
+      "path": "./packages/duo-react"
+    },
+    {
+      "path": "./packages/playground"
+    },
+    {
+      "path": "./packages/core/tests"
+    },
+    {
+      "path": "./packages/browser/tests"
+    }
+  ],
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["es2023", "DOM", "DOM.Iterable"],
-    "moduleDetection": "force",
+    "lib": ["es2023", "dom", "dom.iterable"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "types": ["node", "vite-plus/client"],
+    "types": ["node"],
     "strict": true,
-    "noUnusedLocals": true,
     "noEmit": true,
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.tsbuildinfo"
   },
-  "include": ["vite.config.ts"]
+  "files": []
 }

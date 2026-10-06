@@ -1,6 +1,6 @@
-import { canvasPadding, glassShaders, vertex } from "./shaders"
-import type { BackdropRegion } from "@duo-react/browser"
-import type { GlassGeometry } from "./layout"
+import type { BackdropRegion } from '@private/browser'
+import type { GlassGeometry } from './layout'
+import { canvasPadding, glassShaders, vertex } from './shaders'
 
 interface GlassFrame {
   readonly backdrop?: BackdropRegion
@@ -35,24 +35,24 @@ export class GlassRenderer {
   private readonly outerUniforms: Record<string, WebGLUniformLocation | null>
   private surfaceWidth = 0
   private surfaceHeight = 0
-  private readonly neutralCanvas = document.createElement("canvas")
+  private readonly neutralCanvas = document.createElement('canvas')
   private uploadedNeutral = false
   private uploadedBackdrop?: BackdropRegion
   private uploadedArtwork?: HTMLCanvasElement
-  private readonly colorCanvas = document.createElement("canvas")
-  private readonly colorContext = this.colorCanvas.getContext("2d")!
+  private readonly colorCanvas = document.createElement('canvas')
+  private readonly colorContext = this.colorCanvas.getContext('2d')!
   private accents: readonly string[] = []
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
     private readonly vertical: boolean,
   ) {
-    const gl = canvas.getContext("webgl2", {
+    const gl = canvas.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: false,
       antialias: false,
     })
-    if (!gl) throw new Error("WebGL 2 is unavailable")
+    if (!gl) throw new Error('WebGL 2 is unavailable')
     this.gl = gl
     this.framebuffer = gl.createFramebuffer()!
     const { fragment, outerFragment } = glassShaders(vertical)
@@ -88,19 +88,25 @@ export class GlassRenderer {
       throw error
     }
     this.neutralCanvas.width = this.neutralCanvas.height = 1
-    const neutralContext = this.neutralCanvas.getContext("2d")!
-    neutralContext.fillStyle = "#ffffff"
+    const neutralContext = this.neutralCanvas.getContext('2d')!
+    neutralContext.fillStyle = '#ffffff'
     neutralContext.fillRect(0, 0, 1, 1)
     this.colorCanvas.width = this.colorCanvas.height = 1
   }
 
   dispose() {
     const { gl } = this
-    this.textures.forEach((texture) => gl.deleteTexture(texture))
-    this.shaders.forEach((shader) => gl.deleteShader(shader))
-    this.programs.forEach((program) => gl.deleteProgram(program))
+    this.textures.forEach((texture) => {
+      gl.deleteTexture(texture)
+    })
+    this.shaders.forEach((shader) => {
+      gl.deleteShader(shader)
+    })
+    this.programs.forEach((program) => {
+      gl.deleteProgram(program)
+    })
     gl.deleteFramebuffer(this.framebuffer)
-    if (!this.canvas.isConnected) gl.getExtension("WEBGL_lose_context")?.loseContext()
+    if (!this.canvas.isConnected) gl.getExtension('WEBGL_lose_context')?.loseContext()
   }
 
   private compileShader(type: number, source: string) {
@@ -110,7 +116,7 @@ export class GlassRenderer {
     gl.shaderSource(shader, source)
     gl.compileShader(shader)
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-      throw new Error(gl.getShaderInfoLog(shader) || "Shader compilation failed")
+      throw new Error(gl.getShaderInfoLog(shader) || 'Shader compilation failed')
     return shader
   }
   private linkProgram(vertexShader: WebGLShader, fragmentSource: string) {
@@ -121,7 +127,7 @@ export class GlassRenderer {
     gl.attachShader(program, this.compileShader(gl.FRAGMENT_SHADER, fragmentSource))
     gl.linkProgram(program)
     if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-      throw new Error(gl.getProgramInfoLog(program) || "Shader link failed")
+      throw new Error(gl.getProgramInfoLog(program) || 'Shader link failed')
     return program
   }
 
@@ -178,7 +184,7 @@ export class GlassRenderer {
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
       gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textures[3], 0)
       if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE)
-        throw new Error("Outer refraction framebuffer is incomplete")
+        throw new Error('Outer refraction framebuffer is incomplete')
       this.surfaceWidth = width
       this.surfaceHeight = height
     }

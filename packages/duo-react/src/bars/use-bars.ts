@@ -1,18 +1,18 @@
-import * as React from "react"
-import { useDuoScreen } from "../screen/screen-context"
 import {
   type BarAllocation,
   type BarsLayoutRequest,
-  type TabBarLayoutRequest,
   getBarsLayout,
-} from "@duo-react/core"
-import type { BarsLayout, ResolvedBarLayout } from "./types"
+  type TabBarLayoutRequest,
+} from '@private/core'
+import React from 'react'
+import { useDuoScreen } from '../screen/screen-context'
+import type { BarsLayout, ResolvedBarLayout } from './types'
 
 const alignments = {
-  start: "flex-start",
-  end: "flex-end",
-  center: "center",
-  spread: "space-between",
+  start: 'flex-start',
+  end: 'flex-end',
+  center: 'center',
+  spread: 'space-between',
 } as const
 
 function bindBar({ placement, axis, rect, alignment }: BarAllocation): ResolvedBarLayout {
@@ -21,18 +21,18 @@ function bindBar({ placement, axis, rect, alignment }: BarAllocation): ResolvedB
     axis,
     rect,
     containerProps: {
-      "data-duo-react-bar-placement": placement,
-      "data-duo-react-bar-axis": axis,
+      'data-duo-react-bar-placement': placement,
+      'data-duo-react-bar-axis': axis,
       style: {
-        position: "absolute",
+        position: 'absolute',
         left: rect.x,
         top: rect.y,
         width: rect.width,
         height: rect.height,
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: axis === "horizontal" ? "row" : "column",
-        alignItems: "center",
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: axis === 'horizontal' ? 'row' : 'column',
+        alignItems: 'center',
         justifyContent: alignments[alignment],
       },
     },

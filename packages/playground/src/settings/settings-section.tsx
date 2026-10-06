@@ -1,5 +1,5 @@
-import type * as React from "react"
-import { ChevronDown } from "lucide-react"
+import { ChevronDown } from 'lucide-react'
+import type * as React from 'react'
 
 export function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (

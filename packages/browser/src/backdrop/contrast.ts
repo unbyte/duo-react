@@ -1,4 +1,4 @@
-export type ResolvedIndicatorStyle = "light" | "dark"
+export type ResolvedIndicatorStyle = 'light' | 'dark'
 
 export function chooseIndicatorStyle(pixels: Uint8ClampedArray, previous: ResolvedIndicatorStyle) {
   let luminance = 0
@@ -19,6 +19,6 @@ export function chooseIndicatorStyle(pixels: Uint8ClampedArray, previous: Resolv
   if (!weight) return previous
   const average = luminance / weight
   // Retain the current choice near equal black/white contrast to avoid flickering.
-  const threshold = previous === "light" ? 0.189 : 0.169
-  return average < threshold ? "light" : "dark"
+  const threshold = previous === 'light' ? 0.189 : 0.169
+  return average < threshold ? 'light' : 'dark'
 }

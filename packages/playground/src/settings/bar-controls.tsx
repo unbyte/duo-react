@@ -1,9 +1,9 @@
-import { AlignHorizontalDistributeCenter } from "lucide-react"
-import { IconNumber, IconBoxAlignTopLeft, IconAxisX } from "@tabler/icons-react"
-import type { ToolbarLayoutRequest } from "duo-react"
-import { SelectSetting } from "../components/setting-fields"
-import { CountLabel, PlacementLabel, DistributionLabel } from "./option-labels"
-import type { BarSettings } from "./bar-settings"
+import { IconAxisX, IconBoxAlignTopLeft, IconNumber } from '@tabler/icons-react'
+import type { ToolbarLayoutRequest } from 'duo-react'
+import { AlignHorizontalDistributeCenter } from 'lucide-react'
+import { SelectSetting } from '../components/setting-fields'
+import type { BarSettings } from './bar-settings'
+import { CountLabel, DistributionLabel, PlacementLabel } from './option-labels'
 
 export function TabBarControls({
   settings,
@@ -21,7 +21,7 @@ export function TabBarControls({
         value={String(settings.tabbarCount)}
         options={[0, 2, 3, 4, 5].map((count) => ({
           value: String(count),
-          text: count === 0 ? "0 — None" : `${count} tabs`,
+          text: count === 0 ? '0 — None' : `${count} tabs`,
           label: <CountLabel count={count} unit="tab" />,
         }))}
         onValueChange={(value) => onChange({ ...settings, tabbarCount: Number(value) })}
@@ -34,18 +34,18 @@ export function TabBarControls({
             value={settings.distribution}
             options={[
               {
-                value: "packed",
-                text: "Packed",
+                value: 'packed',
+                text: 'Packed',
                 label: <DistributionLabel distribution="packed">Packed</DistributionLabel>,
               },
               {
-                value: "edges",
-                text: "Edges",
+                value: 'edges',
+                text: 'Edges',
                 label: <DistributionLabel distribution="edges">Edges</DistributionLabel>,
               },
             ]}
             onValueChange={(value) =>
-              onChange({ ...settings, distribution: value as BarSettings["distribution"] })
+              onChange({ ...settings, distribution: value as BarSettings['distribution'] })
             }
           />
         </div>
@@ -76,7 +76,7 @@ export function ToolbarControls({
         value={String(settings.toolbarCount)}
         options={[0, 1, 2, 3].map((count) => ({
           value: String(count),
-          text: count === 0 ? "0 — None" : `${count} ${count === 1 ? "bar" : "bars"}`,
+          text: count === 0 ? '0 — None' : `${count} ${count === 1 ? 'bar' : 'bars'}`,
           label: <CountLabel count={count} />,
         }))}
         onValueChange={(value) => onChange({ ...settings, toolbarCount: Number(value) })}
@@ -96,36 +96,36 @@ export function ToolbarControls({
                 value={bar.placement}
                 options={[
                   {
-                    value: "top-leading",
-                    text: "Top leading",
+                    value: 'top-leading',
+                    text: 'Top leading',
                     label: <PlacementLabel placement="top-leading">Top leading</PlacementLabel>,
                   },
                   {
-                    value: "top-trailing",
-                    text: "Top trailing",
+                    value: 'top-trailing',
+                    text: 'Top trailing',
                     label: <PlacementLabel placement="top-trailing">Top trailing</PlacementLabel>,
                   },
                   {
-                    value: "bottom",
-                    text: "Bottom",
+                    value: 'bottom',
+                    text: 'Bottom',
                     label: <PlacementLabel placement="bottom">Bottom</PlacementLabel>,
                   },
                 ]}
                 onValueChange={(value) =>
-                  updateToolbar(bar.id, { placement: value as ToolbarLayoutRequest["placement"] })
+                  updateToolbar(bar.id, { placement: value as ToolbarLayoutRequest['placement'] })
                 }
               />
               <SelectSetting
                 icon={IconAxisX}
                 label="Axis"
                 ariaLabel={`Toolbar ${bar.id} axis`}
-                value={bar.axis ?? "adaptive"}
+                value={bar.axis ?? 'adaptive'}
                 options={[
-                  { value: "adaptive", label: "Adaptive" },
-                  { value: "horizontal", label: "Horizontal" },
+                  { value: 'adaptive', label: 'Adaptive' },
+                  { value: 'horizontal', label: 'Horizontal' },
                 ]}
                 onValueChange={(value) =>
-                  updateToolbar(bar.id, { axis: value as ToolbarLayoutRequest["axis"] })
+                  updateToolbar(bar.id, { axis: value as ToolbarLayoutRequest['axis'] })
                 }
               />
             </fieldset>

@@ -1,7 +1,7 @@
-import * as React from "react"
-import { DuoStore, type DuoDefaults, type DuoSystemOptions } from "@duo-react/core"
-import { useBrowserLayoutEffect } from "../shared/use-browser-layout-effect"
-import { StoreContext } from "./store-context"
+import { type DuoDefaults, DuoStore, type DuoSystemOptions } from '@private/core'
+import React from 'react'
+import { useBrowserLayoutEffect } from '../shared/use-browser-layout-effect'
+import { StoreContext } from './store-context'
 
 export interface DuoProviderProps {
   children?: React.ReactNode

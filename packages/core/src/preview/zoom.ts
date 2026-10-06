@@ -1,15 +1,15 @@
-import type { DuoFitPadding, DuoZoom } from "./types"
-import type { DuoSize } from "@duo-react/profiles"
+import type { DuoSize } from '@private/profiles'
+import type { DuoFitPadding, DuoZoom } from './types'
 
 export function validateZoom(zoom: DuoZoom) {
-  if (zoom !== "fit" && (typeof zoom !== "number" || !Number.isFinite(zoom) || zoom <= 0)) {
+  if (zoom !== 'fit' && (typeof zoom !== 'number' || !Number.isFinite(zoom) || zoom <= 0)) {
     throw new RangeError('Duo zoom must be "fit" or a positive finite number.')
   }
 }
 
 export function resolveFitPadding(padding: DuoFitPadding = 24) {
   const insets =
-    typeof padding === "number"
+    typeof padding === 'number'
       ? { top: padding, right: padding, bottom: padding, left: padding }
       : {
           top: padding.top ?? 24,
@@ -18,7 +18,7 @@ export function resolveFitPadding(padding: DuoFitPadding = 24) {
           left: padding.left ?? 24,
         }
   if (Object.values(insets).some((value) => !Number.isFinite(value) || value < 0))
-    throw new RangeError("fitPadding sides must be nonnegative finite numbers.")
+    throw new RangeError('fitPadding sides must be nonnegative finite numbers.')
   return insets
 }
 
@@ -31,7 +31,7 @@ export function resolveZoom(
   validateZoom(zoom)
   const { top, right, bottom, left } = resolveFitPadding(padding)
   if (container.width <= 0 || container.height <= 0) return 0
-  return zoom === "fit"
+  return zoom === 'fit'
     ? Math.max(
         0,
         Math.min(

@@ -1,11 +1,11 @@
-import type * as React from "react"
-import { ScrollSurface } from "../components/scroll-surface"
-import { InspectorToggle } from "../inspector/inspector-controls"
-import { AppSettings, type AppSettingsProps } from "./app-settings"
-import { SystemSettings } from "./system-settings"
-import { TabBarControls, ToolbarControls } from "./bar-controls"
-import type { BarSettings } from "./bar-settings"
-import { SettingsSection } from "./settings-section"
+import type * as React from 'react'
+import { ScrollSurface } from '../components/scroll-surface'
+import { InspectorToggle } from '../inspector/inspector-controls'
+import { AppSettings, type AppSettingsProps } from './app-settings'
+import { TabBarControls, ToolbarControls } from './bar-controls'
+import type { BarSettings } from './bar-settings'
+import { SettingsSection } from './settings-section'
+import { SystemSettings } from './system-settings'
 
 export function SettingsPanel({
   barSettings,

@@ -1,9 +1,9 @@
-import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture } from "@duo-react/profiles"
-import type { DuoScreenInfo } from "../geometry/types"
-import type { DuoZoom } from "../preview/types"
+import type { DuoDisplay, DuoOrientation, DuoPlacement, DuoPosture } from '@private/profiles'
+import type { DuoScreenInfo } from '../geometry/types'
+import type { DuoZoom } from '../preview/types'
 
-export type DuoColorMode = "light" | "dark"
-export type DuoIndicatorStyle = "auto" | DuoColorMode
+export type DuoColorMode = 'light' | 'dark'
+export type DuoIndicatorStyle = 'auto' | DuoColorMode
 
 export interface DuoIndicatorStyles {
   readonly statusBar: DuoIndicatorStyle
@@ -28,7 +28,7 @@ export interface DuoSystem {
   readonly indicatorStyles: Readonly<Record<DuoDisplay, DuoIndicatorStyles>>
 }
 
-export interface DuoSystemOptions extends Partial<Omit<DuoSystem, "indicatorStyles">> {
+export interface DuoSystemOptions extends Partial<Omit<DuoSystem, 'indicatorStyles'>> {
   readonly indicatorStyles?: Partial<Record<DuoDisplay, Partial<DuoIndicatorStyles>>>
 }
 export interface DuoDefaults {

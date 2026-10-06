@@ -1,11 +1,11 @@
-import { systemMetrics, type DuoRect } from "@duo-react/profiles"
-import * as React from "react"
-import { useBackdropRegion } from "../../backdrop/use-backdrop-region"
-import { useBackdropStore } from "../../backdrop/backdrop-context"
-import { useDuoState } from "../../context/hooks"
-import { getSystemLayout, type DuoScreenInfo } from "@duo-react/core"
-import { StatusGlyph } from "./status-glyph"
-import { SystemIndicator } from "./system-indicator"
+import { type DuoScreenInfo, getSystemLayout } from '@private/core'
+import { type DuoRect, systemMetrics } from '@private/profiles'
+import React from 'react'
+import { useBackdropStore } from '../../backdrop/backdrop-context'
+import { useBackdropRegion } from '../../backdrop/use-backdrop-region'
+import { useDuoState } from '../../context/hooks'
+import { StatusGlyph } from './status-glyph'
+import { SystemIndicator } from './system-indicator'
 
 function boundsStyle(bounds: DuoRect) {
   return { left: bounds.x, top: bounds.y, width: bounds.width, height: bounds.height }
@@ -24,7 +24,7 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
       const scale = frame.canvas.width / frame.width
       output.width = Math.ceil(area.width * scale)
       output.height = Math.ceil(area.height * scale)
-      const context = output.getContext("2d")!
+      const context = output.getContext('2d')!
       context.drawImage(
         frame.blurred,
         (area.x - frame.x) * scale,
@@ -97,7 +97,7 @@ export function SystemUI({
                 width={systemMetrics.timeWidth}
                 height={systemMetrics.lineHeight}
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   left: layout.time.x - layout.status.x,
                   top: layout.time.y - layout.status.y,
                 }}
@@ -139,7 +139,7 @@ export function SystemUI({
                 width={systemMetrics.glyphWidth}
                 height={systemMetrics.glyphHeight}
                 style={{
-                  position: "absolute",
+                  position: 'absolute',
                   left: layout.glyph.x - layout.status.x,
                   top: layout.glyph.y - layout.status.y,
                 }}

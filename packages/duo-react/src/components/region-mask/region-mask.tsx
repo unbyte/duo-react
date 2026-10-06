@@ -1,20 +1,20 @@
-import * as React from "react"
-import { useDuoState } from "../../context/hooks"
-import { useBrowserLayoutEffect } from "../../shared/use-browser-layout-effect"
-import { useDuoRegions } from "../../inspection/use-duo-regions"
-import type { DuoRect } from "@duo-react/profiles"
-import type { DuoScreenInfo } from "@duo-react/core"
+import type { DuoScreenInfo } from '@private/core'
+import type { DuoRect } from '@private/profiles'
+import React from 'react'
+import { useDuoState } from '../../context/hooks'
+import { useDuoRegions } from '../../inspection/use-duo-regions'
+import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
 
-export interface DuoRegionMaskProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+export interface DuoRegionMaskProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   frameRef: React.RefObject<HTMLDivElement | null>
   highlightedRegionId?: string
   onHighlightedRegionChange?: (regionId: string | undefined) => void
-  theme?: "auto" | "light" | "dark"
+  theme?: 'auto' | 'light' | 'dark'
 }
 
 let nextMaskId = 0
 
-function roundedBoundary(bounds: DuoRect, radii: DuoScreenInfo["cornerRadii"]) {
+function roundedBoundary(bounds: DuoRect, radii: DuoScreenInfo['cornerRadii']) {
   const { x, y, width, height } = bounds
   const right = x + width
   const bottom = y + height
@@ -39,14 +39,14 @@ export function DuoRegionMask({
   frameRef,
   highlightedRegionId,
   onHighlightedRegionChange,
-  theme = "auto",
+  theme = 'auto',
   className,
   ...props
 }: DuoRegionMaskProps) {
   const root = React.useRef<HTMLDivElement>(null)
   const [id] = React.useState(() => `duo-react-region-mask-${nextMaskId++}`)
   const screen = useDuoState(
-    (state) => state.screens[state.posture === "closed" ? "outer" : "inner"],
+    (state) => state.screens[state.posture === 'closed' ? 'outer' : 'inner'],
   )
   const regions = useDuoRegions()
   const [layout, setLayout] = React.useState<{
@@ -58,7 +58,7 @@ export function DuoRegionMask({
     const container = root.current
     const frame = frameRef.current
     const display = frame?.querySelector(`[data-duo-react-display="${screen.display}"]`)
-    const rotation = frame?.querySelector(".duo-react-rotation")
+    const rotation = frame?.querySelector('.duo-react-rotation')
     if (!container || !frame || !display || !rotation) return
     let pending = 0
     const measure = () => {
@@ -84,8 +84,8 @@ export function DuoRegionMask({
     resize.observe(container)
     resize.observe(frame)
     const mutation = new MutationObserver(schedule)
-    mutation.observe(display, { attributes: true, attributeFilter: ["style"] })
-    mutation.observe(rotation, { attributes: true, attributeFilter: ["style"] })
+    mutation.observe(display, { attributes: true, attributeFilter: ['style'] })
+    mutation.observe(rotation, { attributes: true, attributeFilter: ['style'] })
     return () => {
       cancelAnimationFrame(pending)
       resize.disconnect()
@@ -100,7 +100,7 @@ export function DuoRegionMask({
       aria-label="Layout regions"
       {...props}
       ref={root}
-      className={["duo-react-region-mask", className].filter(Boolean).join(" ")}
+      className={['duo-react-region-mask', className].filter(Boolean).join(' ')}
       data-duo-react-theme={theme}
       data-duo-react-inspecting={inspecting}
     >
