@@ -603,7 +603,10 @@ export function Playground() {
             aria-label="Playground settings"
           >
             <div className="playground-sidebar-heading box-border flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border px-3 max-sm:group-data-[inspector-open=true]/playground:bg-white/90 max-sm:group-data-[inspector-open=true]/playground:backdrop-blur-[20px] max-sm:group-data-[inspector-open=true]/playground:backdrop-saturate-[125%]">
-              <h1 className="playground-title m-0 text-[13px] font-semibold">Duo React</h1>
+              <h1 className="playground-title m-0 flex items-center gap-2 text-[13px] font-semibold">
+                <img src="/favicon.svg" alt="" width={16} height={16} className="size-4 shrink-0" />
+                Duo React
+              </h1>
               <InspectorToggle
                 buttonRef={inspectorToggle}
                 open={inspectorOpen}
