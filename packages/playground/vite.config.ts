@@ -1,13 +1,14 @@
 import { fileURLToPath } from "node:url"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
+import { cloudflare } from "@cloudflare/vite-plugin"
 import { defineConfig } from "vite-plus"
 
 const path = (relative: string) => fileURLToPath(new URL(relative, import.meta.url))
 
 export default defineConfig({
   root: path("./"),
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), cloudflare({ configPath: path("./wrangler.jsonc") })],
   resolve: {
     alias: {
       "@": path("./src"),

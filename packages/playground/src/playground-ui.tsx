@@ -56,7 +56,7 @@ const inspectorContent = "box-border min-h-full min-w-0! p-3.5"
 
 function SettingLabel({ icon: Icon, label, id }: SettingProps & { id: string }) {
   return (
-    <FieldLabel htmlFor={id} className={cn("demo-field-label", fieldLabel)}>
+    <FieldLabel htmlFor={id} className={cn("playground-field-label", fieldLabel)}>
       {Icon && <Icon size={16} strokeWidth={1.5} aria-hidden="true" />}
       <span>{label}</span>
     </FieldLabel>
@@ -71,7 +71,7 @@ export function ScrollSurface({
 }: ScrollSurfaceProps) {
   return (
     <ScrollArea
-      className={cn("demo-scroll-surface", className)}
+      className={cn("playground-scroll-surface", className)}
       contentClassName={contentClassName}
       viewportProps={{ role: label ? "region" : undefined, "aria-label": label }}
     >
@@ -83,7 +83,11 @@ export function ScrollSurface({
 export function SelectSetting(props: SelectSettingProps) {
   const id = React.useId()
   return (
-    <Field orientation="horizontal" className={cn("demo-select", fieldRow)} title={props.title}>
+    <Field
+      orientation="horizontal"
+      className={cn("playground-select", fieldRow)}
+      title={props.title}
+    >
       <SettingLabel {...props} id={id} />
       <Select
         items={props.options}
@@ -95,7 +99,7 @@ export function SelectSetting(props: SelectSettingProps) {
         <SelectTrigger
           className={cn(
             fieldControl,
-            "[&_svg]:size-3 [&_.demo-option-icon]:size-3.5 [&_.demo-placement-preview]:size-3.5 [&_.demo-distribution-preview]:h-3.5 [&_.demo-distribution-preview]:w-5",
+            "[&_svg]:size-3 [&_.playground-option-icon]:size-3.5 [&_.playground-placement-preview]:size-3.5 [&_.playground-distribution-preview]:h-3.5 [&_.playground-distribution-preview]:w-5",
           )}
           id={id}
           size="sm"
@@ -104,7 +108,7 @@ export function SelectSetting(props: SelectSettingProps) {
           <SelectValue />
         </SelectTrigger>
         <SelectContent
-          className="demo-select-popup p-[3px]"
+          className="playground-select-popup p-[3px]"
           align="end"
           alignItemWithTrigger={false}
         >
@@ -133,7 +137,7 @@ export function ToggleSetting(props: ToggleSettingProps) {
     <Field
       orientation="horizontal"
       className={cn(
-        "demo-toggle",
+        "playground-toggle",
         fieldRow,
         "cursor-pointer select-none grid-cols-[minmax(0,1fr)_auto]",
       )}
@@ -162,7 +166,7 @@ export function RangeSetting(props: RangeSettingProps) {
     setInputId(input?.id)
   }, [])
   return (
-    <Field orientation="horizontal" className={cn("demo-range", fieldRow)}>
+    <Field orientation="horizontal" className={cn("playground-range", fieldRow)}>
       <SettingLabel {...props} id={inputId ?? id} />
       <Slider
         className="px-1"
@@ -186,7 +190,7 @@ export function ColorSetting(props: ColorSettingProps) {
   return (
     <Field
       orientation="horizontal"
-      className={cn("demo-color", fieldRow, "grid-cols-[minmax(0,1fr)_auto]")}
+      className={cn("playground-color", fieldRow, "grid-cols-[minmax(0,1fr)_auto]")}
     >
       <SettingLabel {...props} id={id} />
       <Input
@@ -203,7 +207,7 @@ export function ColorSetting(props: ColorSettingProps) {
 
 export function TimeInput({ value, onValueChange }: TimeInputProps) {
   return (
-    <Field className={cn("demo-time", fieldRow)}>
+    <Field className={cn("playground-time", fieldRow)}>
       <Input
         className={cn(fieldControl, "col-start-2 select-text")}
         type="time"
@@ -222,14 +226,14 @@ export function InspectorTabs({ value, onValueChange, sections }: InspectorTabsP
       <Tabs
         value={value}
         onValueChange={(next) => onValueChange(String(next))}
-        className={cn("demo-inspector-tabs", inspectorTabs)}
+        className={cn("playground-inspector-tabs", inspectorTabs)}
       >
-        <div className={cn("demo-inspector-heading", inspectorHeading)}>
+        <div className={cn("playground-inspector-heading", inspectorHeading)}>
           <h2 className="m-0 shrink-0 text-xs/normal font-semibold">Inspector</h2>
           <TabsList
             variant="line"
             activateOnFocus
-            className={cn("demo-state-tabs", inspectorTabList)}
+            className={cn("playground-state-tabs", inspectorTabList)}
             aria-label="Inspector sections"
           >
             {sections.map((section) => (
@@ -244,15 +248,15 @@ export function InspectorTabs({ value, onValueChange, sections }: InspectorTabsP
             key={section.value}
             value={section.value}
             keepMounted
-            className={cn("demo-inspector-body", inspectorBody)}
+            className={cn("playground-inspector-body", inspectorBody)}
             data-inspector-section={section.value}
           >
             <ScrollSurface
-              className="demo-inspector-scroll flex-1"
+              className="playground-inspector-scroll flex-1"
               contentClassName={cn(
-                "demo-inspector-content",
+                "playground-inspector-content",
                 inspectorContent,
-                section.value === "bars" && "flex flex-col [&>.demo-toggle]:shrink-0",
+                section.value === "bars" && "flex flex-col [&>.playground-toggle]:shrink-0",
                 section.value === "states" && "flex h-full",
               )}
             >
@@ -268,7 +272,7 @@ export function InspectorTabs({ value, onValueChange, sections }: InspectorTabsP
 export function IconHint({ label, children }: IconHintProps) {
   return (
     <Tooltip>
-      <TooltipTrigger className={cn("demo-corner-icon", cornerIcon)} aria-label={label}>
+      <TooltipTrigger className={cn("playground-corner-icon", cornerIcon)} aria-label={label}>
         {children}
         <span className="sr-only">{label}</span>
       </TooltipTrigger>
@@ -284,7 +288,7 @@ export function PinOverlay({ pinned, onPinnedChange }: PinOverlayProps) {
         render={
           <Toggle
             size="sm"
-            className={cn("demo-overlay-pin", iconToggle)}
+            className={cn("playground-overlay-pin", iconToggle)}
             aria-label="Pin overlay"
             pressed={pinned}
             onPressedChange={onPinnedChange}
@@ -311,10 +315,10 @@ export function InspectorToggle({ open, onOpenChange, buttonRef }: InspectorTogg
             <Toggle
               ref={buttonRef}
               size="sm"
-              className={cn("demo-inspector-toggle", iconToggle)}
+              className={cn("playground-inspector-toggle", iconToggle)}
               aria-label="Inspector"
               aria-expanded={open}
-              aria-controls="demo-state-panel"
+              aria-controls="playground-state-panel"
               pressed={open}
               onPressedChange={onOpenChange}
               onKeyDown={(event) => {

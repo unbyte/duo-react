@@ -13,51 +13,51 @@ body {
   select {
     font: inherit;
   }
-  .demo :is(button, input, select, summary):focus-visible {
+  .playground :is(button, input, select, summary):focus-visible {
     outline: 2px solid #2873df;
     outline-offset: 2px;
   }
-  .demo summary:focus-visible {
+  .playground summary:focus-visible {
     outline-offset: -3px;
   }
 }
 
-:where(.demo, .demo *, .demo-select-popup) {
+:where(.playground, .playground *, .playground-select-popup) {
   scrollbar-width: none;
 }
-:where(.demo, .demo *, .demo-select-popup)::-webkit-scrollbar {
+:where(.playground, .playground *, .playground-select-popup)::-webkit-scrollbar {
   display: none;
 }
 
 /* Duo supplies the device surfaces, mask shapes, and preview controls. */
 .duo-display[data-duo-color-mode="dark"] {
-  --demo-scrollbar-thumb: #596779;
-  --demo-scrollbar-thumb-hover: #8191a6;
+  --playground-scrollbar-thumb: #596779;
+  --playground-scrollbar-thumb-hover: #8191a6;
 }
-.demo-frame .duo-display {
+.playground-frame .duo-display {
   cursor: auto;
 }
-.demo-frame > .duo-frame,
-.demo-frame .duo-region-shapes {
+.playground-frame > .duo-frame,
+.playground-frame .duo-region-shapes {
   touch-action: none;
 }
-.demo-frame .duo-region-shapes {
+.playground-frame .duo-region-shapes {
   transition: opacity 160ms ease;
 }
-.demo-frame
+.playground-frame
   .duo-region-mask[data-overlay-pinned="false"][data-inspecting="false"]
   .duo-region-shapes {
   opacity: 0;
 }
-.demo-frame
+.playground-frame
   .duo-region-mask[data-overlay-pinned="false"][data-inspecting="false"]
   .duo-region-fill {
   pointer-events: none;
 }
-.demo-frame .duo-region-fill {
+.playground-frame .duo-region-fill {
   transition: fill-opacity 160ms ease;
 }
-.demo-preview-controls button {
+.playground-preview-controls button {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -74,40 +74,40 @@ body {
     background-color 120ms ease,
     color 120ms ease;
 }
-.demo-preview-controls button:hover:not(:disabled) {
+.playground-preview-controls button:hover:not(:disabled) {
   background: #edf1f6;
 }
-.demo-preview-controls button[aria-pressed="true"] {
+.playground-preview-controls button[aria-pressed="true"] {
   background: #e7f1ff;
   color: #0879ed;
 }
-.demo-preview-controls button[aria-pressed="true"]:hover {
+.playground-preview-controls button[aria-pressed="true"]:hover {
   background: #dcecff;
 }
-.demo-preview-controls button:active:not(:disabled) {
+.playground-preview-controls button:active:not(:disabled) {
   background: #dce4ef;
 }
-.demo-preview-controls button:focus-visible {
+.playground-preview-controls button:focus-visible {
   outline: 2px solid #0879ed;
   outline-offset: 2px;
 }
-.demo-preview-controls button:disabled {
+.playground-preview-controls button:disabled {
   color: #9da6b2;
   cursor: default;
 }
-.demo-preview-controls svg {
+.playground-preview-controls svg {
   display: block;
   width: 18px;
   height: 18px;
 }
-.demo-frame .duo-display[data-duo-placement="full"] {
-  background: var(--demo-background);
+.playground-frame .duo-display[data-duo-placement="full"] {
+  background: var(--playground-background);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .demo-frame .duo-region-shapes,
-  .demo-frame .duo-region-fill,
-  .demo-preview-controls button {
+  .playground-frame .duo-region-shapes,
+  .playground-frame .duo-region-fill,
+  .playground-preview-controls button {
     transition: none;
   }
 }

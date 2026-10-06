@@ -11,7 +11,7 @@ type Gesture =
   | { kind: "pinch"; center: Point; distance: number; scale: number; offset: Point }
 
 const origin = { x: 0, y: 0 }
-const overlaySelector = ".demo-preview-controls, .demo-region-labels"
+const overlaySelector = ".playground-preview-controls, .playground-region-labels"
 
 function pinchPoints(points: Map<number, Point>) {
   const [first, second] = [...points.values()]
@@ -43,10 +43,10 @@ export function PreviewCanvas({
 
   React.useLayoutEffect(() => {
     const node = canvas.current
-    const controls = node?.querySelector(".demo-preview-controls")
-    const page = node?.closest(".demo")
-    const sidebar = page?.querySelector(".demo-sidebar")
-    const inspector = page?.querySelector(".demo-inspector-dock")
+    const controls = node?.querySelector(".playground-preview-controls")
+    const page = node?.closest(".playground")
+    const sidebar = page?.querySelector(".playground-sidebar")
+    const inspector = page?.querySelector(".playground-inspector-dock")
     if (!node || !controls || !sidebar || !inspector) return
     const measure = () => {
       const bounds = node.getBoundingClientRect()
@@ -208,7 +208,7 @@ export function PreviewCanvas({
   return (
     <div
       ref={canvas}
-      className="demo-canvas absolute inset-0 isolate cursor-grab data-[panning=true]:cursor-grabbing data-[panning=true]:select-none"
+      className="playground-canvas absolute inset-0 isolate cursor-grab data-[panning=true]:cursor-grabbing data-[panning=true]:select-none"
       data-panning={panning}
       onPointerDownCapture={start}
       onPointerMoveCapture={move}

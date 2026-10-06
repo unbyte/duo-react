@@ -11,9 +11,9 @@ export function LevelLabel({
   children: React.ReactNode
 }) {
   return (
-    <span className="demo-option-label inline-flex min-w-0 items-center gap-1.5">
+    <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
       <span
-        className="demo-level-meter inline-flex h-3 flex-[0_0_14px] items-end gap-0.5"
+        className="playground-level-meter inline-flex h-3 flex-[0_0_14px] items-end gap-0.5"
         aria-hidden="true"
       >
         {Array.from({ length: maximum }, (_, index) => (
@@ -25,7 +25,7 @@ export function LevelLabel({
           />
         ))}
       </span>
-      <span className="demo-option-number text-[11px] font-semibold tabular-nums text-[#2165c5]">
+      <span className="playground-option-number text-[11px] font-semibold tabular-nums text-[#2165c5]">
         {level}
       </span>
       <span>{children}</span>
@@ -35,11 +35,11 @@ export function LevelLabel({
 
 export function CountLabel({ count, unit = "bar" }: { count: number; unit?: "bar" | "tab" }) {
   return (
-    <span className="demo-option-label inline-flex min-w-0 items-center gap-1.5">
-      <span className="demo-option-number text-[11px] font-semibold tabular-nums text-[#2165c5]">
+    <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
+      <span className="playground-option-number text-[11px] font-semibold tabular-nums text-[#2165c5]">
         {count}
       </span>
-      <span className="demo-option-description text-muted-foreground">
+      <span className="playground-option-description text-muted-foreground">
         {count === 0 ? "None" : count === 1 ? unit : `${unit}s`}
       </span>
     </span>
@@ -54,9 +54,9 @@ export function ChoiceLabel({
   children: React.ReactNode
 }) {
   return (
-    <span className="demo-option-label inline-flex min-w-0 items-center gap-1.5">
+    <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
       <Icon
-        className="demo-option-icon size-3.5 text-muted-foreground"
+        className="playground-option-icon size-3.5 text-muted-foreground"
         size={14}
         strokeWidth={1.5}
         aria-hidden="true"
@@ -74,9 +74,9 @@ export function PlacementLabel({
   children: React.ReactNode
 }) {
   return (
-    <span className="demo-option-label inline-flex min-w-0 items-center gap-1.5">
+    <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
       <svg
-        className="demo-placement-preview size-3.5 shrink-0 text-[#9ba6b5]"
+        className="playground-placement-preview size-3.5 shrink-0 text-[#9ba6b5]"
         width="14"
         height="16"
         viewBox="0 0 14 16"
@@ -89,7 +89,7 @@ export function PlacementLabel({
           width={placement === "bottom" ? 8 : 4}
           height="3"
           rx="1"
-          className="demo-placement-bar fill-primary"
+          className="playground-placement-bar fill-primary"
         />
       </svg>
       <span>{children}</span>
@@ -105,12 +105,12 @@ export function DistributionLabel({
   children: React.ReactNode
 }) {
   return (
-    <span className="demo-option-label inline-flex min-w-0 items-center gap-1.5">
+    <span className="playground-option-label inline-flex min-w-0 items-center gap-1.5">
       <svg
         width="20"
         height="14"
         viewBox="0 0 20 14"
-        className="demo-distribution-preview size-5 h-3.5 shrink-0 text-primary"
+        className="playground-distribution-preview size-5 h-3.5 shrink-0 text-primary"
         aria-hidden="true"
       >
         {(distribution === "packed" ? [6, 10, 14] : [2, 10, 18]).map((x) => (

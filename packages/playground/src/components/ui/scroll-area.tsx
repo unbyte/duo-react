@@ -58,7 +58,7 @@ function ScrollBar({
       <ScrollAreaPrimitive.Thumb
         data-slot="scroll-area-thumb"
         className={cn(
-          "relative rounded-full bg-[var(--demo-scrollbar-thumb,#b8c3d1)] hover:bg-[var(--demo-scrollbar-thumb-hover,#8798ad)]",
+          "relative rounded-full bg-[var(--playground-scrollbar-thumb,#b8c3d1)] hover:bg-[var(--playground-scrollbar-thumb-hover,#8798ad)]",
           orientation === "vertical" ? "w-full" : "h-full",
         )}
       />

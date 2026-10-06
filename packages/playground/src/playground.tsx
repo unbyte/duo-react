@@ -49,7 +49,7 @@ import {
   InspectorToggle,
   ScrollSurface,
   PreviewControls,
-} from "./demo-ui"
+} from "./playground-ui"
 import "./ui.css"
 import { DraggableBlock } from "./draggable-block"
 import { StateInspector } from "./state-inspector"
@@ -171,7 +171,7 @@ function SystemControls() {
   )
   const { setSystem } = useDuoActions()
   return (
-    <div className="demo-controls grid gap-1" role="group" aria-label="System settings">
+    <div className="playground-controls grid gap-1" role="group" aria-label="System settings">
       <SelectSetting
         icon={SunMoon}
         label="Appearance"
@@ -247,8 +247,8 @@ function ExampleApp({
   selectedTab: string
 }) {
   return (
-    <DuoSafeArea className="demo-app relative h-full overflow-auto text-base text-[color:var(--demo-color)] bg-[var(--demo-background)]">
-      <div className="demo-content relative p-6">
+    <DuoSafeArea className="playground-app relative h-full overflow-auto text-base text-[color:var(--playground-color)] bg-[var(--playground-background)]">
+      <div className="playground-content relative p-6">
         <h2 className="m-0 text-xl">{tabItems.find((item) => item.id === selectedTab)?.label}</h2>
       </div>
       <DraggableBlock visible={showBlock} color={blockColor} />
@@ -289,7 +289,7 @@ function TabBarControls({
   onChange: (settings: BarSettings) => void
 }) {
   return (
-    <div className="demo-controls grid gap-1" role="group" aria-label="Tab bar settings">
+    <div className="playground-controls grid gap-1" role="group" aria-label="Tab bar settings">
       <SelectSetting
         icon={IconNumber}
         label="Count"
@@ -344,7 +344,7 @@ function ToolbarControls({
     })
   }
   return (
-    <div className="demo-controls grid gap-1" role="group" aria-label="Toolbar settings">
+    <div className="playground-controls grid gap-1" role="group" aria-label="Toolbar settings">
       <SelectSetting
         icon={IconNumber}
         label="Count"
@@ -358,7 +358,7 @@ function ToolbarControls({
         onValueChange={(value) => onChange({ ...settings, toolbarCount: Number(value) })}
       />
       {settings.toolbarCount > 0 && (
-        <div className="demo-toolbar-settings grid gap-2.5 mt-0.5 mb-1">
+        <div className="playground-toolbar-settings grid gap-2.5 mt-0.5 mb-1">
           {settings.toolbars.slice(0, settings.toolbarCount).map((bar) => (
             <fieldset
               key={bar.id}
@@ -435,7 +435,7 @@ function ExampleBars({
 
   return (
     <div
-      className="demo-bars-layer pointer-events-none absolute inset-0"
+      className="playground-bars-layer pointer-events-none absolute inset-0"
       data-show-bounds={showBounds}
     >
       {bars.toolbars.map((bar) => (
@@ -443,12 +443,12 @@ function ExampleBars({
           key={bar.id}
           data-show-bounds={showBounds}
           {...bar.containerProps}
-          className="demo-bar-area pointer-events-none data-[show-bounds=true]:outline data-[show-bounds=true]:outline-dashed data-[show-bounds=true]:outline-[#0879ed] data-[show-bounds=true]:outline-offset-[-1px] data-[show-bounds=true]:bg-[#0879ed0d]"
-          data-demo-bar={bar.id}
+          className="playground-bar-area pointer-events-none data-[show-bounds=true]:outline data-[show-bounds=true]:outline-dashed data-[show-bounds=true]:outline-[#0879ed] data-[show-bounds=true]:outline-offset-[-1px] data-[show-bounds=true]:bg-[#0879ed0d]"
+          data-playground-bar={bar.id}
         >
           <div
             className={cn(
-              "demo-app-bar pointer-events-auto box-border flex min-h-0 min-w-0 max-h-full max-w-full gap-1 overflow-auto rounded-[28px] bg-[#f0f3f8] p-0.5 text-foreground [flex-direction:inherit]",
+              "playground-app-bar pointer-events-auto box-border flex min-h-0 min-w-0 max-h-full max-w-full gap-1 overflow-auto rounded-[28px] bg-[#f0f3f8] p-0.5 text-foreground [flex-direction:inherit]",
               colorMode === "dark" && "bg-[#2c2c2e] text-[#f4f4f4]",
             )}
           >
@@ -473,9 +473,9 @@ function ExampleBars({
           items={items}
           selectedId={selectedId}
           onSelect={onSelect}
-          className="demo-bar-area pointer-events-none data-[show-bounds=true]:outline data-[show-bounds=true]:outline-dashed data-[show-bounds=true]:outline-[#0879ed] data-[show-bounds=true]:outline-offset-[-1px] data-[show-bounds=true]:bg-[#0879ed0d]"
+          className="playground-bar-area pointer-events-none data-[show-bounds=true]:outline data-[show-bounds=true]:outline-dashed data-[show-bounds=true]:outline-[#0879ed] data-[show-bounds=true]:outline-offset-[-1px] data-[show-bounds=true]:bg-[#0879ed0d]"
           data-show-bounds={showBounds}
-          data-demo-bar="tabs"
+          data-playground-bar="tabs"
         />
       )}
     </div>
@@ -485,7 +485,7 @@ function ExampleBars({
 function ControlSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <details
-      className="demo-section group/section border-b border-border select-none last:border-b-0"
+      className="playground-section group/section border-b border-border select-none last:border-b-0"
       open
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs/normal font-medium [&::-webkit-details-marker]:hidden">
@@ -497,7 +497,7 @@ function ControlSection({ title, children }: { title: string; children: React.Re
           aria-hidden="true"
         />
       </summary>
-      <div className="demo-section-content grid gap-1.5 px-3 pb-1.5">{children}</div>
+      <div className="playground-section-content grid gap-1.5 px-3 pb-1.5">{children}</div>
     </details>
   )
 }
@@ -532,11 +532,11 @@ function PreviewFrame({
   const background = backgrounds[colorMode]
   return (
     <div
-      className="demo-frame absolute inset-0"
+      className="playground-frame absolute inset-0"
       style={
         {
-          "--demo-background": background,
-          "--demo-color": foregroundColor(background),
+          "--playground-background": background,
+          "--playground-color": foregroundColor(background),
         } as React.CSSProperties
       }
     >
@@ -545,7 +545,7 @@ function PreviewFrame({
   )
 }
 
-export function Demo() {
+export function Playground() {
   const [selectedTab, setSelectedTab] = React.useState("home")
   const [backgrounds, setBackgrounds] = React.useState({ light: "#ffffff", dark: "#111111" })
   const [regionsPinned, setRegionsPinned] = React.useState(false)
@@ -594,28 +594,32 @@ export function Demo() {
       outerPortraitLocked={outerPortraitLocked}
     >
       <div
-        className="demo group/demo relative isolate h-dvh overflow-hidden [--demo-sidebar-width:272px] [--demo-inspector-width:min(320px,42vw)] [--demo-sidebar-space:var(--demo-sidebar-width)] [--demo-inspector-space:0px] [--demo-bottom-space:0px] data-[inspector-open=true]:[--demo-inspector-space:var(--demo-inspector-width)] max-[1200px]:[--demo-sidebar-width:248px] max-[960px]:[--demo-sidebar-width:224px] max-sm:[--demo-sidebar-space:0px] max-sm:[--demo-inspector-space:0px] max-sm:data-[inspector-open=true]:[--demo-inspector-space:0px] max-sm:[--demo-bottom-space:35dvh]"
+        className="playground group/playground relative isolate h-dvh overflow-hidden [--playground-sidebar-width:272px] [--playground-inspector-width:min(320px,42vw)] [--playground-sidebar-space:var(--playground-sidebar-width)] [--playground-inspector-space:0px] [--playground-bottom-space:0px] data-[inspector-open=true]:[--playground-inspector-space:var(--playground-inspector-width)] max-[1200px]:[--playground-sidebar-width:248px] max-[960px]:[--playground-sidebar-width:224px] max-sm:[--playground-sidebar-space:0px] max-sm:[--playground-inspector-space:0px] max-sm:data-[inspector-open=true]:[--playground-inspector-space:0px] max-sm:[--playground-bottom-space:35dvh]"
         data-inspector-open={inspectorOpen}
       >
-        <div className="demo-workspace relative h-full">
+        <div className="playground-workspace relative h-full">
           <aside
-            className="demo-sidebar @container absolute inset-y-0 left-0 z-10 box-border flex w-(--demo-sidebar-width) min-h-0 min-w-0 flex-col border-r border-border bg-white/90 backdrop-blur-[20px] backdrop-saturate-[125%] max-sm:inset-x-0 max-sm:top-auto max-sm:h-(--demo-bottom-space) max-sm:w-full max-sm:border-r-0 max-sm:border-t max-sm:group-data-[inspector-open=true]/demo:bg-transparent max-sm:group-data-[inspector-open=true]/demo:backdrop-filter-none"
-            aria-label="Demo settings"
+            className="playground-sidebar @container absolute inset-y-0 left-0 z-10 box-border flex w-(--playground-sidebar-width) min-h-0 min-w-0 flex-col border-r border-border bg-white/90 backdrop-blur-[20px] backdrop-saturate-[125%] max-sm:inset-x-0 max-sm:top-auto max-sm:h-(--playground-bottom-space) max-sm:w-full max-sm:border-r-0 max-sm:border-t max-sm:group-data-[inspector-open=true]/playground:bg-transparent max-sm:group-data-[inspector-open=true]/playground:backdrop-filter-none"
+            aria-label="Playground settings"
           >
-            <div className="demo-sidebar-heading box-border flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border px-3 max-sm:group-data-[inspector-open=true]/demo:bg-white/90 max-sm:group-data-[inspector-open=true]/demo:backdrop-blur-[20px] max-sm:group-data-[inspector-open=true]/demo:backdrop-saturate-[125%]">
-              <h1 className="demo-title m-0 text-[13px] font-semibold">Duo React</h1>
+            <div className="playground-sidebar-heading box-border flex h-11 shrink-0 items-center justify-between gap-2 border-b border-border px-3 max-sm:group-data-[inspector-open=true]/playground:bg-white/90 max-sm:group-data-[inspector-open=true]/playground:backdrop-blur-[20px] max-sm:group-data-[inspector-open=true]/playground:backdrop-saturate-[125%]">
+              <h1 className="playground-title m-0 text-[13px] font-semibold">Duo React</h1>
               <InspectorToggle
                 buttonRef={inspectorToggle}
                 open={inspectorOpen}
                 onOpenChange={(open) => (open ? setInspectorOpen(true) : closeInspector())}
               />
             </div>
-            <ScrollSurface className="demo-sidebar-scroll min-h-0 flex-1 max-sm:group-data-[inspector-open=true]/demo:invisible">
+            <ScrollSurface className="playground-sidebar-scroll min-h-0 flex-1 max-sm:group-data-[inspector-open=true]/playground:invisible">
               <ControlSection title="System">
                 <SystemControls />
               </ControlSection>
               <ControlSection title="App">
-                <div className="demo-controls grid gap-1" role="group" aria-label="App settings">
+                <div
+                  className="playground-controls grid gap-1"
+                  role="group"
+                  aria-label="App settings"
+                >
                   <BackgroundPicker
                     backgrounds={backgrounds}
                     onChange={(mode, color) =>
@@ -655,7 +659,7 @@ export function Demo() {
             </ScrollSurface>
           </aside>
           <main
-            className="demo-preview absolute inset-0 overflow-hidden"
+            className="playground-preview absolute inset-0 overflow-hidden"
             aria-label="Device preview"
           >
             <PreviewCanvas onFitPaddingChange={updateFitPadding}>
