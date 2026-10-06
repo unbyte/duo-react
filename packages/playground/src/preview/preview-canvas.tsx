@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useDuoActions, useDuoState, type DuoInsets } from "duo-frame"
+import { useDuoActions, useDuoState, type DuoInsets } from "duo-react"
 
 interface Point {
   x: number
@@ -71,7 +71,7 @@ export function PreviewCanvas({
   const moveTo = React.useCallback((next: Point) => {
     offset.current = next
     // Translate only the device so its viewport and the canvas overlays stay fixed.
-    const rotation = canvas.current?.querySelector<HTMLElement>(".duo-rotation")
+    const rotation = canvas.current?.querySelector<HTMLElement>(".duo-react-rotation")
     if (rotation) rotation.style.translate = `${next.x}px ${next.y}px`
   }, [])
 
@@ -84,8 +84,8 @@ export function PreviewCanvas({
   }, [scale])
 
   const zoomOffset = React.useCallback(() => {
-    const frame = canvas.current?.querySelector(".duo-frame")?.getBoundingClientRect()
-    const rotation = canvas.current?.querySelector(".duo-rotation")?.getBoundingClientRect()
+    const frame = canvas.current?.querySelector(".duo-react-frame")?.getBoundingClientRect()
+    const rotation = canvas.current?.querySelector(".duo-react-rotation")?.getBoundingClientRect()
     return frame && rotation
       ? { x: rotation.x - frame.x - frame.width / 2, y: rotation.y - frame.y - frame.height / 2 }
       : offset.current
@@ -93,7 +93,7 @@ export function PreviewCanvas({
 
   const zoomAt = React.useCallback(
     (scale: number, start: Point, end: Point, startScale: number, pan: Point) => {
-      const frame = canvas.current?.querySelector(".duo-frame")?.getBoundingClientRect()
+      const frame = canvas.current?.querySelector(".duo-react-frame")?.getBoundingClientRect()
       if (!frame || !Number.isFinite(scale) || scale <= 0) return
       const center = { x: frame.left + frame.width / 2, y: frame.top + frame.height / 2 }
       const ratio = scale / startScale
@@ -128,7 +128,7 @@ export function PreviewCanvas({
     if (pointers.current.size === 0) suppressClick.current = false
     const target = event.target as Element
     if (event.button !== 0 || target.closest(overlaySelector)) return
-    const empty = !target.closest(".duo-display, .duo-hardware, .duo-region-fill")
+    const empty = !target.closest(".duo-react-display, .duo-react-hardware, .duo-react-region-fill")
     if (event.pointerType !== "touch" && (!empty || pointers.current.size > 0)) return
     const point = { x: event.clientX, y: event.clientY }
     pointers.current.set(event.pointerId, { ...point, canPan: empty })
@@ -224,8 +224,8 @@ export function PreviewCanvas({
           suppressClick.current = false
         } else {
           const action = (event.target as Element)
-            .closest("[data-duo-action]")
-            ?.getAttribute("data-duo-action")
+            .closest("[data-duo-react-action]")
+            ?.getAttribute("data-duo-react-action")
           if (action === "fit") moveTo(origin)
           else if (fitting && (action === "zoom-in" || action === "zoom-out")) moveTo(zoomOffset())
         }

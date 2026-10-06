@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Battery, BatteryCharging, Clock, Signal, SunMoon, Sun, Moon, Wifi } from "lucide-react"
-import { useDuoActions, useDuoState, type DuoColorMode } from "duo-frame"
+import { useDuoActions, useDuoState, type DuoColorMode } from "duo-react"
 import { SelectSetting, ToggleSetting, RangeSetting, TimeInput } from "../components/setting-fields"
 import { LevelLabel, ChoiceLabel } from "./option-labels"
 

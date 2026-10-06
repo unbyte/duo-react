@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useDuoScreen } from "duo-frame"
+import { useDuoScreen } from "duo-react"
 
 const initialPosition = { x: 0.6, y: 0.55 }
 const initialSize = { width: 144, height: 144 }

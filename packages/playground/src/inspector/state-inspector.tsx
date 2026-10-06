@@ -18,7 +18,7 @@ import {
   type DuoRect,
   type DuoRegion,
   type DuoScreenInfo,
-} from "duo-frame"
+} from "duo-react"
 import { InspectorTabs } from "./inspector-tabs"
 import { IconHint, PinOverlay } from "./inspector-controls"
 import { ToggleSetting } from "../components/setting-fields"

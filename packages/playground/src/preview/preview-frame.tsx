@@ -1,5 +1,5 @@
 import type * as React from "react"
-import { useDuoState, type DuoColorMode } from "duo-frame"
+import { useDuoState, type DuoColorMode } from "duo-react"
 
 function foregroundColor(background: string) {
   const channels = background

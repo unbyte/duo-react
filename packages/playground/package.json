@@ -1,5 +1,5 @@
 {
-  "name": "@duo-frame/playground",
+  "name": "@duo-react/playground",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,7 +15,7 @@
     "@tabler/icons-react": "^3.48.0",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
-    "duo-frame": "workspace:*",
+    "duo-react": "workspace:*",
     "lucide-react": "1.49.0",
     "motion": "^14.0.0",
     "react": "^19.3.0",

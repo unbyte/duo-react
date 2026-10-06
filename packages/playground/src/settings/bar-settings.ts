@@ -1,4 +1,4 @@
-import type { BarsLayoutRequest, TabBarLayoutRequest, ToolbarLayoutRequest } from "duo-frame"
+import type { BarsLayoutRequest, TabBarLayoutRequest, ToolbarLayoutRequest } from "duo-react"
 
 export interface BarSettings {
   readonly tabbarCount: number

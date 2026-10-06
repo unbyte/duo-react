@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "build": "vp run duo-react#build",
-    "dev": "vp run build && vp run @duo-frame/playground#dev",
+    "dev": "vp run build && vp run @duo-react/playground#dev",
     "test": "vp test",
-    "check": "vp run build && vp check && vp run @duo-frame/playground#check:types",
+    "check": "vp run build && vp check && vp run @duo-react/playground#check:types",
     "watch": "vp run duo-react#watch",
-    "build:playground": "vp run build && vp run @duo-frame/playground#build",
-    "preview:playground": "vp run @duo-frame/playground#preview",
-    "deploy:playground": "vp run build:playground && vp run @duo-frame/playground#deploy"
+    "build:playground": "vp run build && vp run @duo-react/playground#build",
+    "preview:playground": "vp run @duo-react/playground#preview",
+    "deploy:playground": "vp run build:playground && vp run @duo-react/playground#deploy"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

@@ -6,7 +6,7 @@ import {
   DuoZoomControls,
   useDuoActions,
   useDuoState,
-} from "duo-frame"
+} from "duo-react"
 
 const previewControls =
   "pointer-events-none absolute left-(--playground-sidebar-space) right-(--playground-inspector-space) bottom-[calc(var(--playground-bottom-space)+max(16px,env(safe-area-inset-bottom)))] z-2 flex flex-wrap justify-center gap-1.5 bg-transparent px-2 py-1 transition-[left,right] duration-220 ease-[ease] motion-reduce:transition-none"
@@ -21,7 +21,7 @@ function PlacementControls() {
       role="group"
       aria-label="Inner layout"
       aria-hidden={state.posture === "closed"}
-      data-duo-control-group="layout"
+      data-duo-react-control-group="layout"
       className={`playground-control-group ${previewControlGroup}`}
     >
       {(["left", "full", "right"] as const).map((placement) => (
@@ -33,7 +33,7 @@ function PlacementControls() {
               ? "Full width"
               : `${placement === "left" ? "Left" : "Right"} layout`
           }
-          data-duo-action={`layout-${placement}`}
+          data-duo-react-action={`layout-${placement}`}
           aria-pressed={state.innerPlacement === placement}
           disabled={
             state.posture === "closed" ||

@@ -8,7 +8,7 @@ import {
   useDuoState,
   type BarsLayout,
   type BarsLayoutRequest,
-} from "duo-frame"
+} from "duo-react"
 import { DraggableBlock } from "./draggable-block"
 
 export const tabItems = [

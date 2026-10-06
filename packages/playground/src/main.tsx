@@ -1,7 +1,7 @@
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import "./styles/theme.css"
-import "duo-frame/style.css"
+import "duo-react/style.css"
 import "./styles/app.css"
 import { App } from "./app"
 

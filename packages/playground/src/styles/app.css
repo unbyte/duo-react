@@ -30,31 +30,31 @@ body {
 }
 
 /* Duo supplies the device surfaces, mask shapes, and preview controls. */
-.duo-display[data-duo-color-mode="dark"] {
+.duo-react-display[data-duo-react-color-mode="dark"] {
   --playground-scrollbar-thumb: #596779;
   --playground-scrollbar-thumb-hover: #8191a6;
 }
-.playground-frame .duo-display {
+.playground-frame .duo-react-display {
   cursor: auto;
 }
-.playground-frame > .duo-frame,
-.playground-frame .duo-region-shapes {
+.playground-frame > .duo-react-frame,
+.playground-frame .duo-react-region-shapes {
   touch-action: none;
 }
-.playground-frame .duo-region-shapes {
+.playground-frame .duo-react-region-shapes {
   transition: opacity 160ms ease;
 }
 .playground-frame
-  .duo-region-mask[data-overlay-pinned="false"][data-inspecting="false"]
-  .duo-region-shapes {
+  .duo-react-region-mask[data-overlay-pinned="false"][data-duo-react-inspecting="false"]
+  .duo-react-region-shapes {
   opacity: 0;
 }
 .playground-frame
-  .duo-region-mask[data-overlay-pinned="false"][data-inspecting="false"]
-  .duo-region-fill {
+  .duo-react-region-mask[data-overlay-pinned="false"][data-duo-react-inspecting="false"]
+  .duo-react-region-fill {
   pointer-events: none;
 }
-.playground-frame .duo-region-fill {
+.playground-frame .duo-react-region-fill {
   transition: fill-opacity 160ms ease;
 }
 .playground-preview-controls button {
@@ -100,13 +100,13 @@ body {
   width: 18px;
   height: 18px;
 }
-.playground-frame .duo-display[data-duo-placement="full"] {
+.playground-frame .duo-react-display[data-duo-react-placement="full"] {
   background: var(--playground-background);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .playground-frame .duo-region-shapes,
-  .playground-frame .duo-region-fill,
+  .playground-frame .duo-react-region-shapes,
+  .playground-frame .duo-react-region-fill,
   .playground-preview-controls button {
     transition: none;
   }

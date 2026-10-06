@@ -1,5 +1,5 @@
 import * as React from "react"
-import { DuoFrame, DuoRegionMask, DuoProvider, type BarsLayout, type DuoInsets } from "duo-frame"
+import { DuoFrame, DuoRegionMask, DuoProvider, type BarsLayout, type DuoInsets } from "duo-react"
 import { SettingsPanel } from "./settings/settings-panel"
 import { initialBarSettings, barRequest, type BarSettings } from "./settings/bar-settings"
 import { StateInspector } from "./inspector/state-inspector"

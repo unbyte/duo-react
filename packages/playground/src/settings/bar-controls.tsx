@@ -1,6 +1,6 @@
 import { AlignHorizontalDistributeCenter } from "lucide-react"
 import { IconNumber, IconBoxAlignTopLeft, IconAxisX } from "@tabler/icons-react"
-import type { ToolbarLayoutRequest } from "duo-frame"
+import type { ToolbarLayoutRequest } from "duo-react"
 import { SelectSetting } from "../components/setting-fields"
 import { CountLabel, PlacementLabel, DistributionLabel } from "./option-labels"
 import type { BarSettings } from "./bar-settings"

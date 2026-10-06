@@ -1,6 +1,6 @@
 import { Contrast, PanelTop, PaintBucket, LockKeyhole, Square } from "lucide-react"
 import { IconColorSwatch } from "@tabler/icons-react"
-import { useDuoActions, useDuoState, type DuoIndicatorStyle, type DuoColorMode } from "duo-frame"
+import { useDuoActions, useDuoState, type DuoIndicatorStyle, type DuoColorMode } from "duo-react"
 import { SelectSetting, ToggleSetting, ColorSetting } from "../components/setting-fields"
 
 export interface AppSettingsProps {

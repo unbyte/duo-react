@@ -39,7 +39,7 @@ their runtime dependencies, peer contracts, and package-specific build inputs.
 `vp run` orchestrates workspace scripts; `vp check` handles formatting, lint,
 and type checks in one pass using each package's TypeScript configuration.
 The library pins React 16.8.6 for its test baseline and supports React 16.8
-through 19. The private `@duo-frame/playground` package uses React 19 and matching
+through 19. The private `@duo-react/playground` package uses React 19 and matching
 React DOM and types. Vite deduplicates React imports so the playground and library
 share the playground's React instance. The Cloudflare Vite plugin builds the playground's
 static assets and generates its deployment configuration in `packages/playground/dist/`.
@@ -87,13 +87,13 @@ From the workspace root:
 ```sh
 pnpm build:playground
 pnpm preview:playground
-pnpm --filter @duo-frame/playground exec wrangler deploy --dry-run
+pnpm --filter @duo-react/playground exec wrangler deploy --dry-run
 ```
 
 Authenticate with your Cloudflare account and deploy:
 
 ```sh
-pnpm --filter @duo-frame/playground exec wrangler login
+pnpm --filter @duo-react/playground exec wrangler login
 pnpm deploy:playground
 ```
 
@@ -103,7 +103,7 @@ under **Settings → Domains & Routes → Add → Custom Domain** in Cloudflare.
 This requires `make.ci` to be an active zone in the deploying Cloudflare account;
 Cloudflare manages the DNS record and TLS certificate. For Workers Builds, use the repository
 root as the build directory, `pnpm build:playground` as the build command, and
-`pnpm --filter @duo-frame/playground deploy` as the deploy command.
+`pnpm --filter @duo-react/playground deploy` as the deploy command.
 
 ## Code style and diagnostics
 
