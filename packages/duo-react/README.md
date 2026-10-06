@@ -1,8 +1,8 @@
 # Duo React
 
-React components for previewing apps on iPhone Duo. Wrap your app in a device
-frame, switch displays and orientations, and try full-screen or split layouts
-without losing component state.
+React components for previewing web apps in iPhone Duo device layouts. Wrap your
+app in a device frame, switch displays and orientations, and try full-screen or
+split layouts without losing component state.
 
 [Playground](https://duo.make.ci/) ·
 [Usage guide](docs/usage.md) ·
@@ -121,11 +121,16 @@ container supports responsive layouts. Ordinary viewport units and media queries
 still refer to the host page. Embed an iframe when the content needs its own
 viewport; React context and safe-area properties do not cross the iframe boundary.
 
-The device frame is a 2D preview with simulated system UI. Partially open mode
-exposes fold regions for layout testing. Your app arranges its content around
+Your app runs in the host browser's JavaScript and rendering environment. Duo React
+provides a 2D device frame, layout geometry, and system UI visuals. Partially open
+mode exposes fold regions for layout testing. Your app arranges its content around
 reserved regions and leaves room for overlaid bars.
 
 Glass effects and automatic indicator contrast sample the app's content.
 Cross-origin iframes and external resources can limit those effects; explicit
 indicator colors are available in the
 [system appearance guide](docs/usage.md#system-appearance).
+
+## License
+
+[MIT](LICENSE)

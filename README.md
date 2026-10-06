@@ -1,7 +1,7 @@
 # Duo React
 
-Preview React apps and web pages on iPhone Duo. Switch between the inner and outer
-displays, rotate the device, and explore full-screen or split layouts.
+Preview React apps and web pages in iPhone Duo device layouts. Switch between the
+inner and outer displays, rotate the frame, and explore full-screen or split layouts.
 
 [Try the playground](https://duo.make.ci/) ·
 [Get started](packages/duo-react/README.md) ·
@@ -30,7 +30,12 @@ preview controls. The [usage guide](packages/duo-react/docs/usage.md) covers
 responsive layouts, iframes, navigation, appearance, zoom, and region inspection.
 
 Duo React is preparing for its first public release; the package is currently
-private in this workspace. It renders a 2D device preview with simulated system UI.
-Partially open mode exposes fold regions for layout testing. Content continues to
-run in the browser, and ordinary media queries follow the host page; use container
-queries or an iframe when your app needs to respond to the preview's dimensions.
+private in this workspace. It provides a 2D device frame, layout geometry, and system
+UI visuals. Your app runs in the host browser's JavaScript and rendering environment.
+Partially open mode exposes fold regions for layout testing. Ordinary media queries
+follow the host page; use container queries or an iframe when your app needs to
+respond to the preview's dimensions.
+
+## License
+
+[MIT](LICENSE)

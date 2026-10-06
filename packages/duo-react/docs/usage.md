@@ -1,7 +1,7 @@
 # Duo React usage guide
 
-Configure previews, adapt your app to the active display, and add navigation and
-system UI. Start with the [installation and quick start](../README.md) to mount
+Configure device previews, adapt your web app to the active layout, and add
+navigation and system UI visuals. Start with the [installation and quick start](../README.md) to mount
 `DuoProvider` and `DuoFrame` and load the stylesheet.
 
 - [Preview controls](#preview-controls)
@@ -123,7 +123,7 @@ supported layout, or portrait if started upside down.
 
 ### Embedding an existing page
 
-Use an iframe when the app needs its own viewport, media queries, and native
+Use an iframe when the app needs its own viewport, media queries, and browser
 resize events:
 
 ```tsx
@@ -168,8 +168,8 @@ Use `defaultSystem` to choose the initial appearance and displayed status:
 Change settings later with `useDuoActions().setSystem()` from an event handler
 or effect. Partial updates preserve other settings.
 
-The simulated color mode is independent of the host page. It sets default
-display colors and the color scheme for native controls and the tab bar. Read
+The preview's color mode is independent of the host page. It sets default
+display colors and the color scheme for browser form controls and the tab bar. Read
 it with `useDuoState((state) => state.system.colorMode)` to choose your app's
 palette. Your explicit app colors remain under your control; media queries in
 the host document still follow the host's preference.
