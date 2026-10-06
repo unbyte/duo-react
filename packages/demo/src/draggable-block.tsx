@@ -95,7 +95,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
   return (
     <svg
       ref={svg}
-      className="demo-block-layer"
+      className="demo-block-layer pointer-events-none absolute inset-0 size-full select-none"
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       onPointerMove={(event) => {
@@ -120,7 +120,7 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
       onLostPointerCapture={() => (drag.current = undefined)}
     >
       <rect
-        className="demo-color-block"
+        className="demo-color-block pointer-events-auto touch-none cursor-grab active:cursor-grabbing focus:outline-none"
         fill={color}
         x={x}
         y={y}
@@ -135,11 +135,16 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
       >
         <title>Drag to move. Arrow keys move; Shift moves precisely; Home resets.</title>
       </rect>
-      <text x={x + blockWidth / 2} y={y + blockHeight / 2} aria-hidden="true">
+      <text
+        className="fill-white text-base font-semibold [text-anchor:middle] [dominant-baseline:central]"
+        x={x + blockWidth / 2}
+        y={y + blockHeight / 2}
+        aria-hidden="true"
+      >
         Drag me
       </text>
       <g
-        className="demo-block-resize"
+        className="demo-block-resize pointer-events-auto touch-none cursor-nwse-resize focus:outline-none [&:focus-visible>rect]:fill-black/20 [&:focus-visible>rect]:stroke-white"
         transform={`translate(${x + blockWidth - 28} ${y + blockHeight - 28})`}
         role="button"
         tabIndex={0}
@@ -148,8 +153,11 @@ export function DraggableBlock({ visible, color }: { visible: boolean; color: st
         onKeyDown={(event) => keyDown(event, "resize")}
       >
         <title>Drag to resize. Arrow keys resize; Shift adjusts precisely; Home resets.</title>
-        <rect width={28} height={28} rx={8} />
-        <path d="M9 21 21 9 M15 21 21 15" />
+        <rect className="fill-transparent" width={28} height={28} rx={8} />
+        <path
+          className="pointer-events-none fill-none stroke-white stroke-2 [stroke-linecap:round]"
+          d="M9 21 21 9 M15 21 21 15"
+        />
       </g>
     </svg>
   )

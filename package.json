@@ -4,13 +4,11 @@
   "type": "module",
   "scripts": {
     "build": "vp run duo-frame#build",
-    "dev": "vp run dev@19",
-    "dev@16": "vp run build && vp run @duo-frame/demo#dev@16",
-    "dev@19": "vp run build && vp run @duo-frame/demo#dev@19",
+    "dev": "vp run build && vp run @duo-frame/demo#dev",
     "test": "vp test",
     "check": "vp run build && vp check && vp run @duo-frame/demo#check:types",
-    "build:demos": "vp run build && vp run @duo-frame/demo#build",
-    "watch": "vp run duo-frame#watch"
+    "watch": "vp run duo-frame#watch",
+    "build:demo": "vp run build && vp run @duo-frame/demo#build"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",

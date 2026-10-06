@@ -1,0 +1,59 @@
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@source "./";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--muted);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--muted);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: #dc2626;
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--primary);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 6px;
+}
+
+:root {
+  --background: #fff;
+  --foreground: #25313e;
+  --popover: #fff;
+  --primary: #2873df;
+  --primary-foreground: #fff;
+  --muted: #f1f4f8;
+  --muted-foreground: #677587;
+  --border: #e3e7ed;
+  --input: #dce2ea;
+  --radius: 6px;
+}
+
+/* Keep Tailwind's reset inside the controls, so device geometry stays unchanged. */
+@layer base {
+  [data-slot],
+  [data-slot] * {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+  }
+  [data-slot="input"],
+  [data-slot="select-trigger"],
+  [data-slot="button"] {
+    font: inherit;
+  }
+}
