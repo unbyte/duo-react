@@ -35,6 +35,48 @@ test("vertical expansion retains the resting axis and fits its reserved clearanc
   }
 })
 
+test("an upward drag keeps its destination when the vertical bar expands before release", () => {
+  const layout = new TabLayout(true, 3)
+  for (const scale of [0.5, 1, 2]) {
+    const start = { top: 100, height: layout.rest.length * scale } as DOMRect
+    let value = layout.rest.first + layout.rest.pitch
+    value += layout.movement(start, 0, -32 * scale, layout.rest)
+    expect(Math.round((value - layout.rest.first) / layout.rest.pitch)).toBe(0)
+
+    for (const reveal of [0.25, 0.5, 1]) {
+      const geometry = layout.geometry(reveal, 1, 0)
+      const bounds = {
+        top: start.top - (geometry.length - layout.rest.length) * scale,
+        height: geometry.length * scale,
+      } as DOMRect
+      value += layout.movement(bounds, 0, 0, geometry)
+      expect(Math.round((value - layout.rest.first) / layout.rest.pitch)).toBe(0)
+    }
+  }
+})
+
+test("drag travel follows the current tab spacing at each expansion and zoom", () => {
+  for (const vertical of [false, true]) {
+    const layout = new TabLayout(vertical, 3)
+    for (const reveal of [0, 0.5, 1]) {
+      const geometry = layout.geometry(reveal, 1, 0)
+      for (const scale of [0.5, 1, 2]) {
+        const bounds = {
+          width: (vertical ? geometry.cross : geometry.length) * scale,
+          height: (vertical ? geometry.length : geometry.cross) * scale,
+        } as DOMRect
+        for (const direction of [-1, 1]) {
+          const travel = direction * geometry.pitch * scale
+          expect(
+            layout.movement(bounds, vertical ? 0 : travel, vertical ? travel : 0, geometry),
+          ).toBeCloseTo(direction * layout.rest.pitch)
+        }
+        expect(layout.movement(bounds, vertical ? 10 : 0, vertical ? 0 : 10, geometry)).toBe(0)
+      }
+    }
+  }
+})
+
 test("toolbar and status reservations clear the expanded vertical tab silhouette", () => {
   const store = new DuoStore()
   for (const screen of Object.values(store.getSnapshot().screens)) {

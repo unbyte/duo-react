@@ -82,8 +82,9 @@ export function GlassTabs({
   const suppressClick = React.useRef(false)
   const gesture = React.useRef<{
     pointerId: number
-    start: number
-    anchor: number
+    x: number
+    y: number
+    value: number
     dragged: boolean
     started: number
   }>()
@@ -233,6 +234,18 @@ export function GlassTabs({
   function bounded(value: number) {
     return clamp(value, rest.first, rest.first + rest.pitch * (items.length - 1))
   }
+  function dragPosition(event: React.PointerEvent<HTMLDivElement>) {
+    const active = gesture.current!
+    return (
+      active.value +
+      layout.movement(
+        event.currentTarget.getBoundingClientRect(),
+        event.clientX - active.x,
+        event.clientY - active.y,
+        geometry,
+      )
+    )
+  }
   function pulse() {
     clearTimeout(shrinkTimer.current)
     setExpanded(true)
@@ -245,8 +258,9 @@ export function GlassTabs({
     const index = Math.round((bounded(point) - rest.first) / rest.pitch)
     gesture.current = {
       pointerId: event.pointerId,
-      start: point,
-      anchor: rest.first + index * rest.pitch,
+      x: event.clientX,
+      y: event.clientY,
+      value: rest.first + index * rest.pitch,
       dragged: false,
       started: event.timeStamp,
     }
@@ -259,18 +273,21 @@ export function GlassTabs({
   function move(event: React.PointerEvent<HTMLDivElement>) {
     const active = gesture.current
     if (!active || active.pointerId !== event.pointerId) return
-    const delta = local(event) - active.start
-    if (!active.dragged && Math.abs(delta) <= 3) return
+    const value = dragPosition(event)
+    if (!active.dragged && Math.abs(value - active.value) <= 3) return
     active.dragged = true
+    active.x = event.clientX
+    active.y = event.clientY
+    active.value = value
     clearTimeout(holdTimer.current)
     setDetailed(vertical)
-    const value = active.anchor + delta
     const excess = value - bounded(value)
     setTarget(bounded(value) + (excess * 0.35) / (1 + (Math.abs(excess) * 0.35) / 12))
   }
   function end(event: React.PointerEvent<HTMLDivElement>, cancel = false) {
     const active = gesture.current
     if (!active || active.pointerId !== event.pointerId) return
+    const value = !cancel && active.dragged ? dragPosition(event) : active.value
     gesture.current = undefined
     clearTimeout(holdTimer.current)
     setDetailed(false)
@@ -283,7 +300,6 @@ export function GlassTabs({
       )
     suppressClick.current = true
     if (!cancel) {
-      const value = active.anchor + (active.dragged ? local(event) - active.start : 0)
       const index = Math.round((bounded(value) - rest.first) / rest.pitch)
       onSelect(items[index].id)
       root.current

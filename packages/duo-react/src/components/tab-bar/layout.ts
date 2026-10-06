@@ -79,6 +79,12 @@ export class TabLayout {
     return rest.first + ((position - geometry.first) / geometry.pitch) * rest.pitch
   }
 
+  movement(bounds: DOMRect, dx: number, dy: number, geometry: GlassGeometry) {
+    if (!this.vertical) return (dx * this.rest.length) / bounds.width
+    // Expansion moves the surface under the pointer; only pointer travel is a drag.
+    return (dy * geometry.length * this.rest.pitch) / (bounds.height * geometry.pitch)
+  }
+
   size(geometry: GlassGeometry): CSSProperties {
     return this.vertical
       ? {
