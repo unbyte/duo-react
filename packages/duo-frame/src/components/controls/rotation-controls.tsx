@@ -1,7 +1,6 @@
 import * as React from "react"
-import { RotateCcwSquare, RotateCwSquare } from "lucide-react"
-import { iconProps } from "./icons"
 import { useDuoActions } from "../../context/hooks"
+import { RotateLeftIcon, RotateRightIcon } from "./icons"
 import { IconButton } from "./icon-button"
 import type { DuoControlGroupProps } from "./types"
 
@@ -17,10 +16,10 @@ export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGr
         ref={ref}
       >
         <IconButton label="Rotate left" action="rotate-left" onClick={() => rotate("left")}>
-          <RotateCcwSquare {...iconProps} />
+          <RotateLeftIcon />
         </IconButton>
         <IconButton label="Rotate right" action="rotate-right" onClick={() => rotate("right")}>
-          <RotateCwSquare {...iconProps} />
+          <RotateRightIcon />
         </IconButton>
       </div>
     )

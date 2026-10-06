@@ -1,7 +1,6 @@
 import * as React from "react"
-import { Maximize, ZoomIn, ZoomOut } from "lucide-react"
-import { iconProps } from "./icons"
 import { useDuoActions, useDuoState } from "../../context/hooks"
+import { FitIcon, ZoomInIcon, ZoomOutIcon } from "./icons"
 import { IconButton } from "./icon-button"
 import type { DuoControlGroupProps } from "./types"
 
@@ -14,10 +13,10 @@ export const DuoZoomControls = React.forwardRef<HTMLDivElement, DuoControlGroupP
     return (
       <div role="group" aria-label="Zoom" data-duo-control-group="zoom" {...props} ref={ref}>
         <IconButton label="Zoom out" action="zoom-out" disabled={!canZoom} onClick={zoomOut}>
-          <ZoomOut {...iconProps} />
+          <ZoomOutIcon />
         </IconButton>
         <IconButton label="Zoom in" action="zoom-in" disabled={!canZoom} onClick={zoomIn}>
-          <ZoomIn {...iconProps} />
+          <ZoomInIcon />
         </IconButton>
         <IconButton
           label="Fit to view"
@@ -26,7 +25,7 @@ export const DuoZoomControls = React.forwardRef<HTMLDivElement, DuoControlGroupP
           disabled={state.zoomReadOnly}
           onClick={() => setZoom("fit")}
         >
-          <Maximize {...iconProps} />
+          <FitIcon />
         </IconButton>
       </div>
     )
