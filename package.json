@@ -10,7 +10,7 @@
     "watch": "vp run duo-react#watch",
     "build:playground": "vp run build && vp run @duo-react/playground#build",
     "preview:playground": "vp run @duo-react/playground#preview",
-    "deploy:playground": "vp run build:playground && vp run @duo-react/playground#deploy"
+    "deploy:playground": "vp run @duo-react/playground#deploy"
   },
   "devDependencies": {
     "@types/node": "^26.1.1",
