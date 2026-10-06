@@ -330,8 +330,10 @@ display CSS pixels, and updates when the provider's geometry changes.
 
 Highlighting is controlled by `highlightedRegionId`. The optional
 `onHighlightedRegionChange` callback reports the ID under the pointer, or
-`undefined` when it leaves. Share this state with your own list to link
-interactions in either direction:
+`undefined` when it leaves. The mask observes hover over the frame without
+blocking clicks, scrolling, or dragging in your app. Omit the callback to disable
+hover tracking while still controlling the highlight from your own UI.
+Share this state with your own list to link interactions in either direction:
 
 ```tsx
 import * as React from "react"

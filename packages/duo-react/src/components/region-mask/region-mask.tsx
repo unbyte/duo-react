@@ -49,6 +49,10 @@ export function DuoRegionMask({
     (state) => state.screens[state.posture === 'closed' ? 'outer' : 'inner'],
   )
   const regions = useDuoRegions()
+  const sortedRegions = React.useMemo(
+    () => [...regions].sort((a, b) => b.width * b.height - a.width * a.height),
+    [regions],
+  )
   const [layout, setLayout] = React.useState<{
     transform: DOMMatrix
     frame: DuoRect
@@ -93,6 +97,53 @@ export function DuoRegionMask({
     }
   }, [frameRef, screen])
 
+  useBrowserLayoutEffect(() => {
+    const frame = frameRef.current
+    const svg = root.current?.querySelector('svg')
+    if (!frame || !svg || !layout || !onHighlightedRegionChange) return
+    const frameBoundary = svg.querySelector<SVGRectElement>(`[id="${id}-frame"] rect`)!
+    const displayBoundary = svg.querySelector<SVGPathElement>(`[id="${id}-display"] path`)!
+    const windowBoundary = svg.querySelector<SVGPathElement>(`[id="${id}-window"] path`)!
+    let hoveredRegionId = highlightedRegionId
+    const highlight = (regionId: string | undefined) => {
+      if (hoveredRegionId === regionId) return
+      hoveredRegionId = regionId
+      onHighlightedRegionChange(regionId)
+    }
+    const leave = () => highlight(undefined)
+    const move = (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return
+      const matrix = svg.getScreenCTM()
+      if (!matrix) return leave()
+      const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse())
+      const local = point.matrixTransform(layout.transform.inverse())
+      if (!frameBoundary.isPointInFill(point) || !displayBoundary.isPointInFill(local))
+        return leave()
+      const insideWindow = windowBoundary.isPointInFill(local)
+      // Match SVG paint order and clipping without intercepting the app's pointer events.
+      for (let index = sortedRegions.length - 1; index >= 0; index--) {
+        const region = sortedRegions[index]
+        if (
+          (region.scope === 'display' || insideWindow) &&
+          local.x >= region.x &&
+          local.x <= region.x + region.width &&
+          local.y >= region.y &&
+          local.y <= region.y + region.height
+        )
+          return highlight(region.id)
+      }
+      leave()
+    }
+    frame.addEventListener('pointermove', move, { capture: true, passive: true })
+    frame.addEventListener('pointerleave', leave)
+    frame.addEventListener('pointercancel', leave)
+    return () => {
+      frame.removeEventListener('pointermove', move, true)
+      frame.removeEventListener('pointerleave', leave)
+      frame.removeEventListener('pointercancel', leave)
+    }
+  }, [frameRef, id, layout, sortedRegions, highlightedRegionId, onHighlightedRegionChange])
+
   const inspecting = regions.some((region) => region.id === highlightedRegionId)
   return (
     <div
@@ -120,25 +171,21 @@ export function DuoRegionMask({
           <g clipPath={`url(#${id}-frame)`}>
             <g transform={layout.transform.toString()}>
               <g clipPath={`url(#${id}-display)`}>
-                {[...regions]
-                  .sort((a, b) => b.width * b.height - a.width * a.height)
-                  .map((region) => (
-                    <g key={region.id} clipPath={`url(#${id}-${region.scope})`}>
-                      <rect
-                        className="duo-react-region-fill"
-                        data-duo-react-region={region.id}
-                        data-duo-react-kind={region.kind}
-                        data-duo-react-highlighted={highlightedRegionId === region.id}
-                        x={region.x}
-                        y={region.y}
-                        width={region.width}
-                        height={region.height}
-                        vectorEffect="non-scaling-stroke"
-                        onMouseEnter={() => onHighlightedRegionChange?.(region.id)}
-                        onMouseLeave={() => onHighlightedRegionChange?.(undefined)}
-                      />
-                    </g>
-                  ))}
+                {sortedRegions.map((region) => (
+                  <g key={region.id} clipPath={`url(#${id}-${region.scope})`}>
+                    <rect
+                      className="duo-react-region-fill"
+                      data-duo-react-region={region.id}
+                      data-duo-react-kind={region.kind}
+                      data-duo-react-highlighted={highlightedRegionId === region.id}
+                      x={region.x}
+                      y={region.y}
+                      width={region.width}
+                      height={region.height}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </g>
+                ))}
               </g>
             </g>
           </g>

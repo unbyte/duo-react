@@ -364,7 +364,7 @@
   fill: currentColor;
   fill-opacity: 0.12;
   stroke: none;
-  pointer-events: auto;
+  pointer-events: none;
 }
 .duo-react-region-mask[data-duo-react-inspecting="true"]
   .duo-react-region-fill[data-duo-react-highlighted="false"] {

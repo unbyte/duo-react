@@ -108,7 +108,7 @@ export function App() {
                   frameRef={frame}
                   theme="light"
                   highlightedRegionId={highlightedRegionId}
-                  onHighlightedRegionChange={setHighlightedRegionId}
+                  onHighlightedRegionChange={regionsPinned ? setHighlightedRegionId : undefined}
                   data-overlay-pinned={regionsPinned}
                 />
               </PreviewFrame>
@@ -120,7 +120,10 @@ export function App() {
             request={request}
             layout={barsLayout}
             regionsPinned={regionsPinned}
-            onRegionsPinnedChange={setRegionsPinned}
+            onRegionsPinnedChange={(pinned) => {
+              setRegionsPinned(pinned)
+              setHighlightedRegionId(undefined)
+            }}
             showBarBounds={showBarBounds}
             onShowBarBoundsChange={setShowBarBounds}
             highlightedRegionId={highlightedRegionId}

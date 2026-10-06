@@ -49,11 +49,6 @@ body {
   .duo-react-region-shapes {
   opacity: 0;
 }
-.playground-frame
-  .duo-react-region-mask[data-overlay-pinned="false"][data-duo-react-inspecting="false"]
-  .duo-react-region-fill {
-  pointer-events: none;
-}
 .playground-frame .duo-react-region-fill {
   transition: fill-opacity 160ms ease;
 }
