@@ -39,7 +39,7 @@ export function Hardware({
   const buttons = inner ? innerButtons : outerButtons
   return (
     <div
-      className="duo-hardware"
+      className="duo-react-hardware"
       aria-hidden="true"
       style={{
         width: inner ? 951 : 466,
@@ -49,23 +49,23 @@ export function Hardware({
     >
       {!inner && (
         <>
-          <span className="duo-hinge-spine" />
-          <span className="duo-outer-body" />
-          <span className="duo-outer-glass" />
+          <span className="duo-react-hinge-spine" />
+          <span className="duo-react-outer-body" />
+          <span className="duo-react-outer-glass" />
         </>
       )}
       {buttons.map(({ name, x, y, width, height }) => (
         <span
           key={name}
-          className="duo-hardware-button"
-          data-duo-hardware={name}
+          className="duo-react-hardware-button"
+          data-duo-react-hardware={name}
           style={{ left: x, top: y, width, height }}
         />
       ))}
       {inner && (
         <>
-          <span className="duo-hinge-cap duo-hinge-cap-top" />
-          <span className="duo-hinge-cap duo-hinge-cap-bottom" />
+          <span className="duo-react-hinge-cap duo-react-hinge-cap-top" />
+          <span className="duo-react-hinge-cap duo-react-hinge-cap-bottom" />
         </>
       )}
     </div>

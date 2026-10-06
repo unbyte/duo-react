@@ -13,7 +13,7 @@ export async function makeArtwork(
   const context = canvas.getContext("2d")!
   context.scale(ratio, ratio)
   await document.fonts?.ready
-  const icons = element.querySelectorAll<HTMLElement>(".duo-tab-bar-icon")
+  const icons = element.querySelectorAll<HTMLElement>(".duo-react-tab-bar-icon")
   await Promise.all(
     Array.from(icons).map(async (icon, index) => {
       // Arbitrary React icons remain usable through the DOM presentation. Only

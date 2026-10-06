@@ -44,7 +44,7 @@ export function DuoRegionMask({
   ...props
 }: DuoRegionMaskProps) {
   const root = React.useRef<HTMLDivElement>(null)
-  const [id] = React.useState(() => `duo-region-mask-${nextMaskId++}`)
+  const [id] = React.useState(() => `duo-react-region-mask-${nextMaskId++}`)
   const screen = useDuoState(
     (state) => state.screens[state.posture === "closed" ? "outer" : "inner"],
   )
@@ -57,8 +57,8 @@ export function DuoRegionMask({
   useBrowserLayoutEffect(() => {
     const container = root.current
     const frame = frameRef.current
-    const display = frame?.querySelector(`[data-duo-display="${screen.display}"]`)
-    const rotation = frame?.querySelector(".duo-rotation")
+    const display = frame?.querySelector(`[data-duo-react-display="${screen.display}"]`)
+    const rotation = frame?.querySelector(".duo-react-rotation")
     if (!container || !frame || !display || !rotation) return
     let pending = 0
     const measure = () => {
@@ -100,12 +100,12 @@ export function DuoRegionMask({
       aria-label="Layout regions"
       {...props}
       ref={root}
-      className={["duo-region-mask", className].filter(Boolean).join(" ")}
-      data-theme={theme}
-      data-inspecting={inspecting}
+      className={["duo-react-region-mask", className].filter(Boolean).join(" ")}
+      data-duo-react-theme={theme}
+      data-duo-react-inspecting={inspecting}
     >
       {layout && (
-        <svg className="duo-region-shapes" aria-hidden="true">
+        <svg className="duo-react-region-shapes" aria-hidden="true">
           <defs>
             <clipPath id={`${id}-frame`}>
               <rect {...layout.frame} />
@@ -125,10 +125,10 @@ export function DuoRegionMask({
                   .map((region) => (
                     <g key={region.id} clipPath={`url(#${id}-${region.scope})`}>
                       <rect
-                        className="duo-region-fill"
-                        data-region={region.id}
-                        data-kind={region.kind}
-                        data-highlighted={highlightedRegionId === region.id}
+                        className="duo-react-region-fill"
+                        data-duo-react-region={region.id}
+                        data-duo-react-kind={region.kind}
+                        data-duo-react-highlighted={highlightedRegionId === region.id}
                         x={region.x}
                         y={region.y}
                         width={region.width}

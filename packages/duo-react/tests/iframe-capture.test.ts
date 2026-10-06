@@ -24,7 +24,7 @@ function fixture() {
   toPng.mockResolvedValue(image as HTMLImageElement)
   const plugin = iframeCapture
   const context = {
-    exclude: [".duo-system"],
+    exclude: [".duo-react-system"],
     excludeMode: "remove",
     fast: false,
     invalidate: true,
@@ -41,7 +41,7 @@ test("iframe capture preserves the live viewport and captures its scrolled conte
     scale: 1,
     dpr: 1,
     clip: { x: 12, y: 750, width: 466, height: 678 },
-    exclude: [".duo-system"],
+    exclude: [".duo-react-system"],
     excludeMode: "remove",
     fast: false,
     invalidate: true,

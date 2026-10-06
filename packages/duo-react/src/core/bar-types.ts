@@ -24,8 +24,8 @@ export type BarAxis = "horizontal" | "vertical"
 
 export interface BarContainerProps {
   readonly style: CSSProperties
-  readonly "data-duo-bar-placement": BarPlacement
-  readonly "data-duo-bar-axis": BarAxis
+  readonly "data-duo-react-bar-placement": BarPlacement
+  readonly "data-duo-react-bar-axis": BarAxis
 }
 
 export interface ResolvedBarLayout {

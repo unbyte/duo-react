@@ -69,7 +69,7 @@ export function DisplayIcon({ inner }: { inner: boolean }) {
         fill="currentColor"
         fillOpacity="0.14"
         stroke="none"
-        data-duo-icon-tone="secondary"
+        data-duo-react-icon-tone="secondary"
       />
       <path d={outline} />
       {inner ? (
@@ -93,7 +93,7 @@ export function LayoutIcon({ placement }: { placement: DuoPlacement }) {
         fill="currentColor"
         fillOpacity="0.14"
         stroke="none"
-        data-duo-icon-tone="secondary"
+        data-duo-react-icon-tone="secondary"
       />
       <rect x="3" y="4" width="18" height="16" rx="2" />
       {placement !== "full" && <path d="M12 4v16" />}
@@ -111,7 +111,7 @@ export function PartialFoldIcon() {
         fill="currentColor"
         fillOpacity="0.14"
         stroke="none"
-        data-duo-icon-tone="secondary"
+        data-duo-react-icon-tone="secondary"
       />
       <path d={outline} />
       <path d="M12 6v14" />

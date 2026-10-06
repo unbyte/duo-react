@@ -143,7 +143,7 @@ export function GlassTabs({
     }
     const request = requestAnimationFrame(load)
     const observer = new MutationObserver(load)
-    source.querySelectorAll(".duo-tab-bar-icon").forEach((icon) =>
+    source.querySelectorAll(".duo-react-tab-bar-icon").forEach((icon) =>
       observer.observe(icon, {
         subtree: true,
         childList: true,
@@ -288,7 +288,7 @@ export function GlassTabs({
   })
   return (
     <div
-      className="duo-tab-bar-slot"
+      className="duo-react-tab-bar-slot"
       style={{
         width: vertical ? rest.cross : rest.length,
         height: vertical ? rest.length : rest.cross,
@@ -296,12 +296,12 @@ export function GlassTabs({
     >
       <div
         ref={root}
-        className="duo-tab-bar-surface"
-        data-gl-ready={ready}
-        data-gl-artwork={ready && artworkReady}
-        data-expanded={expanded}
-        data-label-reveal={geometry.labels}
-        data-material-dark={dark}
+        className="duo-react-tab-bar-surface"
+        data-duo-react-gl-ready={ready}
+        data-duo-react-gl-artwork={ready && artworkReady}
+        data-duo-react-expanded={expanded}
+        data-duo-react-label-reveal={geometry.labels}
+        data-duo-react-material-dark={dark}
         style={layout.size(geometry)}
         onPointerDown={start}
         onPointerMove={move}
@@ -311,7 +311,7 @@ export function GlassTabs({
       >
         <canvas
           ref={canvas}
-          className="duo-tab-bar-glass"
+          className="duo-react-tab-bar-glass"
           aria-hidden="true"
           style={{ width: canvasSize.width, height: canvasSize.height }}
         />
@@ -319,7 +319,7 @@ export function GlassTabs({
           <button
             key={item.id}
             type="button"
-            className="duo-tab-bar-item"
+            className="duo-react-tab-bar-item"
             style={{
               ...layout.itemStyle(geometry, index),
               color: item.selectedColor ?? defaultAccent,
@@ -350,10 +350,10 @@ export function GlassTabs({
                 [next]?.focus({ preventScroll: true })
             }}
           >
-            <span className="duo-tab-bar-icon" aria-hidden="true">
+            <span className="duo-react-tab-bar-icon" aria-hidden="true">
               {item.icon}
             </span>
-            <span className="duo-tab-bar-label" style={{ opacity: geometry.labels }}>
+            <span className="duo-react-tab-bar-label" style={{ opacity: geometry.labels }}>
               {item.label}
             </span>
           </button>

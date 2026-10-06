@@ -36,13 +36,13 @@ export function SystemIndicator({
   )
   return (
     <span
-      className={`duo-indicator ${className}`}
-      data-duo-indicator-style={appearance}
-      data-duo-resolved-style={resolved}
+      className={`duo-react-indicator ${className}`}
+      data-duo-react-indicator-style={appearance}
+      data-duo-react-resolved-style={resolved}
       style={{ width, height, ...style }}
     >
-      <span className="duo-indicator-fixed">{children}</span>
-      {foreground && <span className="duo-indicator-foreground">{foreground}</span>}
+      <span className="duo-react-indicator-fixed">{children}</span>
+      {foreground && <span className="duo-react-indicator-foreground">{foreground}</span>}
     </span>
   )
 }

@@ -86,11 +86,11 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
     <div
       {...props}
       ref={root}
-      className={["duo-frame", className].filter(Boolean).join(" ")}
+      className={["duo-react-frame", className].filter(Boolean).join(" ")}
       style={style}
     >
       <div
-        className="duo-rotation"
+        className="duo-react-rotation"
         style={{
           transform: `rotate(${rotation}deg)`,
           left:

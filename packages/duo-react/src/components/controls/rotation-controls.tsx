@@ -11,7 +11,7 @@ export const DuoRotationControls = React.forwardRef<HTMLDivElement, DuoControlGr
       <div
         role="group"
         aria-label="Rotation"
-        data-duo-control-group="rotation"
+        data-duo-react-control-group="rotation"
         {...props}
         ref={ref}
       >

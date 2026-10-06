@@ -8,10 +8,10 @@ export const DuoSafeArea = React.forwardRef<HTMLDivElement, React.HTMLAttributes
         ref={ref}
         style={{
           boxSizing: "border-box",
-          paddingTop: "var(--duo-safe-area-inset-top, 0px)",
-          paddingRight: "var(--duo-safe-area-inset-right, 0px)",
-          paddingBottom: "var(--duo-safe-area-inset-bottom, 0px)",
-          paddingLeft: "var(--duo-safe-area-inset-left, 0px)",
+          paddingTop: "var(--duo-react-safe-area-inset-top, 0px)",
+          paddingRight: "var(--duo-react-safe-area-inset-right, 0px)",
+          paddingBottom: "var(--duo-react-safe-area-inset-bottom, 0px)",
+          paddingLeft: "var(--duo-react-safe-area-inset-left, 0px)",
           ...style,
         }}
       />

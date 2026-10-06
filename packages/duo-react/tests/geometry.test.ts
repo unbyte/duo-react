@@ -22,10 +22,10 @@ test("split windows preserve a common pixel density and local reserved-region co
     height: 37,
   })
   expect(safeAreaStyle(right.safeArea)).toEqual({
-    "--duo-safe-area-inset-top": "0px",
-    "--duo-safe-area-inset-right": "84px",
-    "--duo-safe-area-inset-bottom": "34px",
-    "--duo-safe-area-inset-left": "0px",
+    "--duo-react-safe-area-inset-top": "0px",
+    "--duo-react-safe-area-inset-right": "84px",
+    "--duo-react-safe-area-inset-bottom": "34px",
+    "--duo-react-safe-area-inset-left": "0px",
   })
 })
 

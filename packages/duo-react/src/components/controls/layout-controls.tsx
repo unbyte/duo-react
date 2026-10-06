@@ -13,7 +13,7 @@ export const DuoLayoutControls = React.forwardRef<HTMLDivElement, DuoControlGrou
       <div
         role="group"
         aria-label="Inner layout"
-        data-duo-control-group="layout"
+        data-duo-react-control-group="layout"
         {...props}
         ref={ref}
       >

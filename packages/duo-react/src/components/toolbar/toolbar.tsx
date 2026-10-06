@@ -16,17 +16,17 @@ export const DuoToolbar = React.forwardRef<HTMLDivElement, DuoToolbarProps>(func
   if (!host) return null
   return createPortal(
     <div
-      className="duo-accessory-layout"
-      data-duo-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
+      className="duo-react-accessory-layout"
+      data-duo-react-bar-axis={side === "horizontal" ? "horizontal" : "vertical"}
       style={bounds}
     >
-      <div className="duo-accessory-toolbar" style={{ marginRight: toolbarEndInset }}>
+      <div className="duo-react-accessory-toolbar" style={{ marginRight: toolbarEndInset }}>
         <div
           {...props}
           ref={ref}
-          className={["duo-toolbar", className].filter(Boolean).join(" ")}
-          data-duo-bar="toolbar"
-          data-duo-bar-placement={side === "horizontal" ? "top" : side}
+          className={["duo-react-toolbar", className].filter(Boolean).join(" ")}
+          data-duo-react-bar="toolbar"
+          data-duo-react-bar-placement={side === "horizontal" ? "top" : side}
         />
       </div>
     </div>,

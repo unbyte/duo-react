@@ -11,7 +11,7 @@ export const DuoControls = React.forwardRef<HTMLDivElement, DuoControlsProps>(fu
       aria-label="Device preview controls"
       {...props}
       ref={ref}
-      className={["duo-controls", className].filter(Boolean).join(" ")}
+      className={["duo-react-controls", className].filter(Boolean).join(" ")}
     />
   )
 })

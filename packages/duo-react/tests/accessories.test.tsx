@@ -101,7 +101,7 @@ test("helpers require a frame surface and server rendering defers portals", () =
       </DuoFrame>
     </DuoProvider>,
   )
-  expect(html.match(/data-duo-accessory-host=""/g)).toHaveLength(1)
+  expect(html.match(/data-duo-react-accessory-host=""/g)).toHaveLength(1)
   expect(html).not.toContain("Home")
 })
 

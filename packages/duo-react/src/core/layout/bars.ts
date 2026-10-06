@@ -41,8 +41,8 @@ function resolve(
     axis,
     rect,
     containerProps: {
-      "data-duo-bar-placement": placement,
-      "data-duo-bar-axis": axis,
+      "data-duo-react-bar-placement": placement,
+      "data-duo-react-bar-axis": axis,
       style: {
         position: "absolute",
         left: rect.x,

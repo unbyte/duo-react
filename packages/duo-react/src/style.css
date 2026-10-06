@@ -1,4 +1,4 @@
-.duo-frame {
+.duo-react-frame {
   position: relative;
   width: 100%;
   aspect-ratio: 1.45;
@@ -6,16 +6,16 @@
   overflow: hidden;
   isolation: isolate;
 }
-.duo-rotation {
+.duo-react-rotation {
   position: absolute;
   left: 50%;
   top: 50%;
   width: 0;
   height: 0;
 }
-.duo-display {
-  --duo-bezel-color: #151618;
-  --duo-rim-color: #515357;
+.duo-react-display {
+  --duo-react-bezel-color: #151618;
+  --duo-react-rim-color: #515357;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -23,31 +23,36 @@
   background: #fff;
   color: #17202a;
 }
-.duo-display[data-duo-color-mode="dark"] {
+.duo-react-display[data-duo-react-color-mode="dark"] {
   background: #111;
   color: #f4f4f4;
 }
-.duo-screen {
+.duo-react-screen {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: inherit;
   overflow: hidden;
 }
-.duo-hardware {
+.duo-react-hardware {
   position: absolute;
   left: 50%;
   top: 50%;
   pointer-events: none;
 }
-.duo-hinge-spine,
-.duo-hinge-cap {
+.duo-react-hinge-spine,
+.duo-react-hinge-cap {
   box-sizing: border-box;
   border: 1px solid #18191a;
-  background: linear-gradient(var(--duo-hinge-light-angle, 180deg), #64666a, #292b2d 35%, #35373a);
+  background: linear-gradient(
+    var(--duo-react-hinge-light-angle, 180deg),
+    #64666a,
+    #292b2d 35%,
+    #35373a
+  );
 }
-.duo-hinge-spine {
-  --duo-hinge-light-angle: 90deg;
+.duo-react-hinge-spine {
+  --duo-react-hinge-light-angle: 90deg;
   position: absolute;
   left: -24px;
   top: -6px;
@@ -58,29 +63,29 @@
     inset 0 2px #191a1b,
     inset 0 -2px #191a1b;
 }
-.duo-outer-body {
+.duo-react-outer-body {
   position: absolute;
   inset: -12px;
   border-radius: 3px 71px 71px 3px;
-  background: var(--duo-rim-color);
+  background: var(--duo-react-rim-color);
 }
-.duo-outer-glass {
+.duo-react-outer-glass {
   position: absolute;
   inset: -10px;
   border-radius: 18px 69px 69px 18px;
-  background: var(--duo-bezel-color);
+  background: var(--duo-react-bezel-color);
 }
-.duo-hardware-button {
+.duo-react-hardware-button {
   position: absolute;
   box-sizing: border-box;
   border: 1px solid #343639;
   border-radius: 3px;
   background: linear-gradient(#909296, #4b4d50 45%, #252729);
 }
-.duo-hardware-button[data-duo-hardware="side"] {
+.duo-react-hardware-button[data-duo-react-hardware="side"] {
   background: linear-gradient(90deg, #252729, #4b4d50 55%, #909296);
 }
-.duo-hinge-cap {
+.duo-react-hinge-cap {
   position: absolute;
   left: 50%;
   width: 62px;
@@ -91,41 +96,41 @@
     inset 2px 0 #191a1b,
     inset -2px 0 #191a1b;
 }
-.duo-hinge-cap-top {
+.duo-react-hinge-cap-top {
   top: -14px;
 }
-.duo-hinge-cap-bottom {
+.duo-react-hinge-cap-bottom {
   bottom: -14px;
   /* Keep centering outside the rotation so the cap stays on the hinge axis. */
   transform: translateX(-50%) rotate(180deg);
 }
-.duo-window {
+.duo-react-window {
   z-index: 0;
   position: absolute;
   overflow: hidden;
   container-type: size;
-  container-name: duo-screen;
+  container-name: duo-react-screen;
   color: inherit;
 }
-.duo-display[data-duo-placement="left"],
-.duo-display[data-duo-placement="right"] {
+.duo-react-display[data-duo-react-placement="left"],
+.duo-react-display[data-duo-react-placement="right"] {
   background: #000;
 }
-.duo-system {
+.duo-react-system {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
-.duo-camera-cutout {
+.duo-react-camera-cutout {
   position: absolute;
   border-radius: 50%;
   background: #000;
 }
-.duo-status-material {
+.duo-react-status-material {
   position: absolute;
   border-radius: 999px;
 }
-.duo-status {
+.duo-react-status {
   position: absolute;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 600;
@@ -133,67 +138,64 @@
   text-align: center;
   white-space: nowrap;
 }
-.duo-status > span {
-  flex-shrink: 0;
-}
-.duo-indicator {
+.duo-react-indicator {
   position: relative;
   display: block;
   color: #000;
 }
-.duo-indicator svg {
+.duo-react-indicator svg {
   display: block;
 }
-.duo-indicator-foreground {
+.duo-react-indicator-foreground {
   position: absolute;
   inset: 0;
 }
-[data-duo-resolved-style] {
+.duo-react-indicator[data-duo-react-resolved-style] {
   transition: color 120ms ease-in-out;
 }
-[data-duo-resolved-style="light"] {
+.duo-react-indicator[data-duo-react-resolved-style="light"] {
   color: #fff;
 }
-[data-duo-resolved-style="dark"] {
+.duo-react-indicator[data-duo-react-resolved-style="dark"] {
   color: #000;
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-duo-resolved-style] {
+  .duo-react-indicator[data-duo-react-resolved-style] {
     transition: none;
   }
 }
-.duo-home {
+.duo-react-home {
   position: absolute;
 }
-.duo-divider {
+.duo-react-divider {
   position: absolute;
   border-radius: 2px;
   background: #b3b3b3;
 }
 
-.duo-accessory-window {
+.duo-react-accessory-window {
   position: absolute;
   z-index: 1;
   overflow: hidden;
   pointer-events: none;
 }
-.duo-accessory-layout {
+.duo-react-accessory-layout {
   position: absolute;
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-height: 0;
 }
-.duo-accessory-toolbar {
+.duo-react-accessory-toolbar {
   display: flex;
   flex: 0 1 auto;
   min-height: 0;
   max-width: 100%;
 }
-.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-accessory-toolbar {
+.duo-react-accessory-layout[data-duo-react-bar-axis="horizontal"] .duo-react-accessory-toolbar {
   justify-content: flex-end;
 }
-:where(.duo-toolbar) {
+:where(.duo-react-toolbar) {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -203,51 +205,51 @@
   overflow: auto;
   pointer-events: auto;
 }
-:where(.duo-toolbar > *) {
+:where(.duo-react-toolbar > *) {
   flex-shrink: 0;
 }
-:where(.duo-accessory-layout[data-duo-bar-axis="vertical"] .duo-toolbar) {
+:where(.duo-react-accessory-layout[data-duo-react-bar-axis="vertical"] .duo-react-toolbar) {
   width: 100%;
 }
-:where(.duo-accessory-layout[data-duo-bar-axis="horizontal"] .duo-toolbar) {
+:where(.duo-react-accessory-layout[data-duo-react-bar-axis="horizontal"] .duo-react-toolbar) {
   flex-direction: row;
 }
 
-.duo-tab-bar {
+.duo-react-tab-bar {
   pointer-events: none;
 }
-.duo-tab-bar-slot {
+.duo-react-tab-bar-slot {
   position: relative;
   flex: none;
 }
-.duo-tab-bar-surface {
-  --duo-tab-foreground: #101910;
+.duo-react-tab-bar-surface {
+  --duo-react-tab-foreground: #101910;
   position: absolute;
   border-radius: 999px;
-  color: var(--duo-tab-foreground);
+  color: var(--duo-react-tab-foreground);
   pointer-events: auto;
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
-.duo-tab-bar-surface[data-material-dark="true"] {
-  --duo-tab-foreground: #f4f6ef;
+.duo-react-tab-bar-surface[data-duo-react-material-dark="true"] {
+  --duo-react-tab-foreground: #f4f6ef;
 }
-.duo-tab-bar-surface[data-gl-ready="true"] {
+.duo-react-tab-bar-surface[data-duo-react-gl-ready="true"] {
   background: transparent;
   box-shadow: none;
 }
-.duo-tab-bar-glass {
+.duo-react-tab-bar-glass {
   position: absolute;
   left: -24px;
   top: -24px;
   pointer-events: none;
   visibility: hidden;
 }
-[data-gl-ready="true"] > .duo-tab-bar-glass {
+.duo-react-tab-bar-surface[data-duo-react-gl-ready="true"] > .duo-react-tab-bar-glass {
   visibility: visible;
 }
-.duo-tab-bar-item {
+.duo-react-tab-bar-item {
   position: absolute;
   display: flex;
   flex-direction: column;
@@ -268,20 +270,20 @@
   cursor: pointer;
   touch-action: none;
 }
-[data-gl-ready="true"] > .duo-tab-bar-item {
+.duo-react-tab-bar-surface[data-duo-react-gl-ready="true"] > .duo-react-tab-bar-item {
   background: transparent;
 }
-[data-gl-artwork="true"] > .duo-tab-bar-item > span {
+.duo-react-tab-bar-surface[data-duo-react-gl-artwork="true"] > .duo-react-tab-bar-item > span {
   visibility: hidden;
 }
-.duo-tab-bar-item:focus-visible {
+.duo-react-tab-bar-item:focus-visible {
   outline: 2px solid #0088ff;
   outline-offset: -2px;
 }
-.duo-tab-bar-item:not([aria-current="page"]) > span {
-  color: var(--duo-tab-foreground);
+.duo-react-tab-bar-item:not([aria-current="page"]) > span {
+  color: var(--duo-react-tab-foreground);
 }
-.duo-tab-bar-icon {
+.duo-react-tab-bar-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -289,86 +291,87 @@
   height: 27px;
   flex: none;
 }
-.duo-tab-bar-icon > svg {
+.duo-react-tab-bar-icon > svg {
   width: 100%;
   height: 100%;
 }
-.duo-tab-bar-label {
+.duo-react-tab-bar-label {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.duo-tab-bar[data-duo-bar-axis="vertical"] .duo-tab-bar-label {
+.duo-react-tab-bar[data-duo-react-bar-axis="vertical"] .duo-react-tab-bar-label {
   position: absolute;
   top: calc(50% + 8px);
 }
 
-.duo-region-mask {
+.duo-react-region-mask {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
-.duo-region-mask [data-kind="safe-area"] {
-  --duo-region-light: #21834b;
-  --duo-region-dark: #6fdb9c;
+.duo-react-region-mask [data-duo-react-kind="safe-area"] {
+  --duo-react-region-light: #21834b;
+  --duo-react-region-dark: #6fdb9c;
 }
-.duo-region-mask [data-kind="top"] {
-  --duo-region-light: #966000;
-  --duo-region-dark: #f1bd68;
+.duo-react-region-mask [data-duo-react-kind="top"] {
+  --duo-react-region-light: #966000;
+  --duo-react-region-dark: #f1bd68;
 }
-.duo-region-mask [data-kind="right"] {
-  --duo-region-light: #2563cc;
-  --duo-region-dark: #87b5ff;
+.duo-react-region-mask [data-duo-react-kind="right"] {
+  --duo-react-region-light: #2563cc;
+  --duo-react-region-dark: #87b5ff;
 }
-.duo-region-mask [data-kind="bottom"] {
-  --duo-region-light: #a13dac;
-  --duo-region-dark: #e9a3f1;
+.duo-react-region-mask [data-duo-react-kind="bottom"] {
+  --duo-react-region-light: #a13dac;
+  --duo-react-region-dark: #e9a3f1;
 }
-.duo-region-mask [data-kind="left"] {
-  --duo-region-light: #00828b;
-  --duo-region-dark: #6adce4;
+.duo-react-region-mask [data-duo-react-kind="left"] {
+  --duo-react-region-light: #00828b;
+  --duo-react-region-dark: #6adce4;
 }
-.duo-region-mask [data-kind="occlusion"] {
-  --duo-region-light: #c53b33;
-  --duo-region-dark: #ff9d96;
+.duo-react-region-mask [data-duo-react-kind="occlusion"] {
+  --duo-react-region-light: #c53b33;
+  --duo-react-region-dark: #ff9d96;
 }
-.duo-region-mask [data-kind="division"] {
-  --duo-region-light: #8c6b17;
-  --duo-region-dark: #e8cc79;
+.duo-react-region-mask [data-duo-react-kind="division"] {
+  --duo-react-region-light: #8c6b17;
+  --duo-react-region-dark: #e8cc79;
 }
-.duo-region-mask [data-kind="gap"] {
-  --duo-region-light: #5b50b4;
-  --duo-region-dark: #b6adff;
+.duo-react-region-mask [data-duo-react-kind="gap"] {
+  --duo-react-region-light: #5b50b4;
+  --duo-react-region-dark: #b6adff;
 }
-.duo-region-mask [data-kind] {
-  --duo-region-color: var(--duo-region-light);
-  color: var(--duo-region-color);
+.duo-react-region-mask [data-duo-react-kind] {
+  --duo-react-region-color: var(--duo-react-region-light);
+  color: var(--duo-react-region-color);
 }
-.duo-region-mask[data-theme="dark"] [data-kind] {
-  --duo-region-color: var(--duo-region-dark);
+.duo-react-region-mask[data-duo-react-theme="dark"] [data-duo-react-kind] {
+  --duo-react-region-color: var(--duo-react-region-dark);
 }
 @media (prefers-color-scheme: dark) {
-  .duo-region-mask[data-theme="auto"] [data-kind] {
-    --duo-region-color: var(--duo-region-dark);
+  .duo-react-region-mask[data-duo-react-theme="auto"] [data-duo-react-kind] {
+    --duo-react-region-color: var(--duo-react-region-dark);
   }
 }
-.duo-region-shapes {
+.duo-react-region-shapes {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
-.duo-region-fill {
+.duo-react-region-fill {
   fill: currentColor;
   fill-opacity: 0.12;
   stroke: none;
   pointer-events: auto;
 }
-.duo-region-mask[data-inspecting="true"] .duo-region-fill[data-highlighted="false"] {
+.duo-react-region-mask[data-duo-react-inspecting="true"]
+  .duo-react-region-fill[data-duo-react-highlighted="false"] {
   fill-opacity: 0.035;
 }
-.duo-region-fill[data-highlighted="true"] {
+.duo-react-region-fill[data-duo-react-highlighted="true"] {
   fill-opacity: 0.18;
   stroke: currentColor;
   stroke-width: 1.5px;

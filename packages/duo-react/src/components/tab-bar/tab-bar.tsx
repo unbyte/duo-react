@@ -47,7 +47,7 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
       {...props}
       {...layout.containerProps}
       ref={ref}
-      className={["duo-tab-bar", className].filter(Boolean).join(" ")}
+      className={["duo-react-tab-bar", className].filter(Boolean).join(" ")}
       style={{ ...style, ...layout.containerProps.style }}
     >
       <GlassTabs

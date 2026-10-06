@@ -11,7 +11,7 @@ export const DuoZoomControls = React.forwardRef<HTMLDivElement, DuoControlGroupP
     const scale = typeof state.zoom === "number" ? state.zoom : state.renderedZoom
     const canZoom = !state.zoomReadOnly && scale !== undefined && scale > 0
     return (
-      <div role="group" aria-label="Zoom" data-duo-control-group="zoom" {...props} ref={ref}>
+      <div role="group" aria-label="Zoom" data-duo-react-control-group="zoom" {...props} ref={ref}>
         <IconButton label="Zoom out" action="zoom-out" disabled={!canZoom} onClick={zoomOut}>
           <ZoomOutIcon />
         </IconButton>

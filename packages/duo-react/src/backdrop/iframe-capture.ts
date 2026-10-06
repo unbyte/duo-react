@@ -1,7 +1,7 @@
 import type { SnapdomPlugin } from "@zumer/snapdom"
 
 export const iframeCapture: SnapdomPlugin = {
-  name: "duo-iframe-capture",
+  name: "duo-react-iframe-capture",
   pure: true,
   async resolveNode(node, context) {
     // Nested iframe elements belong to another realm, so instanceof is unsuitable.

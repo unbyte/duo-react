@@ -73,7 +73,7 @@ export function backdropOrigin(element: HTMLElement) {
   let x = 0
   let y = 0
   let current: HTMLElement | null = element
-  while (current && !current.classList.contains("duo-screen")) {
+  while (current && !current.classList.contains("duo-react-screen")) {
     x += current.offsetLeft
     y += current.offsetTop
     current = current.offsetParent as HTMLElement | null

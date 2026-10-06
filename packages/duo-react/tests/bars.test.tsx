@@ -40,8 +40,8 @@ function checkLayout(screen: DuoScreenInfo, bars: readonly ResolvedBarLayout[]) 
       height: rect.height,
       flexDirection: bar.axis === "horizontal" ? "row" : "column",
     })
-    expect(containerProps["data-duo-bar-placement"]).toBe(bar.placement)
-    expect(containerProps["data-duo-bar-axis"]).toBe(bar.axis)
+    expect(containerProps["data-duo-react-bar-placement"]).toBe(bar.placement)
+    expect(containerProps["data-duo-react-bar-axis"]).toBe(bar.axis)
     for (const other of bars.slice(index + 1)) expect(overlaps(rect, other.rect)).toBe(false)
     for (const region of screen.reservedRegions) expect(overlaps(rect, region)).toBe(false)
   }
@@ -225,7 +225,7 @@ test("the hook renders custom content with application context on React 16.8 and
     expect(html).toContain("App actions")
     expect(html).toContain("Tabs")
     expect(html).toContain(
-      `data-duo-bar-placement="${orientation === "portrait" ? "top" : "right"}"`,
+      `data-duo-react-bar-placement="${orientation === "portrait" ? "top" : "right"}"`,
     )
     expect(html).toContain(`left:${orientation === "portrait" ? 20 : 879}px`)
   }

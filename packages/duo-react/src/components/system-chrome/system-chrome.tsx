@@ -44,7 +44,7 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
   return (
     <canvas
       ref={canvas}
-      className="duo-status-material"
+      className="duo-react-status-material"
       style={boundsStyle(area)}
       aria-hidden="true"
     />
@@ -71,14 +71,18 @@ export function SystemChrome({
   const showStatus = showIndicators && screen.statusBarVisible
   const layout = React.useMemo(() => getSystemLayout(screen), [screen])
   return (
-    <div className="duo-system" aria-hidden="true">
-      {layout.camera && <div className="duo-camera-cutout" style={boundsStyle(layout.camera)} />}
+    <div className="duo-react-system" aria-hidden="true">
+      {layout.camera && (
+        <div className="duo-react-camera-cutout" style={boundsStyle(layout.camera)} />
+      )}
       {showIndicators && (
         <>
-          {layout.divider && <div className="duo-divider" style={boundsStyle(layout.divider)} />}
+          {layout.divider && (
+            <div className="duo-react-divider" style={boundsStyle(layout.divider)} />
+          )}
           {showStatus && (
             <div
-              className="duo-status"
+              className="duo-react-status"
               style={{
                 ...boundsStyle(layout.status),
                 fontSize: systemMetrics.fontSize,
@@ -86,7 +90,7 @@ export function SystemChrome({
               }}
             >
               <SystemIndicator
-                className="duo-status-time"
+                className="duo-react-status-time"
                 sample="time"
                 area={layout.time}
                 appearance={appearance.statusBar}
@@ -115,7 +119,7 @@ export function SystemChrome({
                 </svg>
               </SystemIndicator>
               <SystemIndicator
-                className="duo-status-glyph"
+                className="duo-react-status-glyph"
                 foreground={
                   charging ? (
                     <StatusGlyph
@@ -154,7 +158,7 @@ export function SystemChrome({
           )}
           {homeIndicatorVisible && (
             <SystemIndicator
-              className="duo-home"
+              className="duo-react-home"
               sample="home"
               area={layout.home}
               appearance={appearance.homeIndicator}

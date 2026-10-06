@@ -37,9 +37,9 @@ test("system color mode reaches app context and the active display on the first 
         </DuoProvider>,
       )
       expect(html).toContain(`mode:${colorMode}`)
-      expect(html).toContain(`data-duo-color-mode="${colorMode}"`)
+      expect(html).toContain(`data-duo-react-color-mode="${colorMode}"`)
       expect(html).toContain(`color-scheme:${colorMode}`)
-      expect(html).toContain(`data-duo-display="${posture === "closed" ? "outer" : "inner"}"`)
+      expect(html).toContain(`data-duo-react-display="${posture === "closed" ? "outer" : "inner"}"`)
     }
   }
 })
@@ -90,11 +90,11 @@ test("frame can be server-rendered without browser globals", () => {
       </DuoFrame>
     </DuoProvider>,
   )
-  expect(html).toContain('data-duo-window="inner"')
-  expect(html).not.toContain('data-duo-window="outer"')
+  expect(html).toContain('data-duo-react-window="inner"')
+  expect(html).not.toContain('data-duo-react-window="outer"')
   expect(html).toContain("App content")
-  expect(html).not.toContain('class="duo-indicator duo-home"')
-  expect(html).not.toContain('class="duo-divider"')
+  expect(html).not.toContain('class="duo-react-indicator duo-react-home"')
+  expect(html).not.toContain('class="duo-react-divider"')
 })
 
 test("asymmetric fit padding shifts the frame center and leaves numeric zoom centered", () => {
@@ -105,7 +105,7 @@ test("asymmetric fit padding shifts the frame center and leaves numeric zoom cen
           <span>App content</span>
         </DuoFrame>
       </DuoProvider>,
-    ).match(/class="duo-rotation" style="([^"]+)"/)?.[1]
+    ).match(/class="duo-react-rotation" style="([^"]+)"/)?.[1]
   expect(render("fit")).toContain("left:calc(50% + 30px)")
   expect(render("fit")).toContain("top:calc(50% + -40px)")
   expect(render(2)).not.toContain("left:")
@@ -138,11 +138,11 @@ test("region masks can be server-rendered before frame measurement", () => {
       />
     </DuoProvider>,
   )
-  expect(html).toContain('class="duo-region-mask"')
-  expect(html).toContain('data-theme="dark"')
+  expect(html).toContain('class="duo-react-region-mask"')
+  expect(html).toContain('data-duo-react-theme="dark"')
   expect(html).not.toContain("clipPath")
-  expect(html).toContain('data-inspecting="true"')
-  expect(html).not.toContain("duo-region-label")
+  expect(html).toContain('data-duo-react-inspecting="true"')
+  expect(html).not.toContain("duo-react-region-label")
   expect(html).not.toContain("highlightedRegionId")
 })
 
@@ -193,7 +193,7 @@ test("frame children receive the active display's screen context on the server",
       </DuoProvider>,
     )
     expect(html).toContain(posture === "closed" ? "outer:466" : "inner:669")
-    expect(html.match(/class="duo-window"/g)).toHaveLength(1)
+    expect(html.match(/class="duo-react-window"/g)).toHaveLength(1)
   }
 })
 
@@ -210,13 +210,13 @@ test("split chrome is passive and the home indicator is opt-in", () => {
       </DuoProvider>,
     )
   const visible = render(true)
-  expect(visible).toContain('class="duo-divider"')
-  expect(visible).toContain('class="duo-indicator duo-home"')
-  expect(visible).toContain('class="duo-status-material"')
+  expect(visible).toContain('class="duo-react-divider"')
+  expect(visible).toContain('class="duo-react-indicator duo-react-home"')
+  expect(visible).toContain('class="duo-react-status-material"')
   const hidden = render(false)
-  expect(hidden).not.toContain('class="duo-divider"')
-  expect(hidden).not.toContain('class="duo-indicator duo-home"')
-  expect(hidden).not.toContain('class="duo-status-material"')
+  expect(hidden).not.toContain('class="duo-react-divider"')
+  expect(hidden).not.toContain('class="duo-react-indicator duo-react-home"')
+  expect(hidden).not.toContain('class="duo-react-status-material"')
 })
 
 test("outer landscape hides status and capsule while retaining the camera and optional home indicator", () => {
@@ -239,10 +239,10 @@ test("outer landscape hides status and capsule while retaining the camera and op
           </DuoProvider>,
         )
         expect(html).toContain(`status:${expected}`)
-        expect(html.includes('class="duo-status"')).toBe(expected && showSystemUI)
-        expect(html.includes('class="duo-status-material"')).toBe(expected && showSystemUI)
-        expect(html).toContain('class="duo-camera-cutout"')
-        expect(html.includes('class="duo-indicator duo-home"')).toBe(showSystemUI)
+        expect(html.includes('class="duo-react-status"')).toBe(expected && showSystemUI)
+        expect(html.includes('class="duo-react-status-material"')).toBe(expected && showSystemUI)
+        expect(html).toContain('class="duo-react-camera-cutout"')
+        expect(html.includes('class="duo-react-indicator duo-react-home"')).toBe(showSystemUI)
       }
     }
   }
@@ -266,12 +266,14 @@ test("app status preference reaches children and rendering while retaining indep
           </DuoProvider>,
         )
         expect(html).toContain(`status:${!prefersStatusBarHidden}`)
-        expect(html.includes('class="duo-status"')).toBe(showSystemUI && !prefersStatusBarHidden)
-        expect(html.includes('class="duo-status-material"')).toBe(
+        expect(html.includes('class="duo-react-status"')).toBe(
           showSystemUI && !prefersStatusBarHidden,
         )
-        expect(html.includes('class="duo-indicator duo-home"')).toBe(showSystemUI)
-        expect(html.includes('class="duo-camera-cutout"')).toBe(posture === "closed")
+        expect(html.includes('class="duo-react-status-material"')).toBe(
+          showSystemUI && !prefersStatusBarHidden,
+        )
+        expect(html.includes('class="duo-react-indicator duo-react-home"')).toBe(showSystemUI)
+        expect(html.includes('class="duo-react-camera-cutout"')).toBe(posture === "closed")
       }
     }
   }
@@ -285,7 +287,7 @@ test("headless control groups compose independently with the React 16.8 baseline
   )
   expect(standalone).toContain('class="my-rotation"')
   expect(standalone).toContain('aria-label="Rotate left"')
-  expect(standalone).not.toContain('data-duo-control-group="zoom"')
+  expect(standalone).not.toContain('data-duo-react-control-group="zoom"')
   const composed = renderToString(
     <DuoProvider defaultState={{ posture: "closed" }}>
       <DuoControls className="my-controls">
@@ -295,10 +297,10 @@ test("headless control groups compose independently with the React 16.8 baseline
       </DuoControls>
     </DuoProvider>,
   )
-  expect(composed).toContain('class="duo-controls my-controls"')
+  expect(composed).toContain('class="duo-react-controls my-controls"')
   expect(composed).toContain('aria-label="Zoom in"')
   expect(composed).toContain('aria-label="Closed"')
-  expect(composed).not.toContain('data-duo-control-group="layout"')
+  expect(composed).not.toContain('data-duo-react-control-group="layout"')
 })
 
 test("partial posture selects its own control and keeps landscape layout controls available", () => {
@@ -308,9 +310,9 @@ test("partial posture selects its own control and keeps landscape layout control
       <DuoLayoutControls />
     </DuoProvider>,
   )
-  expect(html).toMatch(/data-duo-action="partially-open" aria-pressed="true"/)
-  expect(html).toMatch(/data-duo-action="inner" aria-pressed="false"/)
-  expect(html).toMatch(/data-duo-action="outer" aria-pressed="false"/)
-  expect(html).toContain('data-duo-control-group="layout"')
+  expect(html).toMatch(/data-duo-react-action="partially-open" aria-pressed="true"/)
+  expect(html).toMatch(/data-duo-react-action="inner" aria-pressed="false"/)
+  expect(html).toMatch(/data-duo-react-action="outer" aria-pressed="false"/)
+  expect(html).toContain('data-duo-react-control-group="layout"')
   expect(html).not.toContain("disabled")
 })

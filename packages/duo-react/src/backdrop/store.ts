@@ -26,7 +26,7 @@ const initial: BackdropSnapshot = {
   colors: { time: "dark", glyph: "dark", home: "dark" },
 }
 
-const excluded = ".duo-accessory-window, .duo-status-material, .duo-system"
+const excluded = ".duo-react-accessory-window, .duo-react-status-material, .duo-react-system"
 
 export class BackdropStore {
   private snapshot = initial

@@ -10,7 +10,13 @@ export function IconButton({
   action: string
 }) {
   return (
-    <button type="button" aria-label={label} title={label} data-duo-action={action} {...props}>
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      data-duo-react-action={action}
+      {...props}
+    >
       {children}
     </button>
   )

@@ -43,10 +43,10 @@ export function DisplaySurface({
   return (
     <BackdropContext.Provider value={backdrop}>
       <div
-        className="duo-display"
-        data-duo-display={display}
-        data-duo-color-mode={colorMode}
-        data-duo-placement={screen.placement}
+        className="duo-react-display"
+        data-duo-react-display={display}
+        data-duo-react-color-mode={colorMode}
+        data-duo-react-placement={screen.placement}
         aria-hidden={!screen.visible}
         style={{
           colorScheme: colorMode,
@@ -59,15 +59,15 @@ export function DisplaySurface({
           borderRadius: screen.cornerRadii.map((radius) => `${radius}px`).join(" "),
           boxShadow:
             display === "inner"
-              ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-rim-color)`
+              ? `0 0 0 ${frameBezel.inner - 2}px var(--duo-react-bezel-color), 0 0 0 ${frameBezel.inner}px var(--duo-react-rim-color)`
               : undefined,
         }}
       >
         <Hardware display={display} orientation={screen.orientation} />
-        <div className="duo-screen" ref={source}>
+        <div className="duo-react-screen" ref={source}>
           <div
-            className="duo-window"
-            data-duo-window={display}
+            className="duo-react-window"
+            data-duo-react-window={display}
             style={{
               left: bounds.x,
               top: bounds.y,
@@ -84,8 +84,8 @@ export function DisplaySurface({
             </ScreenContext.Provider>
           </div>
           <div
-            className="duo-accessory-window"
-            data-duo-accessory-host=""
+            className="duo-react-accessory-window"
+            data-duo-react-accessory-host=""
             ref={attachBarHost}
             style={{
               left: bounds.x,

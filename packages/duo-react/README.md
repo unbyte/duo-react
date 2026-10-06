@@ -8,6 +8,10 @@ full-screen or split layouts without losing app state.
 Requires React and React DOM 16.8–19 and a modern browser with ResizeObserver and
 CSS container-query support.
 
+Library classes, CSS custom properties, data attributes, and named containers use
+the `duo-react-` prefix. Examples include `.duo-react-frame`,
+`--duo-react-safe-area-inset-top`, and `data-duo-react-action`.
+
 ## Getting started
 
 Import the stylesheet once, wrap the preview in `DuoProvider`, and give the frame
@@ -68,7 +72,7 @@ window. Zoom controls enlarge, reduce, or fit the preview.
 
 The groups can be omitted, reordered, or used without `DuoControls`. Supply your
 own control layout and button styling. Buttons have accessible names and expose
-selection through `aria-pressed`; style them with `[data-duo-action]`,
+selection through `aria-pressed`; style them with `[data-duo-react-action]`,
 `[aria-pressed="true"]`, and `:disabled`. Icons inherit `currentColor`.
 
 For custom controls, call actions from an event handler:
@@ -95,10 +99,10 @@ For custom spacing, use the inherited safe-area properties directly:
 ```css
 .app-content {
   padding:
-    var(--duo-safe-area-inset-top)
-    var(--duo-safe-area-inset-right)
-    var(--duo-safe-area-inset-bottom)
-    var(--duo-safe-area-inset-left);
+    var(--duo-react-safe-area-inset-top)
+    var(--duo-react-safe-area-inset-right)
+    var(--duo-react-safe-area-inset-bottom)
+    var(--duo-react-safe-area-inset-left);
 }
 ```
 
@@ -118,10 +122,10 @@ function App() {
 ```
 
 Screen dimensions and safe-area values use app CSS pixels before preview zoom.
-For CSS-based responsive layouts, use the `duo-screen` container:
+For CSS-based responsive layouts, use the `duo-react-screen` container:
 
 ```css
-@container duo-screen (min-width: 600px) {
+@container duo-react-screen (min-width: 600px) {
   .app-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
