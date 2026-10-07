@@ -29,9 +29,9 @@ It shows how to load the stylesheet and compose a provider, frame, safe area, an
 preview controls. The [usage guide](packages/duo-react/docs/usage.md) covers
 responsive layouts, iframes, navigation, appearance, zoom, and region inspection.
 
-Duo React is preparing for its first public release; the package is currently
-private in this workspace. It provides a 2D device frame, layout geometry, and system
-UI visuals. Your app runs in the host browser's JavaScript and rendering environment.
+Duo React is published on npm as `duo-react`. It provides a 2D device frame, layout
+geometry, and system UI visuals. Your app runs in the host browser's JavaScript and
+rendering environment.
 Partially open mode exposes fold regions for layout testing. Ordinary media queries
 follow the host page; use container queries or an iframe when your app needs to
 respond to the preview's dimensions.
