@@ -19,6 +19,27 @@ test('resting tabs retain the measured dimensions for two through five destinati
   }
 })
 
+test.each([
+  [2, 94, 110],
+  [3, 94, 110],
+  [4, 108, 124],
+  [5, 94, 110],
+])('%i horizontal tabs match measured settled and held item widths', (count, settled, held) => {
+  const layout = new TabLayout(false, count)
+  const rest = layout.geometry(0, 0, 0)
+  expect(rest.itemLength).toBe(settled)
+  expect(rest.lensLength).toBe(settled)
+  expect(layout.geometry(0, 1, 0).lensLength).toBe(held)
+
+  for (let index = 0; index < count; index++) {
+    const style = layout.itemStyle(rest, index)
+    expect(style.width).toBe(settled)
+    expect(Number(style.left) + settled / 2).toBeCloseTo(rest.first + index * rest.pitch)
+  }
+  expect(rest.first - settled / 2).toBeCloseTo(4)
+  expect(rest.first + (count - 1) * rest.pitch + settled / 2).toBeCloseTo(rest.length - 4)
+})
+
 test('vertical expansion retains the resting axis and fits its reserved clearance', () => {
   for (const count of [2, 3, 4, 5]) {
     const layout = new TabLayout(true, count)

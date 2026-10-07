@@ -25,6 +25,8 @@ export const barProfile = {
 export const tabProfile = {
   horizontalPitch: 86,
   horizontalPadding: 16,
+  horizontalItemLength: 94,
+  horizontalFourItemLength: 108,
   verticalPitch: 50,
   verticalPadding: 12,
   itemOverlap: 8,

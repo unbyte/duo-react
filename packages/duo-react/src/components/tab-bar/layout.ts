@@ -28,18 +28,23 @@ export class TabLayout {
       : count < 4
         ? count * tabProfile.horizontalPitch + tabProfile.horizontalPadding
         : barProfile.packedTabWidth
+    const itemLength = vertical
+      ? tabProfile.verticalPitch + tabProfile.itemOverlap
+      : count === 4
+        ? tabProfile.horizontalFourItemLength
+        : tabProfile.horizontalItemLength
     const pitch = vertical
       ? tabProfile.verticalPitch
-      : (length - tabProfile.horizontalPadding) / count
+      : count > 1
+        ? (length - tabProfile.horizontalInset * 2 - itemLength) / (count - 1)
+        : tabProfile.horizontalPitch
     this.rest = {
       length,
       cross: vertical ? barProfile.railWidth : barProfile.tabThickness,
       pitch,
-      first: vertical
-        ? (length - (count - 1) * pitch) / 2
-        : tabProfile.horizontalInset + (pitch + tabProfile.itemOverlap) / 2,
-      itemLength: pitch + tabProfile.itemOverlap,
-      lensLength: pitch + tabProfile.itemOverlap,
+      first: (length - (count - 1) * pitch) / 2,
+      itemLength,
+      lensLength: itemLength,
       lensCross: vertical ? tabProfile.verticalLensCross : tabProfile.horizontalLensCross,
       labels: vertical ? 0 : 1,
     }
