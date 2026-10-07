@@ -134,11 +134,7 @@ export function GlassTabs({
       artwork.current = undefined
       setReady(false)
       const requested = ++revision
-      void makeArtwork(
-        source,
-        layout,
-        items.map((item) => item.label),
-      )
+      void makeArtwork(source, layout, items)
         .then((image) => {
           if (disposed || requested !== revision) return
           artwork.current = image
@@ -169,7 +165,7 @@ export function GlassTabs({
       observer.disconnect()
       cancelAnimationFrame(request)
     }
-  }, [items, layout, generation])
+  }, [items, layout, generation, dark])
 
   React.useEffect(() => {
     const draw = () => {
@@ -188,6 +184,7 @@ export function GlassTabs({
               root.current!.querySelectorAll('button'),
               (button) => getComputedStyle(button).color,
             ),
+            pairedIcons: items.map((item) => item.selectedIcon !== undefined),
           },
           artwork.current,
         )
@@ -343,6 +340,7 @@ export function GlassTabs({
           aria-hidden="true"
           style={{ width: canvasSize.width, height: canvasSize.height }}
         />
+        {/* DOM icons and labels remain visible while WebGL or its artwork is not yet ready. */}
         {items.map((item, index) => (
           <button
             key={item.id}
@@ -378,9 +376,28 @@ export function GlassTabs({
                 [next]?.focus({ preventScroll: true })
             }}
           >
-            <span className="duo-react-tab-bar-icon" aria-hidden="true">
-              {item.icon}
-            </span>
+            {item.selectedIcon !== undefined ? (
+              <>
+                <span
+                  className="duo-react-tab-bar-icon"
+                  data-duo-react-icon-state="inactive"
+                  aria-hidden="true"
+                >
+                  {item.icon}
+                </span>
+                <span
+                  className="duo-react-tab-bar-icon"
+                  data-duo-react-icon-state="active"
+                  aria-hidden="true"
+                >
+                  {item.selectedIcon}
+                </span>
+              </>
+            ) : (
+              <span className="duo-react-tab-bar-icon" aria-hidden="true">
+                {item.icon}
+              </span>
+            )}
             <span className="duo-react-tab-bar-label" style={{ opacity: geometry.labels }}>
               {item.label}
             </span>

@@ -1,7 +1,8 @@
 import { DuoStore, getBarsLayout } from '@private/core'
 import { barProfile } from '@private/profiles'
-import { expect, test } from 'vitest'
+import { expect, expectTypeOf, test } from 'vitest'
 import { TabLayout } from '../src/components/tab-bar/layout'
+import type { DuoTabBarItem } from '../src/components/tab-bar/types'
 
 test('resting tabs retain the measured dimensions for two through five destinations', () => {
   for (const [index, count] of [2, 3, 4, 5].entries()) {
@@ -100,4 +101,20 @@ test('toolbar and status reservations clear the expanded vertical tab silhouette
       }
     }
   }
+})
+
+test('tab items require an icon and accept optional selected artwork and color', () => {
+  type Base = { id: string; label: string }
+  expectTypeOf<Base & { icon: string }>().toExtend<DuoTabBarItem>()
+  expectTypeOf<Base & { icon: string; selectedColor: string }>().toExtend<DuoTabBarItem>()
+  expectTypeOf<Base & { icon: string; selectedIcon: string }>().toExtend<DuoTabBarItem>()
+  expectTypeOf<
+    Base & { icon: string; selectedIcon: string; selectedColor: string }
+  >().toExtend<DuoTabBarItem>()
+  expectTypeOf<
+    Base & { icon: string; selectedIcon: undefined; selectedColor: undefined }
+  >().toExtend<DuoTabBarItem>()
+  expectTypeOf<Base>().not.toExtend<DuoTabBarItem>()
+  expectTypeOf<Base & { selectedIcon: string }>().not.toExtend<DuoTabBarItem>()
+  expectTypeOf<Base & { icon: string; selectedColor: number }>().not.toExtend<DuoTabBarItem>()
 })

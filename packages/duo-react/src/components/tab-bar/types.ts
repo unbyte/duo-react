@@ -3,9 +3,11 @@ import type { ResolvedBarLayout } from '../../bars/types'
 
 export interface DuoTabBarItem {
   readonly id: string
-  readonly icon: React.ReactNode
   readonly label: string
-  /** CSS color for the selected icon and label; defaults to the material's blue. */
+  readonly icon: React.ReactNode
+  /** Replaces the selected icon without tinting either icon. */
+  readonly selectedIcon?: React.ReactNode
+  /** Selected label color; also tints the icon without selectedIcon. Defaults to the material's blue. */
   readonly selectedColor?: React.CSSProperties['color']
 }
 

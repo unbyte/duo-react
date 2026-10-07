@@ -18,7 +18,8 @@ export const tabItems = [
   { id: 'search', icon: <Search />, label: 'Search' },
   {
     id: 'favorites',
-    icon: <img src="/icons/heart.png" width={27} height={27} alt="" draggable={false} />,
+    icon: <img src="/icons/heart-inactive.png" width={27} height={27} alt="" draggable={false} />,
+    selectedIcon: <img src="/icons/heart.png" width={27} height={27} alt="" draggable={false} />,
     label: 'Favorites',
     selectedColor: '#ff2d55',
   },

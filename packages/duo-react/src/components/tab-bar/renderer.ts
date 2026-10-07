@@ -11,6 +11,7 @@ interface GlassFrame {
   readonly growth: number
   readonly dark: boolean
   readonly accents: readonly string[]
+  readonly pairedIcons: readonly boolean[]
 }
 
 const optics = {
@@ -42,6 +43,7 @@ export class GlassRenderer {
   private readonly colorCanvas = document.createElement('canvas')
   private readonly colorContext = this.colorCanvas.getContext('2d')!
   private accents: readonly string[] = []
+  private pairedIcons: readonly boolean[] = []
 
   constructor(
     private readonly canvas: HTMLCanvasElement,
@@ -141,12 +143,12 @@ export class GlassRenderer {
     )
   }
 
-  private upload(unit: number, source: HTMLCanvasElement) {
+  private upload(unit: number, source: HTMLCanvasElement, premultiplied = false) {
     const { gl, textures } = this
     gl.activeTexture(gl.TEXTURE0 + unit)
     gl.bindTexture(gl.TEXTURE_2D, textures[unit])
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false)
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiplied)
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source)
     gl.generateMipmap(gl.TEXTURE_2D)
   }
@@ -202,7 +204,8 @@ export class GlassRenderer {
       this.uploadedNeutral = true
     }
     if (this.uploadedArtwork !== artwork) {
-      this.upload(1, artwork)
+      // Filter transparent artwork in premultiplied form to avoid dark fringes.
+      this.upload(1, artwork, true)
       this.uploadedArtwork = artwork
     }
     gl.uniform2f(uniforms.uCanvasSize, canvasWidth, canvasHeight)
@@ -230,15 +233,20 @@ export class GlassRenderer {
     gl.uniform1f(uniforms.uDark, props.dark ? 1 : 0)
     if (
       this.accents.length !== props.accents.length ||
-      props.accents.some((color, index) => color !== this.accents[index])
+      props.accents.some((color, index) => color !== this.accents[index]) ||
+      props.pairedIcons.some((paired, index) => paired !== this.pairedIcons[index])
     ) {
       this.colorCanvas.width = props.accents.length
+      this.colorCanvas.height = 2
       props.accents.forEach((color, index) => {
         this.colorContext.fillStyle = color
         this.colorContext.fillRect(index, 0, 1, 1)
+        this.colorContext.fillStyle = props.pairedIcons[index] ? '#ffffff' : '#000000'
+        this.colorContext.fillRect(index, 1, 1, 1)
       })
       this.upload(4, this.colorCanvas)
       this.accents = props.accents
+      this.pairedIcons = props.pairedIcons
     }
     gl.uniform1f(uniforms.uPixel, 1 / ratio)
     gl.drawArrays(gl.TRIANGLES, 0, 3)

@@ -229,8 +229,31 @@ function App() {
 The bar adapts between horizontal and vertical layouts and stays attached to
 the app window while content scrolls. Your app owns navigation. `onSelect`
 also fires when the current destination is activated again. Use unique item
-IDs and icons that inherit `currentColor`; set an item's `selectedColor` to
-customize its selected icon and label.
+IDs. Each item requires an `icon` and accepts an optional `selectedIcon` and
+`selectedColor`:
+
+- Without `selectedIcon`, the bar automatically colors the icon and label.
+  Use an icon that inherits `currentColor`. The selected icon and label use
+  `selectedColor`, which defaults to the material's blue.
+- With `selectedIcon`, the bar replaces `icon` when selected and preserves
+  both icons' supplied colors. `currentColor` uses the material's foreground
+  color. `selectedColor` applies only to the selected label and defaults to
+  the material's blue. The inactive label uses the material's foreground color.
+
+You can mix the styles in the same bar:
+
+```tsx
+const items = [
+  { id: "home", label: "Home", icon: <HomeIcon />, selectedColor: "#ff6600" },
+  {
+    id: "library",
+    label: "Library",
+    icon: <LibraryOutlineIcon />,
+    selectedIcon: <LibraryFilledIcon />,
+    selectedColor: "#af52de",
+  },
+]
+```
 
 Bars overlay content without adding safe-area padding. Leave room for them in
 your content layout, and keep the number of destinations small enough to fit;

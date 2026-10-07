@@ -1,6 +1,9 @@
 heart.png is an unmodified Twemoji heart icon (U+2764).
+heart-inactive.png is an unmodified Twemoji white heart icon (U+1F90D).
 Project: https://github.com/jdecked/twemoji
-Source: https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/2764.png
+Sources:
+https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/2764.png
+https://raw.githubusercontent.com/jdecked/twemoji/main/assets/72x72/1f90d.png
 Graphics license: Creative Commons Attribution 4.0 International
 
 Attribution 4.0 International

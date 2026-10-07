@@ -137,12 +137,13 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   vec3 c = mix(bg, glass, inside);
   c = mix(c, mix(vec3(.20), vec3(.9 * uGrowth), uDark), selected * uGrowth * mix(.008, .012, uDark));
   c *= 1.0 - lensShadow(outlinePoint);
-  float ink = 0.0;
+  vec4 artwork = vec4(0.0);
   // The sampled artwork owns its tint, even when a lens covers multiple items.
   float item = clamp(floor((artPoint.x - uFirstCenter) / uPitch + .5), 0.0, uCount - 1.0);
   if (uVertical > .5) {
     // Derive the filter footprint before clipping or jumping between atlas cells.
-    vec2 atlasSize = vec2(uCount * 80.0, 96.0);
+    vec2 atlasSize = vec2(uCount * 80.0, 192.0);
+    float stateOffset = selected * 96.0;
     vec2 atlasDx = dFdx(artPoint.yx) / atlasSize;
     vec2 atlasDy = dFdy(artPoint.yx) / atlasSize;
     vec2 local = vec2(artPoint.y - uBarHeight * .5, artPoint.x - (uFirstCenter + item * uPitch));
@@ -150,11 +151,14 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
     float iconY = 24.0 + local.y + 9.5 * uLabels;
     float labelY = 72.0 + local.y - 14.0;
     if (abs(local.x) < 40.0 && iconY >= 0.0 && iconY < 48.0)
-      ink = textureGrad(uArtwork, vec2(atlasX, iconY) / atlasSize, atlasDx, atlasDy).a;
-    if (abs(local.x) < 40.0 && labelY >= 48.0 && labelY < 96.0)
-      ink = max(ink, textureGrad(uArtwork, vec2(atlasX, labelY) / atlasSize, atlasDx, atlasDy).a * uLabels);
+      artwork = textureGrad(uArtwork, vec2(atlasX, iconY + stateOffset) / atlasSize, atlasDx, atlasDy);
+    if (abs(local.x) < 40.0 && labelY >= 48.0 && labelY < 96.0) {
+      vec4 label = textureGrad(uArtwork, vec2(atlasX, labelY + stateOffset) / atlasSize, atlasDx, atlasDy);
+      label *= uLabels;
+      if (label.a > artwork.a) artwork = label;
+    }
   } else if (artPoint.x >= 0.0 && artPoint.x <= uBarWidth && artPoint.y >= 0.0 && artPoint.y <= uBarHeight) {
-    ink = texture(uArtwork, artPoint / vec2(uBarWidth, uBarHeight)).a;
+    artwork = texture(uArtwork, vec2(artPoint.x / uBarWidth, (artPoint.y / uBarHeight + selected) * .5));
   }
   vec3 foreground = clamp(mix((glass - .76) * .25, vec3(.94) + glass * .28, uDark), 0.0, 1.0);
   vec4 accent = texelFetch(uAccents, ivec2(int(item), 0), 0);
@@ -164,7 +168,10 @@ vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float in
   // Retain the tuned held-lens tint while the resting icon blends with its fill.
   vec3 heldTint = mix(accent.rgb * mix(vec3(1.0), c, .08), accent.rgb, uDark) * 1.12;
   vec3 tint = clamp(mix(mix(lightTint, darkTint, uDark), heldTint, clamp(uGrowth, 0.0, 1.0)), 0.0, 1.0);
-  return mix(c, mix(foreground, tint, selected), ink * mix(1.0, accent.a, selected));
+  float paired = texelFetch(uAccents, ivec2(int(item), 1), 0).r;
+  vec3 tinted = mix(c, mix(foreground, tint, selected), artwork.a * mix(1.0, accent.a, selected));
+  vec3 colored = c * (1.0 - artwork.a) + artwork.rgb;
+  return mix(tinted, colored, paired);
 }
 
 void main() {
