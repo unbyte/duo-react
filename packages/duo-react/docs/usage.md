@@ -174,8 +174,9 @@ it with `useDuoState((state) => state.system.colorMode)` to choose your app's
 palette. Your explicit app colors remain under your control; media queries in
 the host document still follow the host's preference.
 
-Status and home indicators automatically choose black or white against your
-content. For a fixed foreground, set an indicator preference, for example:
+With the default enhanced rendering, status and home indicators automatically
+choose black or white against your content. For a fixed foreground, set an
+indicator preference, for example:
 
 ```tsx
 setSystem({
@@ -195,6 +196,57 @@ Set `prefersStatusBarHidden: true` to hide it, `false` to show it in every
 layout, or `undefined` to restore the default. This leaves safe-area spacing
 unchanged. `showSystemUI={false}` on the frame also hides the home indicator;
 the outer camera cutout remains visible.
+
+## Rendering modes
+
+Use basic rendering when capturing app content for automatic contrast and glass
+effects is too expensive:
+
+```tsx
+<DuoProvider rendering={{ system: "basic", tabBar: "basic" }}>
+  <DuoFrame>
+    <App />
+  </DuoFrame>
+</DuoProvider>
+```
+
+Each setting defaults to `"enhanced"`. The `rendering` prop updates live without
+resetting app or simulated device state. `DuoRenderingMode` and
+`DuoRenderingOptions` are exported for typed configuration.
+
+Basic system rendering uses an untinted CSS blur for the status material.
+Indicators with `"auto"` appearance use an SVG backdrop filter and artwork mask
+to choose black or white from the rendered background around each control,
+independently of the preview's color mode. Explicit `indicatorStyles` bypass
+the filter, and charging accents retain their colors.
+
+Automatic CSS contrast requires support for SVG backdrop filters and masks.
+Without backdrop-filter syntax support, indicators use black; use explicit
+`"light"` or `"dark"` styles where automatic CSS contrast does not render correctly.
+
+Basic tab bars retain their resting dimensions, icons, labels, selection colors,
+and horizontal or vertical placement. They use translucent CSS background blur
+and a static selection pill, with click and keyboard navigation. They do not
+expand when held or support drag selection and liquid glass effects. Vertical
+bars remain compact, with destination names available through accessible labels
+and tooltips.
+
+Override the provider's tab bar mode on an individual control:
+
+```tsx
+<DuoTabBar
+  rendering="basic"
+  layout={bars.tabbar}
+  items={items}
+  selectedId={selectedId}
+  onSelect={setSelectedId}
+/>
+```
+
+The control prop takes precedence over the provider setting. Basic controls
+make no DOM capture requests. Set both system and tab bar rendering to basic
+to eliminate their sampling; an enhanced control still requests captures.
+Background blur is handled by the browser.
 
 ## App navigation and actions
 

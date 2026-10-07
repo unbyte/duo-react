@@ -4,6 +4,7 @@ import React from 'react'
 import { useBackdropStore } from '../../backdrop/backdrop-context'
 import { useBackdropRegion } from '../../backdrop/use-backdrop-region'
 import { useDuoState } from '../../context/hooks'
+import { useRenderingMode } from '../../context/rendering-context'
 import { StatusGlyph } from './status-glyph'
 import { SystemIndicator } from './system-indicator'
 
@@ -12,9 +13,22 @@ function boundsStyle(bounds: DuoRect) {
 }
 
 export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
+  const mode = useRenderingMode('system')
+  const area = React.useMemo(() => getSystemLayout(screen).material, [screen])
+  if (mode === 'enhanced') return <SampledSystemMaterial area={area} />
+  return (
+    <div
+      className="duo-react-status-material"
+      data-duo-react-rendering="basic"
+      style={boundsStyle(area)}
+      aria-hidden="true"
+    />
+  )
+}
+
+function SampledSystemMaterial({ area }: { area: DuoRect }) {
   const store = useBackdropStore()
   const canvas = React.useRef<HTMLCanvasElement>(null)
-  const area = React.useMemo(() => getSystemLayout(screen).material, [screen])
   const region = useBackdropRegion(() => ({ area, blur: 12 }))
   React.useEffect(() => {
     const draw = () => {
@@ -46,6 +60,7 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
       ref={canvas}
       className="duo-react-status-material"
       style={boundsStyle(area)}
+      tabIndex={-1}
       aria-hidden="true"
     />
   )
@@ -54,9 +69,11 @@ export function SystemMaterial({ screen }: { screen: DuoScreenInfo }) {
 export function SystemUI({
   screen,
   showIndicators,
+  scale,
 }: {
   screen: DuoScreenInfo
   showIndicators: boolean
+  scale: number
 }) {
   const {
     time,
@@ -92,6 +109,7 @@ export function SystemUI({
               <SystemIndicator
                 className="duo-react-status-time"
                 sample="time"
+                scale={scale}
                 area={layout.time}
                 appearance={appearance.statusBar}
                 width={systemMetrics.timeWidth}
@@ -134,6 +152,7 @@ export function SystemUI({
                   ) : undefined
                 }
                 sample="glyph"
+                scale={scale}
                 area={layout.glyph}
                 appearance={appearance.statusBar}
                 width={systemMetrics.glyphWidth}
@@ -160,6 +179,7 @@ export function SystemUI({
             <SystemIndicator
               className="duo-react-home"
               sample="home"
+              scale={scale}
               area={layout.home}
               appearance={appearance.homeIndicator}
               width={layout.home.width}

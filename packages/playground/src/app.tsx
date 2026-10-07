@@ -1,4 +1,11 @@
-import { type BarsLayout, DuoFrame, type DuoInsets, DuoProvider, DuoRegionMask } from 'duo-react'
+import {
+  type BarsLayout,
+  DuoFrame,
+  type DuoInsets,
+  DuoProvider,
+  DuoRegionMask,
+  type DuoRenderingMode,
+} from 'duo-react'
 import * as React from 'react'
 import { StateInspector } from './inspector/state-inspector'
 import { ExampleApp, ExampleBars, tabItems } from './preview/example-content'
@@ -9,6 +16,7 @@ import { type BarSettings, barRequest, initialBarSettings } from './settings/bar
 import { SettingsPanel } from './settings/settings-panel'
 
 export function App() {
+  const [rendering, setRendering] = React.useState<DuoRenderingMode>('enhanced')
   const [selectedTab, setSelectedTab] = React.useState('home')
   const [backgrounds, setBackgrounds] = React.useState({ light: '#ffffff', dark: '#111111' })
   const [regionsPinned, setRegionsPinned] = React.useState(false)
@@ -55,6 +63,7 @@ export function App() {
     <DuoProvider
       defaultSystem={{ colorMode: 'light', cameraActive: true }}
       outerPortraitLocked={outerPortraitLocked}
+      rendering={{ system: rendering, tabBar: rendering }}
     >
       <div
         className="playground group/playground relative isolate h-dvh overflow-hidden [--playground-sidebar-width:272px] [--playground-inspector-width:min(320px,42vw)] [--playground-sidebar-space:var(--playground-sidebar-width)] [--playground-inspector-space:0px] [--playground-bottom-space:0px] data-[inspector-open=true]:[--playground-inspector-space:var(--playground-inspector-width)] max-[1200px]:[--playground-sidebar-width:248px] max-[960px]:[--playground-sidebar-width:224px] max-sm:[--playground-sidebar-space:0px] max-sm:[--playground-inspector-space:0px] max-sm:data-[inspector-open=true]:[--playground-inspector-space:0px] max-sm:[--playground-bottom-space:35dvh]"
@@ -117,6 +126,8 @@ export function App() {
           </main>
           <StateInspector
             open={inspectorOpen}
+            rendering={rendering}
+            onRenderingChange={setRendering}
             request={request}
             layout={barsLayout}
             regionsPinned={regionsPinned}

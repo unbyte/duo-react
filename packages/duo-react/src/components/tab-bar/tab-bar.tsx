@@ -1,16 +1,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { useDuoState } from '../../context/hooks'
+import { useRenderingMode } from '../../context/rendering-context'
 import { useAccessoryHost } from '../../screen/accessory-context'
+import { BasicTabs } from './basic-tabs'
 import { GlassTabs } from './glass-tabs'
 import type { DuoTabBarProps } from './types'
 
 export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(function DuoTabBar(
-  { items, selectedId, onSelect, layout, className, style, ...props },
+  { items, selectedId, onSelect, layout, rendering, className, style, ...props },
   ref,
 ) {
   const host = useAccessoryHost()
   const colorMode = useDuoState((state) => state.system.colorMode)
+  const mode = useRenderingMode('tabBar', rendering)
+  const Tabs = mode === 'basic' ? BasicTabs : GlassTabs
   const dark = (style?.colorScheme ?? colorMode) === 'dark'
   const ids = new Set<string>()
   for (const item of items) {
@@ -31,7 +35,7 @@ export const DuoTabBar = React.forwardRef<HTMLDivElement, DuoTabBarProps>(functi
       className={['duo-react-tab-bar', className].filter(Boolean).join(' ')}
       style={{ ...style, ...layout.containerProps.style }}
     >
-      <GlassTabs
+      <Tabs
         key={layout.axis}
         dark={dark}
         items={items}

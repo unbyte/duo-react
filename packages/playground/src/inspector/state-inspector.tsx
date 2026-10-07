@@ -14,6 +14,7 @@ import {
   type BarsLayoutRequest,
   type DuoRect,
   type DuoRegion,
+  type DuoRenderingMode,
   type DuoScreenInfo,
   useDuoRegions,
   useDuoState,
@@ -24,6 +25,7 @@ import { ScrollSurface } from '../components/scroll-surface'
 import { ToggleSetting } from '../components/setting-fields'
 import { IconHint, PinOverlay } from './inspector-controls'
 import { InspectorTabs } from './inspector-tabs'
+import { RenderInspector } from './render-inspector'
 
 const headingRow =
   'flex items-center justify-between gap-2 @max-[280px]:flex-wrap @max-[280px]:gap-y-0'
@@ -206,6 +208,8 @@ function ScreenInformation() {
 
 export function StateInspector({
   open,
+  rendering,
+  onRenderingChange,
   request,
   layout,
   regionsPinned,
@@ -217,6 +221,8 @@ export function StateInspector({
   onClose,
 }: {
   open: boolean
+  rendering: DuoRenderingMode
+  onRenderingChange: (mode: DuoRenderingMode) => void
   request: BarsLayoutRequest
   layout?: BarsLayout
   regionsPinned: boolean
@@ -376,6 +382,17 @@ export function StateInspector({
                   className="playground-state-data min-h-0 max-h-none flex-1"
                   data={state}
                   label="Playground state"
+                />
+              ),
+            },
+            {
+              value: 'render',
+              label: 'Render',
+              content: (
+                <RenderInspector
+                  active={open && tab === 'render'}
+                  mode={rendering}
+                  onModeChange={onRenderingChange}
                 />
               ),
             },

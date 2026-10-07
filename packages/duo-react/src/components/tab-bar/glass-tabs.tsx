@@ -6,7 +6,8 @@ import { clamp, TabLayout } from './layout'
 import { useLensMotion } from './motion'
 import { GlassRenderer } from './renderer'
 import { canvasPadding } from './shaders'
-import type { TabContent } from './types'
+import { TabItems } from './tab-items'
+import type { TabRendererProps } from './types'
 
 /** Offset-parent coordinates exclude the frame's presentation zoom and rotation. */
 function backdropOrigin(element: HTMLElement) {
@@ -39,10 +40,7 @@ export function GlassTabs({
   onSelect,
   vertical,
   dark = false,
-}: TabContent & {
-  vertical: boolean
-  dark?: boolean
-}) {
+}: TabRendererProps) {
   const layout = React.useMemo(
     () => new TabLayout(vertical, items.length),
     [vertical, items.length],
@@ -89,7 +87,6 @@ export function GlassTabs({
     started: number
   }>()
   const selected = items.findIndex((item) => item.id === selectedId)
-  const defaultAccent = dark ? '#209bff' : '#0088ff'
   const { rest } = layout
   const selectedPosition = rest.first + Math.max(0, selected) * rest.pitch
   const motion = useLensMotion(target ?? selectedPosition, expanded, reducedMotion)
@@ -341,68 +338,21 @@ export function GlassTabs({
           style={{ width: canvasSize.width, height: canvasSize.height }}
         />
         {/* DOM icons and labels remain visible while WebGL or its artwork is not yet ready. */}
-        {items.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            className="duo-react-tab-bar-item"
-            style={{
-              ...layout.itemStyle(geometry, index),
-              color: item.selectedColor ?? defaultAccent,
-            }}
-            aria-current={item.id === selectedId ? 'page' : undefined}
-            aria-label={item.label}
-            title={item.label}
-            onClick={(event) => {
-              if (event.detail !== 0 && suppressClick.current) {
-                suppressClick.current = false
-                return
-              }
-              onSelect(item.id)
-              pulse()
-            }}
-            onKeyDown={(event) => {
-              let next = index
-              if (event.key === (vertical ? 'ArrowDown' : 'ArrowRight'))
-                next = (index + 1) % items.length
-              else if (event.key === (vertical ? 'ArrowUp' : 'ArrowLeft'))
-                next = (index + items.length - 1) % items.length
-              else if (event.key === 'Home') next = 0
-              else if (event.key === 'End') next = items.length - 1
-              else return
-              event.preventDefault()
-              root.current
-                ?.querySelectorAll<HTMLButtonElement>('button')
-                [next]?.focus({ preventScroll: true })
-            }}
-          >
-            {item.selectedIcon !== undefined ? (
-              <>
-                <span
-                  className="duo-react-tab-bar-icon"
-                  data-duo-react-icon-state="inactive"
-                  aria-hidden="true"
-                >
-                  {item.icon}
-                </span>
-                <span
-                  className="duo-react-tab-bar-icon"
-                  data-duo-react-icon-state="active"
-                  aria-hidden="true"
-                >
-                  {item.selectedIcon}
-                </span>
-              </>
-            ) : (
-              <span className="duo-react-tab-bar-icon" aria-hidden="true">
-                {item.icon}
-              </span>
-            )}
-            <span className="duo-react-tab-bar-label" style={{ opacity: geometry.labels }}>
-              {item.label}
-            </span>
-          </button>
-        ))}
+        <TabItems
+          items={items}
+          selectedId={selectedId}
+          dark={dark}
+          layout={layout}
+          geometry={geometry}
+          onActivate={(id, event) => {
+            if (event.detail !== 0 && suppressClick.current) {
+              suppressClick.current = false
+              return
+            }
+            onSelect(id)
+            pulse()
+          }}
+        />
       </div>
     </div>
   )

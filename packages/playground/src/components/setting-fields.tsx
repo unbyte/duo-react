@@ -1,18 +1,20 @@
 import type { TablerIcon } from '@tabler/icons-react'
 import { cn } from 'cn'
-import type { LucideIcon } from 'lucide-react'
+import { CircleHelp, type LucideIcon } from 'lucide-react'
 import * as React from 'react'
 import { Field, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Slider } from './ui/slider'
 import { Switch } from './ui/switch'
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip'
 
 interface SettingProps {
   icon?: LucideIcon | TablerIcon
   label: string
   ariaLabel?: string
   title?: string
+  hint?: string
 }
 
 interface SelectSettingProps extends SettingProps {
@@ -50,12 +52,30 @@ const fieldControl =
 const colorControl =
   'h-7 w-9 cursor-pointer justify-self-end rounded-md border border-input bg-background p-[3px] [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-[3px] [&::-webkit-color-swatch]:border-0 [&::-moz-color-swatch]:rounded-[3px] [&::-moz-color-swatch]:border-0'
 
-function SettingLabel({ icon: Icon, label, id }: SettingProps & { id: string }) {
-  return (
+function SettingLabel({ icon: Icon, label, hint, id }: SettingProps & { id: string }) {
+  const content = (
     <FieldLabel htmlFor={id} className={cn('playground-field-label', fieldLabel)}>
       {Icon && <Icon size={16} strokeWidth={1.5} aria-hidden="true" />}
       <span>{label}</span>
     </FieldLabel>
+  )
+  if (!hint) return content
+  return (
+    <div className="flex min-w-0 items-center gap-1">
+      {content}
+      <Tooltip>
+        <TooltipTrigger
+          type="button"
+          aria-label={`About ${label.toLowerCase()}`}
+          className="inline-flex size-5 shrink-0 cursor-help items-center justify-center rounded border-0 bg-transparent p-0 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+        >
+          <CircleHelp size={13} strokeWidth={1.5} aria-hidden="true" />
+        </TooltipTrigger>
+        <TooltipContent align="start" className="leading-relaxed">
+          {hint}
+        </TooltipContent>
+      </Tooltip>
+    </div>
   )
 }
 

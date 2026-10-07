@@ -101,7 +101,7 @@ export function DisplaySurface({
           />
           {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
         </div>
-        <SystemUI screen={screen} showIndicators={showSystemUI} />
+        <SystemUI screen={screen} showIndicators={showSystemUI} scale={scale} />
       </div>
     </BackdropContext.Provider>
   )

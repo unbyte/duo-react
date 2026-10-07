@@ -29,7 +29,6 @@ export function InspectorTabs({ value, onValueChange, sections }: InspectorTabsP
         className={cn('playground-inspector-tabs', inspectorTabs)}
       >
         <div className={cn('playground-inspector-heading', inspectorHeading)}>
-          <h2 className="m-0 shrink-0 text-xs/normal font-semibold">Inspector</h2>
           <TabsList
             variant="line"
             activateOnFocus

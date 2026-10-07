@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import type { ResolvedBarLayout } from '../../bars/types'
+import type { DuoRenderingMode } from '../../context/rendering-context'
 
 export interface DuoTabBarItem {
   readonly id: string
@@ -22,4 +23,11 @@ export interface DuoTabBarProps
   extends TabContent,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onSelect'> {
   readonly layout: ResolvedBarLayout
+  /** Overrides the provider's tab bar rendering mode. */
+  readonly rendering?: DuoRenderingMode
+}
+
+export interface TabRendererProps extends TabContent {
+  readonly vertical: boolean
+  readonly dark: boolean
 }
