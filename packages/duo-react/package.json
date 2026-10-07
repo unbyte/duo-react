@@ -1,6 +1,6 @@
 {
   "name": "duo-react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React components for previewing web apps in iPhone Duo device layouts.",
   "keywords": [
     "iphone-duo",
