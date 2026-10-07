@@ -5,6 +5,8 @@ import type { DuoRenderingMode } from '../../context/rendering-context'
 export interface DuoTabBarItem {
   readonly id: string
   readonly label: string
+  /** Text badge. An empty string shows a dot; undefined hides the badge. */
+  readonly badge?: string
   readonly icon: React.ReactNode
   /** Replaces the selected icon without tinting either icon. */
   readonly selectedIcon?: React.ReactNode

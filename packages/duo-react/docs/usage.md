@@ -303,9 +303,17 @@ const items = [
     icon: <LibraryOutlineIcon />,
     selectedIcon: <LibraryFilledIcon />,
     selectedColor: "#af52de",
+    badge: "99+",
   },
 ]
 ```
+
+Set an item's `badge` to a string to show a red badge with white text. Omit it
+to hide the badge, or use `""` for an empty dot. Values such as `"0"` and `"99+"`
+are displayed literally. Badges show only the first line and truncate long text
+with an ellipsis at 64 px; the full value remains in the tab's accessible label.
+Badges do not change tab or bar dimensions. Both rendering modes support them;
+enhanced rendering also applies the glass lens's distortion to badge pixels.
 
 Bars overlay content without adding safe-area padding. Leave room for them in
 your content layout, and keep the number of destinations small enough to fit;

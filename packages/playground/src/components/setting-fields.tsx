@@ -17,10 +17,12 @@ interface SettingProps {
   hint?: string
 }
 
-interface SelectSettingProps extends SettingProps {
-  value: string
+interface SelectSettingProps<Multiple extends boolean = false> extends SettingProps {
+  multiple?: Multiple
+  value: Multiple extends true ? string[] : string
   options: readonly { value: string; label: React.ReactNode; text?: string }[]
-  onValueChange: (value: string) => void
+  onValueChange: (value: Multiple extends true ? string[] : string) => void
+  valueLabel?: React.ReactNode
 }
 
 interface ToggleSettingProps extends SettingProps {
@@ -79,7 +81,9 @@ function SettingLabel({ icon: Icon, label, hint, id }: SettingProps & { id: stri
   )
 }
 
-export function SelectSetting(props: SelectSettingProps) {
+export function SelectSetting<Multiple extends boolean = false>(
+  props: SelectSettingProps<Multiple>,
+) {
   const id = React.useId()
   return (
     <Field
@@ -88,7 +92,8 @@ export function SelectSetting(props: SelectSettingProps) {
       title={props.title}
     >
       <SettingLabel {...props} id={id} />
-      <Select
+      <Select<string, Multiple>
+        multiple={props.multiple}
         items={props.options}
         value={props.value}
         onValueChange={(value) => {
@@ -104,7 +109,7 @@ export function SelectSetting(props: SelectSettingProps) {
           size="sm"
           aria-label={props.ariaLabel}
         >
-          <SelectValue />
+          <SelectValue>{props.valueLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent
           className="playground-select-popup p-[3px]"

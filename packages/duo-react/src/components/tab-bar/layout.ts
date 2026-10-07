@@ -116,4 +116,31 @@ export class TabLayout {
           height: this.rest.lensCross,
         }
   }
+
+  badgeOffset(geometry: GlassGeometry, width: number) {
+    const buttonWidth = this.vertical
+      ? geometry.cross - tabProfile.verticalInset * 2
+      : this.rest.itemLength
+    const trailing = buttonWidth + 4 - width
+    // Icons have a 27px unscaled box. Expanded rails use the horizontal anchor.
+    const expanded = Math.min(buttonWidth / 2 + 13.5 - 5, trailing)
+    if (!this.vertical) return expanded
+    const compact = Math.max(-4, trailing)
+    return compact + (expanded - compact) * geometry.labels
+  }
+
+  badgeRect(geometry: GlassGeometry, index: number, width: number, height: number) {
+    const button = this.itemStyle(geometry, index)
+    return {
+      x: Number(button.left) + this.badgeOffset(geometry, width),
+      y: Number(button.top) + this.badgeTop(geometry),
+      width,
+      height,
+    }
+  }
+
+  badgeTop(geometry: GlassGeometry) {
+    // Compact hit targets follow the pitch; the native badge follows the taller item box.
+    return this.vertical ? 2 - (this.rest.itemLength - geometry.pitch) / 2 : 2
+  }
 }

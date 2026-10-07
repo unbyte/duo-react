@@ -1,7 +1,7 @@
 import React from 'react'
 import { useBackdropStore } from '../../backdrop/backdrop-context'
 import { useBackdropRegion } from '../../backdrop/use-backdrop-region'
-import { makeArtwork } from './artwork'
+import { makeArtwork, type TabArtwork } from './artwork'
 import { clamp, TabLayout } from './layout'
 import { useLensMotion } from './motion'
 import { GlassRenderer } from './renderer'
@@ -66,7 +66,7 @@ export function GlassTabs({
   })
   const canvas = React.useRef<HTMLCanvasElement>(null)
   const renderer = React.useRef<GlassRenderer>()
-  const artwork = React.useRef<HTMLCanvasElement>()
+  const artwork = React.useRef<TabArtwork>()
   const [ready, setReady] = React.useState(false)
   const [artworkReady, setArtworkReady] = React.useState(false)
   const [generation, setGeneration] = React.useState(0)
@@ -140,8 +140,9 @@ export function GlassTabs({
         })
         .catch(() => {
           if (!disposed && requested === revision) {
-            artwork.current = document.createElement('canvas')
-            artwork.current.width = artwork.current.height = 1
+            const icons = document.createElement('canvas')
+            icons.width = icons.height = 1
+            artwork.current = { icons }
             setArtworkReady(false)
             setGenerationArtwork((value) => value + 1)
           }
@@ -173,6 +174,7 @@ export function GlassTabs({
             backdrop: backdrop.getSnapshot().regions.get(region),
             origin: backdropOrigin(root.current!),
             geometry,
+            layout,
             count: items.length,
             x: selected < 0 && target === undefined ? -1000 : position,
             growth: clamp(motion.growth, 0, 1),
@@ -200,6 +202,7 @@ export function GlassTabs({
     backdrop,
     region,
     geometry,
+    layout,
     items,
     position,
     selected,

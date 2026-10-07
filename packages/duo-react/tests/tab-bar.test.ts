@@ -138,4 +138,61 @@ test('tab items require an icon and accept optional selected artwork and color',
   expectTypeOf<Base>().not.toExtend<DuoTabBarItem>()
   expectTypeOf<Base & { selectedIcon: string }>().not.toExtend<DuoTabBarItem>()
   expectTypeOf<Base & { icon: string; selectedColor: number }>().not.toExtend<DuoTabBarItem>()
+  expectTypeOf<DuoTabBarItem['badge']>().toEqualTypeOf<string | undefined>()
+})
+
+test('compact badges retain the measured anchors and overflow without widening the rail', () => {
+  const layout = new TabLayout(true, 4)
+  for (const [width, x] of [
+    [18, 32],
+    [31 + 2 / 3, 18 + 1 / 3],
+    [57, -2],
+    [64, -2],
+  ]) {
+    for (let index = 0; index < 4; index++) {
+      const badge = layout.badgeRect(layout.rest, index, width, 18)
+      expect(badge.x).toBeCloseTo(x)
+      expect(badge.y).toBe(4 + index * 50)
+      expect(badge.width).toBe(width)
+    }
+  }
+  expect(layout.rest).toMatchObject({ cross: 48, length: 212, pitch: 50 })
+})
+
+test('wide horizontal badges stop at the native button boundary for every supported count', () => {
+  for (const count of [2, 3, 4, 5]) {
+    const layout = new TabLayout(false, count)
+    for (let index = 0; index < count; index++) {
+      const short = layout.badgeRect(layout.rest, index, 18, 18)
+      const long = layout.badgeRect(layout.rest, index, 64, 18 + 1 / 3)
+      const item = layout.itemStyle(layout.rest, index)
+      expect(short.x).toBe(Number(item.left) + Number(item.width) / 2 + 8.5)
+      expect(long.x + long.width).toBeCloseTo(Number(item.left) + Number(item.width) + 4)
+      expect(short.y).toBe(6)
+      expect(long.y).toBe(6)
+      expect(layout.badgeRect(layout.geometry(0, 1, 20), index, 64, 18 + 1 / 3)).toEqual(long)
+    }
+  }
+})
+
+test('vertical expansion changes badge anchoring without scaling the badge', () => {
+  const layout = new TabLayout(true, 4)
+  for (const reveal of [0, 0.25, 0.5, 0.75, 1]) {
+    const geometry = layout.geometry(reveal, 1, 20)
+    for (const width of [18, 32, 64]) {
+      const badge = layout.badgeRect(geometry, 1, width, 18)
+      expect(badge.width).toBe(width)
+      expect(badge.height).toBe(18)
+      expect(badge).toEqual(layout.badgeRect(layout.geometry(reveal, 0, 0), 1, width, 18))
+      if (reveal === 1) {
+        const item = layout.itemStyle(geometry, 1)
+        expect(badge.x).toBe(
+          Math.min(
+            Number(item.left) + Number(item.width) / 2 + 8.5,
+            Number(item.left) + Number(item.width) + 4 - width,
+          ),
+        )
+      }
+    }
+  }
 })

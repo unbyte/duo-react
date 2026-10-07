@@ -238,6 +238,7 @@
 }
 .duo-react-tab-bar-surface {
   --duo-react-tab-foreground: #101910;
+  --duo-react-tab-badge: #ff383c;
   position: absolute;
   border-radius: 999px;
   color: var(--duo-react-tab-foreground);
@@ -248,6 +249,7 @@
 }
 .duo-react-tab-bar-surface[data-duo-react-material-dark="true"] {
   --duo-react-tab-foreground: #f4f6ef;
+  --duo-react-tab-badge: #ff4245;
 }
 .duo-react-tab-bar-surface[data-duo-react-rendering="basic"] {
   --duo-react-tab-selection: rgb(0 0 0 / 7%);
@@ -324,7 +326,8 @@
 .duo-react-tab-bar-item:focus-visible {
   outline: none;
 }
-.duo-react-tab-bar-item:not([aria-current="page"]) > span {
+.duo-react-tab-bar-item:not([aria-current="page"]) > .duo-react-tab-bar-icon,
+.duo-react-tab-bar-item:not([aria-current="page"]) > .duo-react-tab-bar-label {
   color: var(--duo-react-tab-foreground);
 }
 .duo-react-tab-bar-icon {
@@ -351,6 +354,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.duo-react-tab-bar-badge {
+  position: absolute;
+  top: 2px;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 18.333333px;
+  max-width: 64px;
+  height: 18.333333px;
+  padding: 2px 4px;
+  border-radius: 9px;
+  background: var(--duo-react-tab-badge);
+  color: #fff;
+  font:
+    500 12px / 14.333333px -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    sans-serif;
+  text-align: center;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.duo-react-tab-bar-badge:empty {
+  min-width: 18px;
+  height: 18px;
 }
 .duo-react-tab-bar[data-duo-react-bar-axis="vertical"] .duo-react-tab-bar-label {
   position: absolute;

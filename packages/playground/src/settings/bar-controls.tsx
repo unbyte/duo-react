@@ -1,8 +1,9 @@
 import { IconAxisX, IconBoxAlignTopLeft, IconNumber } from '@tabler/icons-react'
 import type { ToolbarLayoutRequest } from 'duo-react'
-import { AlignHorizontalDistributeCenter } from 'lucide-react'
+import { AlignHorizontalDistributeCenter, Bell } from 'lucide-react'
 import { SelectSetting } from '../components/setting-fields'
-import type { BarSettings } from './bar-settings'
+import { Input } from '../components/ui/input'
+import { type BarSettings, tabBadgeOptions } from './bar-settings'
 import { CountLabel, DistributionLabel, PlacementLabel } from './option-labels'
 
 export function TabBarControls({
@@ -26,6 +27,33 @@ export function TabBarControls({
         }))}
         onValueChange={(value) => onChange({ ...settings, tabbarCount: Number(value) })}
       />
+      {settings.tabbarCount > 0 && (
+        <>
+          <SelectSetting
+            icon={Bell}
+            label="Badge"
+            ariaLabel="Tab badges"
+            multiple
+            value={[...settings.tabbarBadges]}
+            valueLabel={
+              settings.tabbarBadges.length ? `${settings.tabbarBadges.length} enabled` : 'None'
+            }
+            options={tabBadgeOptions}
+            onValueChange={(tabbarBadges) => onChange({ ...settings, tabbarBadges })}
+          />
+          {settings.tabbarBadges.includes('custom') && (
+            <Input
+              className="h-7 w-[124px] justify-self-end rounded-md bg-background px-2 py-0 text-xs/5 select-text md:text-xs"
+              aria-label="Custom text"
+              placeholder="Custom text"
+              value={settings.customBadge}
+              onChange={(event) =>
+                onChange({ ...settings, customBadge: event.currentTarget.value })
+              }
+            />
+          )}
+        </>
+      )}
       {settings.tabbarCount > 0 && (
         <div hidden>
           <SelectSetting

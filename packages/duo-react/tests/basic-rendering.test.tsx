@@ -72,10 +72,12 @@ function App({
   rendering,
   count = 3,
   onSelect,
+  badges,
 }: {
   rendering?: DuoRenderingMode
   count?: number
   onSelect?: (id: string) => void
+  badges?: readonly (string | undefined)[]
 }) {
   const bars = useBars({ tabbar: {} })
   const [selected, setSelected] = React.useState('0')
@@ -103,7 +105,7 @@ function App({
       <DuoTabBar
         layout={bars.tabbar}
         rendering={rendering}
-        items={items.slice(0, count)}
+        items={items.slice(0, count).map((item, index) => ({ ...item, badge: badges?.[index] }))}
         selectedId={selected}
         onSelect={(id) => {
           setSelected(id)
@@ -120,12 +122,14 @@ function render({
   count,
   vertical = false,
   onSelect,
+  badges,
 }: {
   rendering?: DuoProviderProps['rendering']
   tabRendering?: DuoRenderingMode
   count?: number
   vertical?: boolean
   onSelect?: (id: string) => void
+  badges?: readonly (string | undefined)[]
 } = {}) {
   act(() => {
     ReactDOM.render(
@@ -135,7 +139,7 @@ function render({
         defaultSystem={{ homeIndicatorVisible: true }}
       >
         <DuoFrame zoom={1}>
-          <App rendering={tabRendering} count={count} onSelect={onSelect} />
+          <App rendering={tabRendering} count={count} onSelect={onSelect} badges={badges} />
         </DuoFrame>
       </DuoProvider>,
       root,
@@ -146,6 +150,31 @@ function render({
 function tabs() {
   return Array.from(root.querySelectorAll<HTMLButtonElement>('.duo-react-tab-bar-item'))
 }
+
+test.each(['basic', 'enhanced'] as const)(
+  '%s tab badges distinguish absence, empty, and literal text and update with their item',
+  (tabRendering) => {
+    const onSelect = vi.fn()
+    const options = { rendering: { system: 'basic' as const }, tabRendering, count: 5, onSelect }
+    render({ ...options, badges: [undefined, '', '0', '99+', 'New\nItems'] })
+    expect(root.querySelectorAll('.duo-react-tab-bar-badge')).toHaveLength(4)
+    expect(
+      tabs().map((button) => button.querySelector('.duo-react-tab-bar-badge')?.textContent),
+    ).toEqual([undefined, '', '0', '99+', 'New'])
+    expect(tabs()[4].getAttribute('aria-label')).toBe('Destination 4, New\nItems')
+    act(() => tabs()[3].click())
+    expect(onSelect).toHaveBeenLastCalledWith('3')
+    expect(tabs()[3].getAttribute('aria-current')).toBe('page')
+    render({ ...options, badges: ['Long badge text', undefined, '', '新消息通知', '🔔'] })
+    expect(
+      tabs().map((button) => button.querySelector('.duo-react-tab-bar-badge')?.textContent),
+    ).toEqual(['Long badge text', undefined, '', '新消息通知', '🔔'])
+    expect(tabs()[0].getAttribute('aria-label')).toBe('Destination 0, Long badge text')
+    expect(tabs()[3].getAttribute('aria-current')).toBe('page')
+    render(options)
+    expect(root.querySelectorAll('.duo-react-tab-bar-badge')).toHaveLength(0)
+  },
+)
 
 test('basic controls mount without sampling requests or canvas rendering', () => {
   render({ rendering: { system: 'basic', tabBar: 'basic' } })

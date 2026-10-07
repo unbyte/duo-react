@@ -1,3 +1,5 @@
+import { badgeAtlas } from './artwork'
+
 const artworkMagnification = 1.22
 export const canvasPadding = 24
 const outerRefractionReach = 3
@@ -52,6 +54,9 @@ uniform float uEdgeCurlWidth;
 uniform float uEdgeCurlStrength;
 uniform float uDark;
 uniform sampler2D uAccents;
+uniform sampler2D uBadges;
+uniform sampler2D uBadgeBounds;
+uniform int uBadgeCount;
 uniform float uPixel;
 
 float capsule(vec2 p, vec2 size) {
@@ -90,6 +95,23 @@ vec3 background(vec2 p) {
 }
 vec3 blurBackground(vec2 p) {
   return texture(uBlurredBackdrop, (uBarOrigin + screenPoint(p) * uSceneScale) / uSceneSize).rgb;
+}
+vec4 badges(vec2 p) {
+  vec2 point = screenPoint(p);
+  vec2 atlasSize = vec2(float(max(uBadgeCount, 1)) * ${badgeAtlas.cellWidth.toFixed(1)}, ${badgeAtlas.cellHeight.toFixed(1)});
+  vec2 dx = dFdx(point) / atlasSize;
+  vec2 dy = dFdy(point) / atlasSize;
+  vec4 color = vec4(0.0);
+  for (int i = 0; i < uBadgeCount; i++) {
+    vec4 bounds = texelFetch(uBadgeBounds, ivec2(i, 0), 0);
+    vec2 local = point - bounds.xy;
+    if (bounds.z > 0.0 && all(greaterThanEqual(local, vec2(-1.0))) && all(lessThanEqual(local, bounds.zw + 1.0))) {
+      vec2 atlasPoint = local + vec2(float(i) * ${badgeAtlas.cellWidth.toFixed(1)} + ${badgeAtlas.padding.toFixed(1)}, ${badgeAtlas.padding.toFixed(1)});
+      vec4 badge = textureGrad(uBadges, atlasPoint / atlasSize, dx, dy);
+      color = badge + color * (1.0 - badge.a);
+    }
+  }
+  return color;
 }
 vec3 material(vec2 p, vec2 artPoint, vec2 outlinePoint, float selected, float insetWeight) {
   vec3 bg = background(p);
@@ -281,7 +303,20 @@ void main() {
   refracted = mix(refracted, vec3(1.0), reflection);
   refracted *= 1.0 - rim * (.20 - light * .08);
   vec3 surface = mix(material(p, p, p, 0.0, 0.0), refracted, lensMask);
-  outColor = vec4(surface * surfaceAlpha / max(alpha, .001), alpha);
+  // Badges retain their own size and palette while the bevel bends their pixels.
+  // Composite them independently so their overflow is not clipped to the rail.
+  vec2 badgePoint = p + rimOffset;
+  vec4 badgeRed = badges(badgePoint + opticalNormal * artworkSpread + curlRed);
+  vec4 badgeGreen = badges(badgePoint + curlOffset);
+  vec4 badgeBlue = badges(badgePoint - opticalNormal * artworkSpread + curlBlue);
+  vec4 refractedBadge = vec4(badgeRed.r, badgeGreen.g, badgeBlue.b, max(badgeRed.a, max(badgeGreen.a, badgeBlue.a)));
+  vec4 restingBadge = badges(p);
+  vec4 badge = mix(restingBadge, refractedBadge, lensMask);
+  // Each dispersed channel obscures the material only where its own sample covers it.
+  vec3 badgeCoverage = mix(vec3(restingBadge.a), vec3(badgeRed.a, badgeGreen.a, badgeBlue.a), lensMask);
+  vec3 color = badge.rgb + surface * surfaceAlpha * (1.0 - badgeCoverage);
+  alpha = badge.a + alpha * (1.0 - badge.a);
+  outColor = vec4(color / max(alpha, .001), alpha);
 }`
 
 const outerFragment = `#version 300 es

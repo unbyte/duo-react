@@ -1,11 +1,21 @@
 import type { TabLayout } from './layout'
 import type { DuoTabBarItem } from './types'
 
+export const badgeAtlas = { cellWidth: 80, cellHeight: 32, padding: 4 } as const
+
+export interface TabArtwork {
+  readonly icons: HTMLCanvasElement
+  readonly badges?: {
+    readonly canvas: HTMLCanvasElement
+    readonly sizes: readonly { readonly width: number; readonly height: number }[]
+  }
+}
+
 export async function makeArtwork(
   element: HTMLDivElement,
   layout: TabLayout,
   items: readonly DuoTabBarItem[],
-) {
+): Promise<TabArtwork> {
   const canvas = document.createElement('canvas')
   const ratio = 3
   const { rest, vertical } = layout
@@ -59,5 +69,53 @@ export async function makeArtwork(
       )
     }),
   )
-  return canvas
+  return { icons: canvas, badges: makeBadges(buttons, items, ratio) }
+}
+
+function makeBadges(
+  buttons: NodeListOf<HTMLElement>,
+  items: readonly DuoTabBarItem[],
+  ratio: number,
+) {
+  if (!items.some((item) => item.badge !== undefined)) return undefined
+  const canvas = document.createElement('canvas')
+  const { cellWidth, cellHeight, padding } = badgeAtlas
+  canvas.width = items.length * cellWidth * ratio
+  canvas.height = cellHeight * ratio
+  const context = canvas.getContext('2d')!
+  context.scale(ratio, ratio)
+  const sizes = items.map((item, index) => {
+    if (item.badge === undefined) return { width: 0, height: 0 }
+    const badge = buttons[index].querySelector<HTMLElement>('.duo-react-tab-bar-badge')!
+    const style = getComputedStyle(badge)
+    const width = Number.parseFloat(style.width)
+    const height = Number.parseFloat(style.height)
+    const x = index * cellWidth + padding
+    context.fillStyle = style.backgroundColor
+    context.beginPath()
+    context.roundRect(x, padding, width, height, 9)
+    context.fill()
+    context.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+    context.fillStyle = style.color
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
+    context.fillText(
+      truncateBadge(badge.textContent ?? '', width - 8, context),
+      x + width / 2,
+      padding + height / 2,
+    )
+    return { width, height }
+  })
+  return { canvas, sizes }
+}
+
+function truncateBadge(text: string, width: number, context: CanvasRenderingContext2D) {
+  if (context.measureText(text).width <= width) return text
+  const segments = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)
+  let result = ''
+  for (const { segment } of segments) {
+    if (context.measureText(`${result}${segment}…`).width > width) break
+    result += segment
+  }
+  return `${result}…`
 }

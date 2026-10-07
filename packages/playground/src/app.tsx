@@ -111,6 +111,8 @@ export function App() {
                     selectedId={selectedTab}
                     onSelect={setSelectedTab}
                     tabCount={barSettings.tabbarCount}
+                    tabBadges={barSettings.tabbarBadges}
+                    customBadge={barSettings.customBadge}
                   />
                 </DuoFrame>
                 <DuoRegionMask

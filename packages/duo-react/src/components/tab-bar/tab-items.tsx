@@ -1,4 +1,5 @@
 import React from 'react'
+import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
 import type { GlassGeometry, TabLayout } from './layout'
 import type { TabRendererProps } from './types'
 
@@ -23,7 +24,7 @@ export function TabItems({ items, selectedId, dark, layout, geometry, onActivate
             color: item.selectedColor ?? defaultAccent,
           }}
           aria-current={item.id === selectedId ? 'page' : undefined}
-          aria-label={item.label}
+          aria-label={item.badge ? `${item.label}, ${item.badge}` : item.label}
           title={item.label}
           onClick={(event) => onActivate(item.id, event)}
           onKeyDown={(event) => {
@@ -66,8 +67,43 @@ export function TabItems({ items, selectedId, dark, layout, geometry, onActivate
           <span className="duo-react-tab-bar-label" style={{ opacity: geometry.labels }}>
             {item.label}
           </span>
+          {item.badge !== undefined && (
+            <TabBadge text={item.badge} layout={layout} geometry={geometry} />
+          )}
         </button>
       ))}
     </>
+  )
+}
+
+function TabBadge({
+  text,
+  layout,
+  geometry,
+}: {
+  text: string
+  layout: TabLayout
+  geometry: GlassGeometry
+}) {
+  const ref = React.useRef<HTMLSpanElement>(null)
+  const [width, setWidth] = React.useState(18)
+  useBrowserLayoutEffect(() => {
+    const element = ref.current!
+    const measure = () => setWidth(Number.parseFloat(getComputedStyle(element).width) || 18)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [text])
+  return (
+    <span
+      ref={ref}
+      className="duo-react-tab-bar-badge"
+      style={{ left: layout.badgeOffset(geometry, width), top: layout.badgeTop(geometry) }}
+      title={text}
+      aria-hidden="true"
+    >
+      {text.split(/\r\n?|\n/, 1)[0]}
+    </span>
   )
 }

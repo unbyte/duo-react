@@ -66,7 +66,8 @@ test('mixed SVG and PNG icons retain all labels in either artwork atlas', async 
   for (const vertical of [false, true]) {
     const { element, png, canvas, context } = fixture()
     const result = await makeArtwork(element, new TabLayout(vertical, 2), items)
-    expect(result).toBe(canvas)
+    expect(result.icons).toBe(canvas)
+    expect(result.badges).toBeUndefined()
     expect(png.decode).toHaveBeenCalledOnce()
     expect(png.src).toBe('/heart.png')
     expect(context.drawImage).toHaveBeenCalledTimes(4)

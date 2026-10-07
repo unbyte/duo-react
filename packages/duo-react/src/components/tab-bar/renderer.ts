@@ -1,11 +1,13 @@
 import type { BackdropRegion } from '@private/browser'
-import type { GlassGeometry } from './layout'
+import type { TabArtwork } from './artwork'
+import type { GlassGeometry, TabLayout } from './layout'
 import { canvasPadding, glassShaders, vertex } from './shaders'
 
 interface GlassFrame {
   readonly backdrop?: BackdropRegion
   readonly origin: { readonly x: number; readonly y: number }
   readonly geometry: GlassGeometry
+  readonly layout: TabLayout
   readonly count: number
   readonly x: number
   readonly growth: number
@@ -39,7 +41,7 @@ export class GlassRenderer {
   private readonly neutralCanvas = document.createElement('canvas')
   private uploadedNeutral = false
   private uploadedBackdrop?: BackdropRegion
-  private uploadedArtwork?: HTMLCanvasElement
+  private uploadedArtwork?: TabArtwork
   private readonly colorCanvas = document.createElement('canvas')
   private readonly colorContext = this.colorCanvas.getContext('2d')!
   private accents: readonly string[] = []
@@ -62,7 +64,7 @@ export class GlassRenderer {
       const vertexShader = this.compileShader(gl.VERTEX_SHADER, vertex)
       this.program = this.linkProgram(vertexShader, fragment)
       this.outerProgram = this.linkProgram(vertexShader, outerFragment)
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 7; i++) {
         const texture = gl.createTexture()!
         this.textures.push(texture)
         gl.activeTexture(gl.TEXTURE0 + i)
@@ -70,9 +72,9 @@ export class GlassRenderer {
         gl.texParameteri(
           gl.TEXTURE_2D,
           gl.TEXTURE_MIN_FILTER,
-          i >= 3 ? gl.LINEAR : gl.LINEAR_MIPMAP_LINEAR,
+          i === 6 ? gl.NEAREST : i === 3 || i === 4 ? gl.LINEAR : gl.LINEAR_MIPMAP_LINEAR,
         )
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, i === 6 ? gl.NEAREST : gl.LINEAR)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
       }
@@ -83,6 +85,8 @@ export class GlassRenderer {
       gl.uniform1i(this.uniforms.uArtwork, 1)
       gl.uniform1i(this.uniforms.uBlurredBackdrop, 2)
       gl.uniform1i(this.uniforms.uAccents, 4)
+      gl.uniform1i(this.uniforms.uBadges, 5)
+      gl.uniform1i(this.uniforms.uBadgeBounds, 6)
       gl.useProgram(this.outerProgram)
       gl.uniform1i(this.outerUniforms.uSurface, 3)
     } catch (error) {
@@ -153,7 +157,7 @@ export class GlassRenderer {
     gl.generateMipmap(gl.TEXTURE_2D)
   }
 
-  draw(props: GlassFrame, artwork: HTMLCanvasElement) {
+  draw(props: GlassFrame, artwork: TabArtwork) {
     const {
       gl,
       canvas,
@@ -205,9 +209,32 @@ export class GlassRenderer {
     }
     if (this.uploadedArtwork !== artwork) {
       // Filter transparent artwork in premultiplied form to avoid dark fringes.
-      this.upload(1, artwork, true)
+      this.upload(1, artwork.icons, true)
+      this.upload(5, artwork.badges?.canvas ?? this.neutralCanvas, true)
       this.uploadedArtwork = artwork
     }
+    const sizes = artwork.badges?.sizes ?? []
+    const bounds = new Float32Array(Math.max(1, sizes.length) * 4)
+    sizes.forEach(({ width, height }, index) => {
+      const rect = props.layout.badgeRect(geometry, index, width, height)
+      bounds.set([rect.x, rect.y, width, height], index * 4)
+    })
+    gl.activeTexture(gl.TEXTURE6)
+    gl.bindTexture(gl.TEXTURE_2D, textures[6])
+    // Bounds are numeric data; their height must not premultiply the other coordinates.
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false)
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA32F,
+      Math.max(1, sizes.length),
+      1,
+      0,
+      gl.RGBA,
+      gl.FLOAT,
+      bounds,
+    )
+    gl.uniform1i(uniforms.uBadgeCount, sizes.length)
     gl.uniform2f(uniforms.uCanvasSize, canvasWidth, canvasHeight)
     gl.uniform2f(uniforms.uSceneSize, props.backdrop?.width ?? 1, props.backdrop?.height ?? 1)
     gl.uniform2f(

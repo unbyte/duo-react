@@ -9,6 +9,7 @@ import {
 } from 'duo-react'
 import { Home, Library, Search, Settings } from 'lucide-react'
 import * as React from 'react'
+import { tabBadgeOptions } from '../settings/bar-settings'
 import { DraggableBlock } from './draggable-block'
 
 export const tabItems = [
@@ -51,6 +52,8 @@ export function ExampleBars({
   selectedId,
   onSelect,
   tabCount,
+  tabBadges,
+  customBadge,
 }: {
   request: BarsLayoutRequest
   showBounds: boolean
@@ -58,8 +61,24 @@ export function ExampleBars({
   selectedId: string
   onSelect: (id: string) => void
   tabCount: number
+  tabBadges: readonly string[]
+  customBadge: string
 }) {
-  const items = React.useMemo(() => tabItems.slice(0, tabCount), [tabCount])
+  const items = React.useMemo(
+    () =>
+      tabItems.slice(0, tabCount).map((item, index) => {
+        const option = tabBadgeOptions[index]
+        return {
+          ...item,
+          badge: tabBadges.includes(option.value)
+            ? option.value === 'custom'
+              ? customBadge
+              : option.badge
+            : undefined,
+        }
+      }),
+    [tabCount, tabBadges, customBadge],
+  )
   const bars = useBars(request)
   const colorMode = useDuoState((state) => state.system.colorMode)
   const [counts, setCounts] = React.useState<Readonly<Record<string, number>>>({})
