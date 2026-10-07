@@ -1,7 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config/schema.json",
-  "changelog": "@changesets/cli/changelog",
-  "commit": ["./message.js", {}],
+  "changelog": ["@changesets/changelog-github", { "repo": "unbyte/duo-react" }],
   "fixed": [],
   "access": "public",
   "baseBranch": "main",

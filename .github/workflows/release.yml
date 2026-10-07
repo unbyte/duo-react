@@ -69,6 +69,9 @@ jobs:
       - name: Version packages
         id: version
         uses: changesets/action/version@v2
+        with:
+          commit-message: "chore: release packages"
+          pr-title: "chore: release packages"
 
   pack:
     if: needs.select-mode.outputs.mode == 'publish'
