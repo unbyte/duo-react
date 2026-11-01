@@ -141,6 +141,11 @@ while changing the preview. React context and safe-area CSS properties do not
 cross into the iframe. If the embedded app needs screen information, send it
 through your own `postMessage` bridge with source and origin checks.
 
+For a cross-origin iframe, set `renderer="dom"` on `DuoFrame`. Native
+HTML-in-Canvas cannot display its cross-origin pixels. The DOM backend keeps
+the embedded page visible and interactive, although glass effects cannot
+reliably sample it.
+
 `useDuoEvent("windowchange", handler)` lets you react after screen layout or
 visibility changes. Its event includes `display`, `previous`, and `current`
 screen information. Zoom changes do not trigger this event.
@@ -199,8 +204,51 @@ the outer camera cutout remains visible.
 
 ## Rendering modes
 
-Use basic rendering when capturing app content for automatic contrast and glass
-effects is too expensive:
+`DuoFrame` defaults to `renderer="auto"`. When the browser exposes
+HTML-in-Canvas with native geometry updates, the frame renders the live app
+subtree into a content canvas. Tab bars, toolbars, and system controls remain
+DOM overlays outside that canvas. Native paint events update their backdrops;
+glass regions avoid CPU pixel readback and image serialization. Automatic
+indicator contrast reads only its requested regions.
+
+Chrome 157 supports this API by default. Chrome 156.0.8078.80 also supports it
+with `chrome://flags/#canvas-draw-element` enabled. Selection checks API
+capabilities rather than browser versions. Browsers without these capabilities
+use ordinary DOM content and the DOM capture backend.
+
+The `renderer` prop accepts `"auto"`, `"canvas"`, or `"dom"` (`DuoRenderer`).
+`"canvas"` requests native rendering, with the same DOM fallback when unsupported
+or when native rendering fails. `supportsCanvasRenderer()` reports browser API
+availability so a renderer picker can disable unavailable options. The playground
+places this picker above Mode in the inspector's Render tab; changing either
+setting restarts frame sampling.
+
+Use `renderer="dom"` for cross-origin embeds, content that needs
+browser-managed visuals absent from native snapshots, or browser rendering
+problems:
+
+```tsx
+<DuoFrame renderer="dom">
+  <App />
+</DuoFrame>
+```
+
+Native snapshots require pixel-readable resources, so use same-origin or
+appropriately CORS-enabled images. Popups portaled outside the content subtree
+are outside its snapshot. Native video controls, captions, and some browser
+editing visuals are excluded by the API. Ordinary form controls, keyboard
+input, and pointer interaction remain attached to the real DOM elements.
+
+Choose the content backend before mounting the app. Changing
+`renderer` between active backends remounts the app subtree. A native
+rendering failure switches to the DOM backend and also remounts that subtree.
+The first render uses DOM content for consistent server rendering and hydration
+across supported React versions. Mounting can upgrade it to the native surface
+and remount the app once. Rotation, zoom, and display changes retain the selected
+backend and the mounted app.
+
+Control appearance is configured separately. Use basic rendering when backdrop
+capture for automatic contrast and glass effects is too expensive:
 
 ```tsx
 <DuoProvider rendering={{ system: "basic", tabBar: "basic" }}>
@@ -244,9 +292,10 @@ Override the provider's tab bar mode on an individual control:
 ```
 
 The control prop takes precedence over the provider setting. Basic controls
-make no DOM capture requests. Set both system and tab bar rendering to basic
-to eliminate their sampling; an enhanced control still requests captures.
-Background blur is handled by the browser.
+make no backdrop requests. Set both system and tab bar rendering to basic
+to eliminate their sampling; an enhanced control still requests a backdrop.
+Use `renderer="dom"` as well to keep app content out of canvas entirely.
+Background blur for basic controls is handled by the browser.
 
 ## App navigation and actions
 

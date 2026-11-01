@@ -1,8 +1,13 @@
-export type { ResolvedIndicatorStyle } from './backdrop/contrast'
+export type { ResolvedIndicatorStyle } from './renderers/backdrop/contrast'
+export { BackdropStore } from './renderers/backdrop/store'
 export type {
   BackdropRegion,
   BackdropRequest,
-  BackdropScreen,
+  BackdropSnapshot,
+  BackdropSource,
   IndicatorSample,
-} from './backdrop/store'
-export { BackdropStore } from './backdrop/store'
+} from './renderers/backdrop/types'
+export { supportsCanvasRenderer } from './renderers/canvas/html-in-canvas'
+export { CanvasRenderer } from './renderers/canvas/renderer'
+export { DomRenderer } from './renderers/dom/renderer'
+export type { ContentRenderer, RendererScreen } from './renderers/types'

@@ -9,6 +9,7 @@ import {
 import { frameOutset } from '@private/profiles'
 import React from 'react'
 import { useDuoState, useDuoStore } from '../../context/hooks'
+import type { DuoRenderer } from '../../renderers/types'
 import { useBrowserLayoutEffect } from '../../shared/use-browser-layout-effect'
 import { DisplaySurface } from './display-surface'
 import { useRotation } from './use-rotation'
@@ -19,6 +20,7 @@ export interface DuoFrameProps extends React.HTMLAttributes<HTMLDivElement> {
   onZoomChange?: (zoom: DuoZoom) => void
   fitPadding?: DuoFitPadding
   showSystemUI?: boolean
+  renderer?: DuoRenderer
 }
 
 export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function DuoFrame(
@@ -28,6 +30,7 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
     onZoomChange,
     fitPadding = 24,
     showSystemUI = true,
+    renderer = 'auto',
     className,
     style,
     ...props
@@ -107,7 +110,12 @@ export const DuoFrame = React.forwardRef<HTMLDivElement, DuoFrameProps>(function
               : undefined,
         }}
       >
-        <DisplaySurface display={active.display} scale={scale} showSystemUI={showSystemUI}>
+        <DisplaySurface
+          display={active.display}
+          scale={scale}
+          showSystemUI={showSystemUI}
+          renderer={renderer}
+        >
           {children}
         </DisplaySurface>
       </div>

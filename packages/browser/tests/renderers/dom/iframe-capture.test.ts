@@ -1,6 +1,6 @@
 import { type CaptureContext, snapdom } from '@zumer/snapdom'
 import { beforeEach, expect, test, vi } from 'vitest'
-import { iframeCapture } from '../src/backdrop/iframe-capture'
+import { iframeCapture } from '../../../src/renderers/dom/iframe-capture'
 
 vi.mock('@zumer/snapdom', () => ({ snapdom: { toPng: vi.fn() } }))
 

@@ -34,6 +34,12 @@
   background: inherit;
   overflow: hidden;
 }
+.duo-react-content-canvas,
+.duo-react-content {
+  display: block;
+  position: relative;
+  background: inherit;
+}
 .duo-react-hardware {
   position: absolute;
   left: 50%;

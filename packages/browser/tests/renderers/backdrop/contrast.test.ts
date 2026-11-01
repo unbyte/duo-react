@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { chooseIndicatorStyle } from '../src/backdrop/contrast'
+import { chooseIndicatorStyle } from '../../../src/renderers/backdrop/contrast'
 
 const pixels = (...colors: number[][]) => new Uint8ClampedArray(colors.flat())
 

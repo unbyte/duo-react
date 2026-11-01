@@ -4,6 +4,7 @@ import {
   type DuoInsets,
   DuoProvider,
   DuoRegionMask,
+  type DuoRenderer,
   type DuoRenderingMode,
 } from 'duo-react'
 import * as React from 'react'
@@ -16,6 +17,7 @@ import { type BarSettings, barRequest, initialBarSettings } from './settings/bar
 import { SettingsPanel } from './settings/settings-panel'
 
 export function App() {
+  const [renderer, setRenderer] = React.useState<DuoRenderer>('auto')
   const [rendering, setRendering] = React.useState<DuoRenderingMode>('enhanced')
   const [selectedTab, setSelectedTab] = React.useState('home')
   const [backgrounds, setBackgrounds] = React.useState({ light: '#ffffff', dark: '#111111' })
@@ -95,6 +97,7 @@ export function App() {
               <PreviewFrame backgrounds={backgrounds}>
                 <DuoFrame
                   ref={frame}
+                  renderer={renderer}
                   fitPadding={fitPadding}
                   style={{ width: '100%', height: '100%' }}
                   aria-label="Duo layout preview"
@@ -128,6 +131,8 @@ export function App() {
           </main>
           <StateInspector
             open={inspectorOpen}
+            renderer={renderer}
+            onRendererChange={setRenderer}
             rendering={rendering}
             onRenderingChange={setRendering}
             request={request}

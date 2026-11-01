@@ -121,9 +121,12 @@ provides a 2D device frame, layout geometry, and system UI visuals. Partially op
 mode exposes fold regions for layout testing. Your app arranges its content around
 reserved regions and leaves room for overlaid bars.
 
-Glass effects and automatic indicator contrast sample the app's content.
-Cross-origin iframes and external resources can limit those effects; explicit
-indicator colors are available in the
+On browsers with HTML-in-Canvas support, the frame renders app content into a
+native canvas and supplies its backdrops to glass controls. Controls remain DOM
+overlays. Other browsers use DOM content and DOM capture. Set
+`renderer="dom"` on `DuoFrame` for cross-origin iframes or content that
+requires ordinary DOM presentation. Cross-origin resources can limit backdrop
+effects; explicit indicator colors are available in the
 [system appearance guide](docs/usage.md#system-appearance).
 
 ## License

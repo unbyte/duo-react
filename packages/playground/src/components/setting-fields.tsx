@@ -20,7 +20,7 @@ interface SettingProps {
 interface SelectSettingProps<Multiple extends boolean = false> extends SettingProps {
   multiple?: Multiple
   value: Multiple extends true ? string[] : string
-  options: readonly { value: string; label: React.ReactNode; text?: string }[]
+  options: readonly { value: string; label: React.ReactNode; text?: string; disabled?: boolean }[]
   onValueChange: (value: Multiple extends true ? string[] : string) => void
   valueLabel?: React.ReactNode
 }
@@ -121,6 +121,7 @@ export function SelectSetting<Multiple extends boolean = false>(
               className="min-h-[26px] text-xs/5 data-highlighted:bg-muted"
               key={option.value}
               value={option.value}
+              disabled={option.disabled}
               aria-label={option.text}
               label={
                 option.text ?? (typeof option.label === 'string' ? option.label : option.value)

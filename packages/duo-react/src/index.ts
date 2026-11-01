@@ -1,5 +1,7 @@
 import './style.css'
 
+export { supportsCanvasRenderer } from '@private/browser'
+
 export type {
   BarAxis,
   BarPlacement,
@@ -60,5 +62,6 @@ export type { DuoProviderProps } from './context/provider'
 export { DuoProvider } from './context/provider'
 export type { DuoRenderingMode, DuoRenderingOptions } from './context/rendering-context'
 export { useDuoRegions } from './inspection/use-duo-regions'
+export type { DuoRenderer } from './renderers/types'
 export { safeAreaStyle } from './screen/safe-area'
 export { useDuoScreen } from './screen/screen-context'
