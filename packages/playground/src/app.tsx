@@ -9,7 +9,8 @@ import {
 } from 'duo-react'
 import * as React from 'react'
 import { StateInspector } from './inspector/state-inspector'
-import { ExampleApp, ExampleBars, tabItems } from './preview/example-content'
+import { type DemoPreset, demoPresets } from './preview/demo-presets'
+import { ExampleBars, tabItems } from './preview/example-content'
 import { PreviewCanvas } from './preview/preview-canvas'
 import { PreviewControls } from './preview/preview-controls'
 import { PreviewFrame } from './preview/preview-frame'
@@ -17,6 +18,8 @@ import { type BarSettings, barRequest, initialBarSettings } from './settings/bar
 import { SettingsPanel } from './settings/settings-panel'
 
 export function App() {
+  const [demo, setDemo] = React.useState<DemoPreset>('minimal')
+  const DemoApp = demoPresets[demo]
   const [renderer, setRenderer] = React.useState<DuoRenderer>('auto')
   const [rendering, setRendering] = React.useState<DuoRenderingMode>('enhanced')
   const [selectedTab, setSelectedTab] = React.useState('home')
@@ -73,6 +76,8 @@ export function App() {
       >
         <div className="playground-workspace relative h-full">
           <SettingsPanel
+            demo={demo}
+            onDemoChange={setDemo}
             backgrounds={backgrounds}
             onBackgroundChange={(mode, color) =>
               setBackgrounds((current) => ({ ...current, [mode]: color }))
@@ -102,7 +107,7 @@ export function App() {
                   style={{ width: '100%', height: '100%' }}
                   aria-label="Duo layout preview"
                 >
-                  <ExampleApp
+                  <DemoApp
                     showBlock={showBlock}
                     blockColor={blockColor}
                     selectedTab={selectedTab}

@@ -1,9 +1,12 @@
 import { IconColorSwatch } from '@tabler/icons-react'
 import { type DuoColorMode, type DuoIndicatorStyle, useDuoActions, useDuoState } from 'duo-react'
-import { Contrast, LockKeyhole, PaintBucket, PanelTop, Square } from 'lucide-react'
+import { Contrast, Layers, LockKeyhole, PaintBucket, PanelTop, Square } from 'lucide-react'
 import { ColorSetting, SelectSetting, ToggleSetting } from '../components/setting-fields'
+import type { DemoPreset } from '../preview/demo-presets'
 
 export interface AppSettingsProps {
+  demo: DemoPreset
+  onDemoChange: (demo: DemoPreset) => void
   backgrounds: Record<DuoColorMode, string>
   onBackgroundChange: (mode: DuoColorMode, color: string) => void
   outerPortraitLocked: boolean
@@ -78,6 +81,8 @@ function BackgroundPicker({
 }
 
 export function AppSettings({
+  demo,
+  onDemoChange,
   backgrounds,
   onBackgroundChange,
   outerPortraitLocked,
@@ -89,7 +94,25 @@ export function AppSettings({
 }: AppSettingsProps) {
   return (
     <div className="playground-controls grid gap-1" role="group" aria-label="App settings">
-      <BackgroundPicker backgrounds={backgrounds} onChange={onBackgroundChange} />
+      <div className="mb-2 border-b border-border pb-2">
+        <SelectSetting
+          icon={Layers}
+          label="Demo"
+          ariaLabel="Demo preset"
+          hint="Choose a minimal layout or an interactive city guide."
+          value={demo}
+          options={[
+            { value: 'minimal', label: 'Minimal' },
+            { value: 'rich', label: 'Rich' },
+          ]}
+          onValueChange={(value) => {
+            if (value === 'minimal' || value === 'rich') onDemoChange(value)
+          }}
+        />
+      </div>
+      {demo === 'minimal' && (
+        <BackgroundPicker backgrounds={backgrounds} onChange={onBackgroundChange} />
+      )}
       <IndicatorStylePicker />
       <StatusBarPicker />
       <ToggleSetting
@@ -99,19 +122,23 @@ export function AppSettings({
         checked={outerPortraitLocked}
         onCheckedChange={onOuterPortraitLockedChange}
       />
-      <ToggleSetting
-        icon={Square}
-        label="Block"
-        title="Show draggable color block"
-        checked={showBlock}
-        onCheckedChange={onShowBlockChange}
-      />
-      <ColorSetting
-        icon={IconColorSwatch}
-        label="Block color"
-        value={blockColor}
-        onValueChange={onBlockColorChange}
-      />
+      {demo === 'minimal' && (
+        <>
+          <ToggleSetting
+            icon={Square}
+            label="Block"
+            title="Show draggable color block"
+            checked={showBlock}
+            onCheckedChange={onShowBlockChange}
+          />
+          <ColorSetting
+            icon={IconColorSwatch}
+            label="Block color"
+            value={blockColor}
+            onValueChange={onBlockColorChange}
+          />
+        </>
+      )}
     </div>
   )
 }
