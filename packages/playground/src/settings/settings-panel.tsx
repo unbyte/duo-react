@@ -32,6 +32,13 @@ export function SettingsPanel({
           <h1 className="playground-title m-0 flex items-center gap-2 whitespace-nowrap text-[13px] font-semibold">
             Duo React
           </h1>
+          <a
+            href="/benchmark.html"
+            className="text-[11px] text-muted-foreground hover:text-foreground"
+            aria-label="Open tab bar benchmark"
+          >
+            Lab ↗
+          </a>
           <TooltipProvider delay={200}>
             <div className="flex items-center gap-2.5">
               <Tooltip>

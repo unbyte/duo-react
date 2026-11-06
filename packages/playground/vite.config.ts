@@ -13,6 +13,9 @@ export default defineConfig({
   },
   server: { host: '127.0.0.1', port: 5119, strictPort: true },
   build: {
-    rolldownOptions: { output: { comments: { legal: true } } },
+    rolldownOptions: {
+      input: { playground: 'index.html', benchmark: 'benchmark.html' },
+      output: { comments: { legal: true } },
+    },
   },
 })

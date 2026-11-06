@@ -19,6 +19,8 @@ inner and outer displays, rotate the frame, and explore full-screen or split lay
   display, rotation, layout, and zoom.
 
 The playground lets you try these settings and inspect the resulting geometry.
+The separate [Tab Bar Lab](packages/playground/README.md) compares DOM capture,
+HTML-in-canvas, and basic CSS rendering against a repeatable scrolling workload.
 The `duo-react` [package](packages/duo-react/README.md) provides the components and
 hooks for building previews into your own app.
 
