@@ -25,9 +25,10 @@ export function DuoProvider({
   useBrowserLayoutEffect(() => {
     store.configureOuterPortraitLock(outerPortraitLocked)
   }, [store, outerPortraitLocked])
+  const renderer = rendering?.renderer ?? 'auto'
   const system = rendering?.system ?? 'enhanced'
   const tabBar = rendering?.tabBar ?? 'enhanced'
-  const modes = React.useMemo(() => ({ system, tabBar }), [system, tabBar])
+  const modes = React.useMemo(() => ({ renderer, system, tabBar }), [renderer, system, tabBar])
   return (
     <StoreContext.Provider value={store}>
       <RenderingContext.Provider value={modes}>{children}</RenderingContext.Provider>

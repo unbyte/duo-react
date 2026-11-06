@@ -14,6 +14,7 @@ import {
   type BarsLayoutRequest,
   type DuoRect,
   type DuoRegion,
+  type DuoRenderer,
   type DuoRenderingMode,
   type DuoScreenInfo,
   useDuoRegions,
@@ -208,6 +209,8 @@ function ScreenInformation() {
 
 export function StateInspector({
   open,
+  renderer,
+  onRendererChange,
   rendering,
   onRenderingChange,
   request,
@@ -221,6 +224,8 @@ export function StateInspector({
   onClose,
 }: {
   open: boolean
+  renderer: DuoRenderer
+  onRendererChange: (renderer: DuoRenderer) => void
   rendering: DuoRenderingMode
   onRenderingChange: (mode: DuoRenderingMode) => void
   request: BarsLayoutRequest
@@ -391,6 +396,8 @@ export function StateInspector({
               content: (
                 <RenderInspector
                   active={open && tab === 'render'}
+                  renderer={renderer}
+                  onRendererChange={onRendererChange}
                   mode={rendering}
                   onModeChange={onRenderingChange}
                 />

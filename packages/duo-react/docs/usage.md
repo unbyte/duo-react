@@ -197,6 +197,52 @@ layout, or `undefined` to restore the default. This leaves safe-area spacing
 unchanged. `showSystemUI={false}` on the frame also hides the home indicator;
 the outer camera cutout remains visible.
 
+## Display renderer
+
+`rendering.renderer` defaults to `"auto"`. On browsers exposing the experimental
+HTML-in-Canvas API, the display interior is painted into a native canvas. App
+content, accessory chrome, and system UI remain live DOM with native hit testing;
+the physical frame stays outside the canvas. Other browsers use the existing DOM
+renderer. Initialization errors, missing initial paint events, and context loss
+also restore DOM rendering without remounting the app.
+
+```tsx
+<DuoProvider rendering={{ renderer: "auto" }}>
+  <DuoFrame><App /></DuoFrame>
+</DuoProvider>
+```
+
+Use `"dom"` to force the existing renderer. `"html-in-canvas"` explicitly requests
+the experimental renderer with the same capability checks and fallback as
+`"auto"`. `DuoRenderer` is exported for typed configuration. The playground's
+**Inspector → Render → Renderer** control lets you switch between them live.
+The display's `data-duo-react-renderer` attribute reports the active renderer.
+
+The native renderer copies the app layer before painting chrome and supplies
+those pixels to adaptive indicators and glass tabs. It does not import or call
+SnapDOM, install DOM capture observers, or poll for screenshots. SnapDOM remains
+available for the DOM fallback. Pixel readback and blur still have a cost; this
+is not a direct WebGL texture pipeline or a zero-copy renderer.
+
+HTML-in-Canvas is experimental. In Chromium builds that expose it, enable
+`chrome://flags/#enable-experimental-web-platform-features` and restart. Detection
+requires `content="drawable"`, `drawElementImage`, paint events, geometry updates,
+and state-preserving DOM moves; older `layoutsubtree`-only implementations fall
+back to DOM. Server rendering always emits ordinary DOM before client detection.
+
+Native snapshots exclude protected content, including cross-origin iframe pixels
+and visited-link information. Use `renderer: "dom"` for previews that need those
+embedded pages to remain visible. CSS backdrop filters cannot sample across
+separate drawable layers; use DOM rendering for the basic CSS contrast/blur modes
+or app effects that depend on content outside their drawable subtree. Enhanced
+system UI and glass tabs use the separately sampled app layer instead.
+
+Library-owned glass and material canvases are composited directly from their
+bitmaps beneath the HTML chrome layer, keeping DOM icons and badges on top.
+WebGL drawing buffers are retained on capable browsers so their pixels are available after presentation. Chromium can
+omit composited canvases inside native HTML snapshots; apps with their own
+canvas effects should use DOM rendering if those surfaces are missing.
+
 ## Rendering modes
 
 Use basic rendering when capturing app content for automatic contrast and glass
@@ -210,8 +256,8 @@ effects is too expensive:
 </DuoProvider>
 ```
 
-Each setting defaults to `"enhanced"`. The `rendering` prop updates live without
-resetting app or simulated device state. `DuoRenderingMode` and
+The `system` and `tabBar` settings each default to `"enhanced"`. The `rendering`
+prop updates live without resetting app or simulated device state. `DuoRenderingMode` and
 `DuoRenderingOptions` are exported for typed configuration.
 
 Basic system rendering uses an untinted CSS blur for the status material.

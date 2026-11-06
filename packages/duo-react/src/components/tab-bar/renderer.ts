@@ -1,4 +1,4 @@
-import type { BackdropRegion } from '@private/browser'
+import { type BackdropRegion, supportsHtmlInCanvas } from '@private/browser'
 import type { TabArtwork } from './artwork'
 import type { GlassGeometry, TabLayout } from './layout'
 import { canvasPadding, glassShaders, vertex } from './shaders'
@@ -55,6 +55,9 @@ export class GlassRenderer {
       alpha: true,
       premultipliedAlpha: false,
       antialias: false,
+      // The native display compositor reads this canvas after WebGL presentation.
+      // Retain pixels on capable browsers so live renderer switches work too.
+      preserveDrawingBuffer: supportsHtmlInCanvas(),
     })
     if (!gl) throw new Error('WebGL 2 is unavailable')
     this.gl = gl

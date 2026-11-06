@@ -6,3 +6,4 @@ export type {
   IndicatorSample,
 } from './backdrop/store'
 export { BackdropStore } from './backdrop/store'
+export { HtmlInCanvasRenderer, supportsHtmlInCanvas } from './html-in-canvas'

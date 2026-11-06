@@ -1,4 +1,4 @@
-import type { DuoRenderingMode } from 'duo-react'
+import type { DuoRenderer, DuoRenderingMode } from 'duo-react'
 import * as React from 'react'
 import { SelectSetting, ToggleSetting } from '../components/setting-fields'
 import { type FrameMetrics, sampleFrames } from './frame-sampler'
@@ -14,23 +14,29 @@ function milliseconds(value?: number) {
 
 export function RenderInspector({
   active,
+  renderer,
+  onRendererChange,
   mode,
   onModeChange,
 }: {
   active: boolean
+  renderer: DuoRenderer
+  onRendererChange: (renderer: DuoRenderer) => void
   mode: DuoRenderingMode
   onModeChange: (mode: DuoRenderingMode) => void
 }) {
   const [sampling, setSampling] = React.useState(false)
   const [snapshot, setSnapshot] = React.useState<{
+    renderer: DuoRenderer
     mode: DuoRenderingMode
     metrics: FrameMetrics
   }>()
   React.useEffect(() => {
     if (!active || !sampling) return
-    return sampleFrames((metrics) => setSnapshot({ mode, metrics }))
-  }, [active, sampling, mode])
-  const metrics = snapshot?.mode === mode ? snapshot.metrics : undefined
+    return sampleFrames((metrics) => setSnapshot({ renderer, mode, metrics }))
+  }, [active, sampling, renderer, mode])
+  const metrics =
+    snapshot?.mode === mode && snapshot.renderer === renderer ? snapshot.metrics : undefined
   const rows = [
     ['Frame rate', metrics?.fps === undefined ? '—' : `${metrics.fps.toFixed(1)} fps`],
     ['Latest interval', milliseconds(metrics?.latestInterval)],
@@ -42,6 +48,21 @@ export function RenderInspector({
   return (
     <div className="grid gap-4">
       <section aria-label="Rendering configuration">
+        <SelectSetting
+          label="Renderer"
+          hint="Auto uses native HTML-in-canvas when available and falls back to DOM. Choose DOM to compare with the existing renderer."
+          ariaLabel="Display renderer"
+          value={renderer}
+          options={[
+            { value: 'auto', label: 'Auto' },
+            { value: 'html-in-canvas', label: 'HTML-in-canvas' },
+            { value: 'dom', label: 'DOM' },
+          ]}
+          onValueChange={(value) => {
+            if (value === 'auto' || value === 'dom' || value === 'html-in-canvas')
+              onRendererChange(value)
+          }}
+        />
         <SelectSetting
           label="Mode"
           hint="Applies to system UI and tab bars. Enhanced uses sampled materials and liquid glass. Basic uses CSS contrast, blur, and simple tab selection."

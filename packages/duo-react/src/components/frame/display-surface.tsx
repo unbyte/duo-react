@@ -1,9 +1,10 @@
-import { BackdropStore } from '@private/browser'
+import { BackdropStore, HtmlInCanvasRenderer, supportsHtmlInCanvas } from '@private/browser'
 import { orientationRotation } from '@private/core'
 import { type DuoDisplay, frameBezel } from '@private/profiles'
 import React from 'react'
 import { BackdropContext } from '../../backdrop/backdrop-context'
 import { useDuoState } from '../../context/hooks'
+import { RenderingContext } from '../../context/rendering-context'
 import { AccessoryContext } from '../../screen/accessory-context'
 import { safeAreaStyle } from '../../screen/safe-area'
 import { ScreenContext } from '../../screen/screen-context'
@@ -26,16 +27,39 @@ export function DisplaySurface({
   const colorMode = useDuoState((state) => state.system.colorMode)
   const [backdrop] = React.useState(() => new BackdropStore())
   const source = React.useRef<HTMLDivElement>(null)
+  const chrome = React.useRef<HTMLDivElement>(null)
+  const { renderer } = React.useContext(RenderingContext)
   useBrowserLayoutEffect(() => {
     backdrop.updateScreen({ size: screen.size, visible: screen.visible })
   }, [backdrop, screen, colorMode])
-  React.useEffect(() => {
-    backdrop.connect(
-      source.current!,
-      '.duo-react-accessory-window, .duo-react-status-material, .duo-react-system',
-    )
-    return () => backdrop.disconnect()
-  }, [backdrop])
+  useBrowserLayoutEffect(() => {
+    const screen = source.current!
+    const display = screen.parentElement!
+    const fallback = () => {
+      display.dataset.duoReactRenderer = 'dom'
+      backdrop.connect(screen, '.duo-react-chrome, .duo-react-system')
+    }
+    let native: HtmlInCanvasRenderer | undefined
+    if (renderer !== 'dom' && supportsHtmlInCanvas()) {
+      try {
+        native = new HtmlInCanvasRenderer(
+          screen,
+          chrome.current!,
+          display.querySelector<HTMLElement>('.duo-react-system')!,
+          backdrop,
+          fallback,
+        )
+        display.dataset.duoReactRenderer = 'html-in-canvas'
+      } catch {
+        fallback()
+      }
+    } else fallback()
+    return () => {
+      native?.dispose()
+      backdrop.disconnect()
+      delete display.dataset.duoReactRenderer
+    }
+  }, [backdrop, renderer])
   const [barHost, setBarHost] = React.useState<HTMLDivElement>()
   const attachBarHost = React.useCallback(
     (node: HTMLDivElement | null) => setBarHost(node ?? undefined),
@@ -86,20 +110,22 @@ export function DisplaySurface({
               </AccessoryContext.Provider>
             </ScreenContext.Provider>
           </div>
-          <div
-            className="duo-react-accessory-window"
-            data-duo-react-accessory-host=""
-            ref={attachBarHost}
-            style={{
-              left: bounds.x,
-              top: bounds.y,
-              width: bounds.width,
-              height: bounds.height,
-              borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(' '),
-              ...safeAreaStyle(screen.safeArea),
-            }}
-          />
-          {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
+          <div className="duo-react-chrome" ref={chrome}>
+            <div
+              className="duo-react-accessory-window"
+              data-duo-react-accessory-host=""
+              ref={attachBarHost}
+              style={{
+                left: bounds.x,
+                top: bounds.y,
+                width: bounds.width,
+                height: bounds.height,
+                borderRadius: screen.windowCornerRadii.map((radius) => `${radius}px`).join(' '),
+                ...safeAreaStyle(screen.safeArea),
+              }}
+            />
+            {showSystemUI && screen.statusBarVisible && <SystemMaterial screen={screen} />}
+          </div>
         </div>
         <SystemUI screen={screen} showIndicators={showSystemUI} scale={scale} />
       </div>

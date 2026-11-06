@@ -74,6 +74,11 @@ Controls are optional and can be reordered. Supply your own button styling and
 control layout. `DuoSafeArea` adds padding around the system's safe-area insets;
 apply that padding once.
 
+The display automatically uses experimental HTML-in-Canvas where supported,
+with DOM rendering as its fallback. Set `rendering={{ renderer: "dom" }}` on the
+provider to force DOM rendering. See [display renderers](docs/usage.md#display-renderer)
+for browser requirements and limitations.
+
 ## Choose your starting layout
 
 Use provider defaults for the initial display, orientation, zoom, and system

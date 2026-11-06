@@ -35,6 +35,8 @@ export class BackdropStore {
   private snapshot = initial
   private readonly requests = new Map<symbol, BackdropRequest>()
   private readonly listeners = new Set<() => void>()
+  private nativeCanvas?: HTMLCanvasElement
+  private nativeReady = false
   private source?: HTMLElement
   private excludedSelector?: string
   private screen?: BackdropScreen
@@ -89,6 +91,18 @@ export class BackdropStore {
     this.invalidate()
   }
 
+  connectCanvas(canvas: HTMLCanvasElement) {
+    this.nativeCanvas = canvas
+    this.nativeReady = false
+    this.generation++
+    document.addEventListener('visibilitychange', this.schedule)
+  }
+
+  canvasPainted() {
+    this.nativeReady = true
+    this.schedule()
+  }
+
   connect(source: HTMLElement, excludedSelector?: string) {
     this.source = source
     this.excludedSelector = excludedSelector
@@ -134,6 +148,8 @@ export class BackdropStore {
     this.source?.removeEventListener('load', this.schedule, true)
     document.removeEventListener('visibilitychange', this.schedule)
     this.source = undefined
+    this.nativeCanvas = undefined
+    this.nativeReady = false
   }
 
   private invalidate() {
@@ -142,7 +158,7 @@ export class BackdropStore {
   }
 
   private schedule = () => {
-    if (!this.source || document.hidden || !this.screen?.visible) return
+    if ((!this.source && !this.nativeReady) || document.hidden || !this.screen?.visible) return
     this.dirty = true
     if (this.busy || this.timer !== undefined) return
     this.timer = setTimeout(
@@ -155,8 +171,14 @@ export class BackdropStore {
 
   private async capture() {
     this.timer = undefined
-    const { source, screen } = this
-    if (!source || !screen?.visible || document.hidden) return
+    const { source, screen, nativeCanvas } = this
+    if ((!source && !nativeCanvas) || !screen?.visible || document.hidden) return
+    // A resize can update requests before the native renderer's next paint.
+    if (
+      nativeCanvas &&
+      (nativeCanvas.width !== screen.size.width || nativeCanvas.height !== screen.size.height)
+    )
+      return
     this.busy = true
     this.dirty = false
     this.lastStart = performance.now()
@@ -169,16 +191,7 @@ export class BackdropStore {
       }
       let next = this.snapshot
       if (requests.size) {
-        const { snapdom } = await import('@zumer/snapdom')
-        const canvas = await snapdom.toCanvas(source, {
-          scale: 1,
-          dpr: 1,
-          exclude: this.excludedSelector,
-          excludeMode: 'remove',
-          fast: false,
-          invalidate: true,
-          plugins: [iframeCapture],
-        })
+        const canvas = nativeCanvas ?? (await this.captureDOM(source!))
         next = await this.prepare(canvas, requests)
       } else if (next.regions.size) {
         next = { ...next, regions: new Map() }
@@ -194,6 +207,19 @@ export class BackdropStore {
       this.busy = false
       if (this.dirty) this.schedule()
     }
+  }
+
+  private async captureDOM(source: HTMLElement) {
+    const { snapdom } = await import('@zumer/snapdom')
+    return snapdom.toCanvas(source, {
+      scale: 1,
+      dpr: 1,
+      exclude: this.excludedSelector,
+      excludeMode: 'remove',
+      fast: false,
+      invalidate: true,
+      plugins: [iframeCapture],
+    })
   }
 
   private async prepare(canvas: HTMLCanvasElement, requests: ReadonlyMap<symbol, BackdropRequest>) {

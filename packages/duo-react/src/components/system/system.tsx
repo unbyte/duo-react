@@ -58,6 +58,7 @@ function SampledSystemMaterial({ area }: { area: DuoRect }) {
   return (
     <canvas
       ref={canvas}
+      {...{ drawable: '' }}
       className="duo-react-status-material"
       style={boundsStyle(area)}
       tabIndex={-1}

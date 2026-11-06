@@ -337,6 +337,7 @@ export function GlassTabs({
         <canvas
           ref={canvas}
           className="duo-react-tab-bar-glass"
+          {...{ drawable: '' }}
           aria-hidden="true"
           style={{ width: canvasSize.width, height: canvasSize.height }}
         />

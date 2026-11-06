@@ -34,6 +34,25 @@
   background: inherit;
   overflow: hidden;
 }
+.duo-react-display-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: inherit;
+  overflow: hidden;
+}
+.duo-react-display-canvas > .duo-react-screen,
+.duo-react-display-canvas > .duo-react-system {
+  width: 100%;
+  height: 100%;
+}
+.duo-react-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 .duo-react-hardware {
   position: absolute;
   left: 50%;
